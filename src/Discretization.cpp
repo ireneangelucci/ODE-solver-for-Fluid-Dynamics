@@ -12,11 +12,27 @@ Discretization::Discretization(double dx, double dy, double gamma) {
     _gamma = gamma;
 }
 
-double Discretization::convection_u(const Matrix<double> &U, const Matrix<double> &V, int i, int j) {}
+double Discretization::convection_u(const Matrix<double> &U, const Matrix<double> &V, int i, int j) {
+    double u2x = ((U(i,j)+U(i+1,j))/2*(U(i,j)+U(i+1,j))/2 - (U(i,j)+U(i-1,j))/2*(U(i,j)+U(i-1,j))/2 )/_dx 
+                            + _gamma * (abs(U(i,j)+U(i+1,j))/2*(U(i,j)-U(i+1,j))/2 - abs(U(i-1,j)+U(i,j))/2*(U(i-1,j)-U(i,j))/2)/_dx;
+    double uvy = ((U(i,j)+U(i,j+1))/2 * (V(i,j)+V(i+1,j))/2 - (V(i,j-1)+V(i+1,j-1))/2 * (U(i,j-1)+U(i,j))/2)/_dy
+                        +_gamma*(abs(V(i,j)+V(i+1,j))/2 * (U(i,j)-U(i,j+1))/2 - abs(V(i,j-1)+V(i+1,j-1))/2 * (U(i,j-1)-U(i,j))/2)/_dy;
+    return u2x+uvy;
+}
 
-double Discretization::convection_v(const Matrix<double> &U, const Matrix<double> &V, int i, int j) {}
+double Discretization::convection_v(const Matrix<double> &U, const Matrix<double> &V, int i, int j) {
+    double v2y = ((V(i,j)+V(i,j+1))/2*(V(i,j)+V(i,j+1))/2 - (V(i,j)+V(i,j-1))/2*(V(i,j)-V(i,j-1))/2 )/_dy 
+                            + _gamma * (abs(V(i,j)+V(i,j+1))/2*(V(i,j)-V(i,j+1))/2 - abs(V(i,j-1)+V(i,j))/2*(V(i,j-1)-V(i,j))/2)/_dy;
+    double uvx = ((U(i,j)+U(i,j+1))/2 * (V(i,j)+V(i+1,j))/2 - (U(i-1,j)+U(i-1,j+1))/2 * (V(i-1,j)+V(i,j))/2)/_dx
+                        + _gamma*(abs(U(i,j)+U(i,j+1))/2 * (V(i,j)-V(i+1,j))/2 - abs(U(i-1,j)+U(i-1,j+1))/2 * (V(i-1,j)-V(i,j))/2)/_dx;
+    return uvx+v2y;
+}
 
-double Discretization::diffusion(const Matrix<double> &A, int i, int j) {}
+double Discretization::diffusion(const Matrix<double> &A, int i, int j) {
+    double Axx = (A(i+1,j)-2*A(i,j)+A(i-1,j))/_dx/_dx;
+    double Ayy = (A(i,j+1)-2*A(i,j)+A(i,j-1))/_dy/_dy;
+    return Axx+Ayy;
+}
 
 double Discretization::laplacian(const Matrix<double> &P, int i, int j) {
     double result = (P(i + 1, j) - 2.0 * P(i, j) + P(i - 1, j)) / (_dx * _dx) +
