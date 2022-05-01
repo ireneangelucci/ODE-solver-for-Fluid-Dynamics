@@ -55,9 +55,31 @@ void Fields::calculate_rs(Grid &grid) {
     }
 }
 
-void Fields::calculate_velocities(Grid &grid) {}
+void Fields::calculate_velocities(Grid &grid) {
+    for(auto &cell: grid.fluid_cells()){
+        int i = cell->i();
+        int j = cell->j();
+        setu(i, j, f(i,j) - _dt/grid.dx()*(p(i+1,j)-p(i,j)));
+        setv(i, j, g(i,j) - _dt/grid.dy()*(p(i,j+1)-p(i,j)));       
+    }
+}
 
-double Fields::calculate_dt(Grid &grid) { return _dt; }
+double Fields::calculate_dt(Grid &grid) { 
+    _dt = (1/2/_nu)/(1/grid.dx()/grid.dx() + 1/grid.dy()/grid.dy());
+    for(auto &cell: grid.fluid_cells()){
+        int i = cell->i();
+        int j = cell->j();
+        double dt1 = grid.dx()/u(i,j);
+        double dt2 = grid.dy()/v(i,j);
+        if(dt1<_dt){
+            _dt = dt1;
+        }
+        if(dt2<_dt){
+            _dt = dt2;
+        }  
+    }
+    return _dt; 
+    }
 
 double &Fields::p(int i, int j) { return _P(i, j); }
 double &Fields::u(int i, int j) { return _U(i, j); }

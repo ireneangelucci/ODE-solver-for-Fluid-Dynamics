@@ -162,9 +162,9 @@ void Case::set_file_names(std::string file_name) {
  * - c - Calculate fluxes (F and G) using calculate_fluxes() member function of Fields class.
  *   Flux consists of diffusion and convection part, which are located in Discretization class
  * - c - Calculate right-hand-side of PPE using calculate_rs() member function of Fields class
- * - Iterate the pressure poisson equation until the residual becomes smaller than the desired tolerance
+ * - c -  Iterate the pressure poisson equation until the residual becomes smaller than the desired tolerance
  *   or the maximum number of the iterations are performed using solve() member function of PressureSolver class
- * - Calculate the velocities u and v using calculate_velocities() member function of Fields class
+ * - c - Calculate the velocities u and v using calculate_velocities() member function of Fields class
  * - Calculat the maximal timestep size for the next iteration using calculate_dt() member function of Fields class
  * - Write vtk files using output_vtk() function
  *
@@ -178,15 +178,24 @@ void Case::simulate() {
 
     double t = 0.0;
     double dt = _field.dt();
-    int timestep = 0;
-    double output_counter = 0.0;
-    double res = 1.0;
-    for(auto &boundary: _boundaries){
-        boundary->apply(_field);
+    while(t < _t_end){
+        int timestep = 0;
+        int it = 0;
+        double output_counter = 0.0;
+        double res = 1.0;
+        for(auto &boundary: _boundaries){
+            boundary->apply(_field);
+        }
+        _field.calculate_fluxes(_grid, 0.5, 0.01);
+        _field.calculate_rs(_grid);
+        while(it < _max_iter && res > _tolerance){
+            res = _pressure_solver->solve(_field, _grid, _boundaries);
+            it = it++;
+        }
+        _field.calculate_velocities(_grid);
+        t = t + _field.dt();
+        _field.calculate_dt(_grid);
     }
-    _field.calculate_fluxes(_grid, 0.5, 0.01);
-    _field.calculate_rs(_grid);
-   
 }
 
 void Case::output_vtk(int timestep, int my_rank) {
