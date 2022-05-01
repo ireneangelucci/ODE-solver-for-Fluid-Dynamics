@@ -155,7 +155,7 @@ void Case::set_file_names(std::string file_name) {
 
 /**
  * This function is the main simulation loop. In the simulation loop, following steps are required
- * - Calculate and apply boundary conditions for all the boundaries in _boundaries container
+ * - c - Calculate and apply boundary conditions for all the boundaries in _boundaries container
  *   using apply() member function of Boundary class
  * - Calculate fluxes (F and G) using calculate_fluxes() member function of Fields class.
  *   Flux consists of diffusion and convection part, which are located in Discretization class
@@ -178,6 +178,10 @@ void Case::simulate() {
     double dt = _field.dt();
     int timestep = 0;
     double output_counter = 0.0;
+    for(auto &boundary: _boundaries){
+        boundary->apply(_field);
+    }
+    
 }
 
 void Case::output_vtk(int timestep, int my_rank) {

@@ -32,3 +32,10 @@ double &Fields::rs(int i, int j) { return _RS(i, j); }
 Matrix<double> &Fields::p_matrix() { return _P; }
 
 double Fields::dt() const { return _dt; }
+
+void Fields::setp(int i, int j, double val) { _P(i, j) = val; }
+void Fields::setu(int i, int j, double val) { _U(i, j) = val; }
+void Fields::setv(int i, int j, double val) { _V(i, j) = val; }
+void Fields::setf(int i, int j, double val) { _F(i, j) = val; }
+void Fields::setg(int i, int j, double val) { _G(i, j) = val; }
+void Fields::setrs(int i, int j, double val) { _RS(i, j) = val; }
