@@ -8,7 +8,7 @@ FixedWallBoundary::FixedWallBoundary(std::vector<Cell *> cells, std::map<int, do
     : _cells(cells), _wall_temperature(wall_temperature) {}
 
 void FixedWallBoundary::apply(Fields &field) {
-    for(const auto c : _cells){
+    for(const auto& c : _cells){
         if(c->is_border(border_position::BOTTOM)){
             field.setv(c->i(),c->j(),0.0);
             field.setu(c->i(),c->j(),-(field.u(c->i(),(c->j())+1)));
@@ -40,7 +40,7 @@ MovingWallBoundary::MovingWallBoundary(std::vector<Cell *> cells, std::map<int, 
 
 void MovingWallBoundary::apply(Fields &field) {
     for(const auto c : _cells){
-        if(c->is_border(border_position::TOP)){
+        if(c->is_border(border_position::TOP) == true){
             field.setv(c->i(),c->j()-1,0.0);
             field.setu(c->i(),c->j(),2*_wall_velocity.at(c->i())-(field.u(c->i(),(c->j())-1)));
             field.setp(c->i(),c->j(),field.p(c->i(),(c->j())-1));

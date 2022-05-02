@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <iostream>
 
-Fields::Fields(double nu, double dt, double tau, int imax, int jmax, double UI, double VI, double PI)
+Fields::Fields(double nu, double dt, double tau, int imax, int jmax, double UI, double VI, double PI, double GX, double GY)
     : _nu(nu), _dt(dt), _tau(tau) {
     _U = Matrix<double>(imax + 2, jmax + 2, UI);
     _V = Matrix<double>(imax + 2, jmax + 2, VI);
@@ -12,6 +12,9 @@ Fields::Fields(double nu, double dt, double tau, int imax, int jmax, double UI, 
     _F = Matrix<double>(imax + 2, jmax + 2, 0.0);
     _G = Matrix<double>(imax + 2, jmax + 2, 0.0);
     _RS = Matrix<double>(imax + 2, jmax + 2, 0.0);
+
+    _gx = GX;
+    _gy = GY;
 }
 
 void Fields::calculate_fluxes(Grid &grid, Discretization& disc) {
@@ -19,8 +22,8 @@ void Fields::calculate_fluxes(Grid &grid, Discretization& disc) {
     for(auto &cell: grid.fluid_cells()){
         int i = cell->i();
         int j = cell->j();
-        setf(i,j,u(i,j)+dt()*(_nu*(disc.diffusion(_U, i, j))-disc.convection_u(_U, _V, i, j)));
-        setg(i,j,v(i,j)+dt()*(_nu*disc.diffusion(_V, i, j))-disc.convection_v(_U, _V, i, j));
+        setf(i,j,u(i,j)+dt()*(_nu*(disc.diffusion(_U, i, j))-disc.convection_u(_U, _V, i, j) + _gx));
+        setg(i,j,v(i,j)+dt()*(_nu*(disc.diffusion(_V, i, j))-disc.convection_v(_U, _V, i, j) + _gy));
     }
 }
 
