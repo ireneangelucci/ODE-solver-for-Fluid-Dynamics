@@ -29,9 +29,7 @@ double Discretization::convection_v(const Matrix<double> &U, const Matrix<double
 }
 
 double Discretization::diffusion(const Matrix<double> &A, int i, int j) {
-    double Axx = (A(i+1,j)-2*A(i,j)+A(i-1,j))/_dx/_dx;
-    double Ayy = (A(i,j+1)-2*A(i,j)+A(i,j-1))/_dy/_dy;
-    return Axx+Ayy;
+    return laplacian(A, i ,j);
 }
 
 double Discretization::laplacian(const Matrix<double> &P, int i, int j) {
