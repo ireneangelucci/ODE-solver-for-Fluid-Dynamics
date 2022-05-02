@@ -20,6 +20,7 @@ find_package(MPI REQUIRED)
 # find_package(Boost COMPONENTS filesystem REQUIRED)
 
 # VTK Library
+set(VTK_DIR  "/home/irene/TUM/vtk/build")
 find_package(VTK REQUIRED)
 if (NOT VTK_FOUND)
   message("VTK not found")
@@ -46,7 +47,7 @@ endif()
 include_directories(include)
 
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX /usr/local )
+  set(CMAKE_MODULE_PATH  /usr/local)
 endif()
 
 # Creating the executable of our project and the required dependencies

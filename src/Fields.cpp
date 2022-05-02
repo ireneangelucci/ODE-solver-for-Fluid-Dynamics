@@ -14,35 +14,13 @@ Fields::Fields(double nu, double dt, double tau, int imax, int jmax, double UI, 
     _RS = Matrix<double>(imax + 2, jmax + 2, 0.0);
 }
 
-void Fields::calculate_fluxes(Grid &grid, double gamma, double nu) {
-   
-    Discretization disc(grid.dx(), grid.dy(), gamma);
+void Fields::calculate_fluxes(Grid &grid, Discretization& disc) {
 
     for(auto &cell: grid.fluid_cells()){
         int i = cell->i();
         int j = cell->j();
-        /*
-        double uxx = (u(i+1,j)-2*u(i,j)+u(i-1,j))/grid.dx()/grid.dx();
-        double uyy = (u(i,j+1)-2*u(i,j)+u(i,j-1))/grid.dy()/grid.dy();
-        double u2x = ((u(i,j)+u(i+1,j))/2*(u(i,j)+u(i+1,j))/2 - (u(i,j)+u(i-1,j))/2*(u(i,j)+u(i-1,j))/2 )/grid.dx() 
-                            + gamma * (abs(u(i,j)+u(i+1,j))/2*(u(i,j)-u(i+1,j))/2 - abs(u(i-1,j)+u(i,j))/2*(u(i-1,j)-u(i,j))/2)/grid.dx();
-        double uvy = ((u(i,j)+u(i,j+1))/2 * (v(i,j)+v(i+1,j))/2 - (v(i,j-1)+v(i+1,j-1))/2 * (u(i,j-1)+u(i,j))/2)/grid.dy()
-                        +gamma*(abs(v(i,j)+v(i+1,j))/2 * (u(i,j)-u(i,j+1))/2 - abs(v(i,j-1)+v(i+1,j-1))/2 * (u(i,j-1)-u(i,j))/2)/grid.dy();
-
-        */
-        //setf(i,j,u(i,j)+dt()*(nu*(uxx+uyy)-u2x-uvy));
-        setf(i,j,u(i,j)+dt()*(nu*(disc.diffusion(_U, i, j))-disc.convection_u(_U, _V, i, j)));
-
-        /*
-        double vxx = (v(i+1,j)-2*v(i,j)+v(i-1,j))/grid.dx()/grid.dx();
-        double vyy = (v(i,j+1)-2*v(i,j)+v(i,j-1))/grid.dy()/grid.dy();
-        double v2y = ((v(i,j)+v(i,j+1))/2*(v(i,j)+v(i,j+1))/2 - (v(i,j)+v(i,j-1))/2*(v(i,j)-v(i,j-1))/2 )/grid.dy() 
-                            + gamma * (abs(v(i,j)+v(i,j+1))/2*(v(i,j)-v(i,j+1))/2 - abs(v(i,j-1)+v(i,j))/2*(v(i,j-1)-v(i,j))/2)/grid.dy();
-        double uvx = ((u(i,j)+u(i,j+1))/2 * (v(i,j)+v(i+1,j))/2 - (u(i-1,j)+u(i-1,j+1))/2 * (v(i-1,j)+v(i,j))/2)/grid.dx()
-                        +gamma*(abs(u(i,j)+u(i,j+1))/2 * (v(i,j)-v(i+1,j))/2 - abs(u(i-1,j)+u(i-1,j+1))/2 * (v(i-1,j)-v(i,j))/2)/grid.dx();
-        */
-        //setg(i,j,v(i,j)+dt()*(nu*(vxx+vyy)-uvx-v2y));
-        setg(i,j,v(i,j)+dt()*(nu*disc.diffusion(_V, i, j))-disc.convection_v(_U, _V, i, j));
+        setf(i,j,u(i,j)+dt()*(_nu*(disc.diffusion(_U, i, j))-disc.convection_u(_U, _V, i, j)));
+        setg(i,j,v(i,j)+dt()*(_nu*disc.diffusion(_V, i, j))-disc.convection_v(_U, _V, i, j));
     }
 }
 
