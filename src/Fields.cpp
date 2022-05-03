@@ -56,7 +56,7 @@ double Fields::calculate_dt(Grid &grid) {
             _dt = dt2;
         }  
     }
-    return _dt; 
+    return _dt*_tau; 
     }
 
 double &Fields::p(int i, int j) { return _P(i, j); }
