@@ -8,8 +8,13 @@ FixedWallBoundary::FixedWallBoundary(std::vector<Cell *> cells, std::map<int, do
     : _cells(cells), _wall_temperature(wall_temperature) {}
 
 void FixedWallBoundary::apply(Fields &field) {
+<<<<<<< HEAD
     for(const auto c : _cells){
         if(c->is_border(border_position::TOP)){
+=======
+    for(const auto& c : _cells){
+        if(c->is_border(border_position::BOTTOM)){
+>>>>>>> 80de5319dc60d7ebbd35069b466dedc691ffb436
             field.setv(c->i(),c->j(),0.0);
             field.setu(c->i(),c->j(),-(field.u(c->i(),(c->j())+1)));
             field.setp(c->i(),c->j(),field.p(c->i(),(c->j())+1));
@@ -41,7 +46,11 @@ MovingWallBoundary::MovingWallBoundary(std::vector<Cell *> cells, std::map<int, 
 
 void MovingWallBoundary::apply(Fields &field) {
     for(const auto c : _cells){
+<<<<<<< HEAD
         if(c->is_border(border_position::BOTTOM)){
+=======
+        if(c->is_border(border_position::TOP) == true){
+>>>>>>> 80de5319dc60d7ebbd35069b466dedc691ffb436
             field.setv(c->i(),c->j()-1,0.0);
             field.setu(c->i(),c->j(),2*_wall_velocity.at(c->wall_id())-(field.u(c->i(),(c->j())-1)));
             field.setp(c->i(),c->j(),field.p(c->i(),(c->j())-1));
