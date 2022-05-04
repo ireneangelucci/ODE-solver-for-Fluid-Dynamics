@@ -91,6 +91,7 @@ Case::Case(std::string file_name, int argn, char **args) {
     build_domain(domain, imax, jmax);
 
     _grid = Grid(_geom_name, domain);
+    //std::cout<<nu<<" nu-2 from file \n";
     _field = Fields(nu, dt, tau, _grid.domain().size_x, _grid.domain().size_y, UI, VI, PI, GX, GY);
 
     _discretization = Discretization(domain.dx, domain.dy, gamma);
@@ -183,10 +184,11 @@ void Case::simulate() {
         int it = 0;
         double output_counter = 0.0;
         double res = 1.0;
+        //output_vtk(timestep++, 1);
         for(auto &boundary: _boundaries){
             boundary->apply(_field);
         }
-        output_vtk(timestep++, 1);
+        //output_vtk(timestep++, 1);
         _field.calculate_fluxes(_grid, _discretization);
         _field.calculate_rs(_grid);
         while(it < _max_iter && res > _tolerance){
@@ -196,7 +198,7 @@ void Case::simulate() {
         _field.calculate_velocities(_grid);
         t = t + _field.dt();
         _field.calculate_dt(_grid);
-        //output_vtk(timestep++, 1);
+        output_vtk(timestep++, 1);
     }
 }
 

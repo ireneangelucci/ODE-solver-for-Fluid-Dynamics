@@ -1,10 +1,12 @@
 #include "Fields.hpp"
 
+#include<cmath>
 #include <algorithm>
 #include <iostream>
 
 Fields::Fields(double nu, double dt, double tau, int imax, int jmax, double UI, double VI, double PI, double GX, double GY)
     : _nu(nu), _dt(dt), _tau(tau) {
+    //std::cout<<_nu<<" nu in fields \n";
     _U = Matrix<double>(imax + 2, jmax + 2, UI);
     _V = Matrix<double>(imax + 2, jmax + 2, VI);
     _P = Matrix<double>(imax + 2, jmax + 2, PI);
@@ -46,20 +48,30 @@ void Fields::calculate_velocities(Grid &grid) {
 }
 
 double Fields::calculate_dt(Grid &grid) { 
-    _dt = (1/2/_nu)/(1/grid.dx()/grid.dx() + 1/grid.dy()/grid.dy());
+    _dt = abs(0.5/_nu)/(1/grid.dx()/grid.dx() + 1/grid.dy()/grid.dy());
+    double velmax = 0.0;
     for(auto &cell: grid.fluid_cells()){
         int i = cell->i();
         int j = cell->j();
-        double dt1 = grid.dx()/u(i,j);
-        double dt2 = grid.dy()/v(i,j);
-        if(dt1<_dt){
-            _dt = dt1;
+        /*
+        double dt1 = abs(grid.dx()/u(i,j));
+        std::cout<< dt1 << " dt1\n";
+        double dt2 = abs(grid.dy()/v(i,j));
+        std::cout<< dt2 << " dt2\n";
+        */
+        if(velmax < abs(u(i,j))){
+            velmax = abs(u(i,j));
+            std::cout<< velmax <<","<< u(i,j) <<"\t";
         }
-        if(dt2<_dt){
-            _dt = dt2;
-        }  
+        if(velmax < abs(v(i,j))){
+            velmax = abs(v(i,j));
+            std::cout<< velmax <<","<< v(i,j) <<"\t";
+        }
     }
-    return _dt*_tau; 
+    double dt1 = abs(grid.dx()/velmax);
+    if(_dt<dt1){
+        _dt=dt1;
+    }    return _dt*_tau; 
     }
 
 double &Fields::p(int i, int j) { return _P(i, j); }
