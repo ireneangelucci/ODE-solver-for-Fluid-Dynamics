@@ -19,13 +19,13 @@ Fields::Fields(double nu, double dt, double tau, int imax, int jmax, double UI, 
     _gy = GY;
 }
 
-void Fields::calculate_fluxes(Grid &grid, Discretization& disc) {
+void Fields::calculate_fluxes(Grid &grid) {
 
     for(auto &cell: grid.fluid_cells()){
         int i = cell->i();
         int j = cell->j();
-        setf(i,j,u(i,j)+dt()*(_nu*(disc.diffusion(_U, i, j))-disc.convection_u(_U, _V, i, j) + _gx));
-        setg(i,j,v(i,j)+dt()*(_nu*(disc.diffusion(_V, i, j))-disc.convection_v(_U, _V, i, j) + _gy));
+        setf(i,j,u(i,j)+dt()*(_nu*(Discretization::diffusion(_U, i, j))-Discretization::convection_u(_U, _V, i, j) + _gx));
+        setg(i,j,v(i,j)+dt()*(_nu*(Discretization::diffusion(_V, i, j))-Discretization::convection_v(_U, _V, i, j) + _gy));
     }
 }
 
