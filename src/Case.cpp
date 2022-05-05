@@ -194,9 +194,13 @@ void Case::simulate() {
             it = it++;
         }
         _field.calculate_velocities(_grid);
+        if(t > output_counter*_output_freq){
+            output_vtk(timestep, 1);
+            output_counter +=1;
+        }
         t = t + _field.dt();
         _field.calculate_dt(_grid);
-        output_vtk(timestep++, 1);
+        timestep +=1;
     }
 }
 
