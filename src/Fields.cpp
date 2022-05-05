@@ -49,21 +49,18 @@ void Fields::calculate_velocities(Grid &grid) {
 
 double Fields::calculate_dt(Grid &grid) { 
     _dt = std::abs(0.5/_nu)/(1/grid.dx()/grid.dx() + 1/grid.dy()/grid.dy());
-    double velmax = 0.0;
     for(auto &cell: grid.fluid_cells()){
         int i = cell->i();
         int j = cell->j();
-        if(velmax < std::abs(u(i,j))){
-            velmax = std::abs(u(i,j));
+        double dt1 = std::abs(grid.dx()/u(i,j));
+        double dt2 = std::abs(grid.dy()/v(i,j));
+        if(_dt > dt1){  
+            _dt = dt1;
         }
-        if(velmax < std::abs(v(i,j))){
-            velmax = std::abs(v(i,j));
+        if(_dt > dt2){  
+            _dt = dt2;
         }
     }
-    double dt1 = std::abs(grid.dx()/velmax);
-    if(_dt>dt1){  
-        _dt=dt1;
-    }   
     return _dt*_tau; 
     }
 
