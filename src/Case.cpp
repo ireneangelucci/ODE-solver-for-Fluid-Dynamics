@@ -184,11 +184,9 @@ void Case::simulate() {
         int it = 0;
         double output_counter = 0.0;
         double res = 1.0;
-        //output_vtk(timestep++, 1);
         for(auto &boundary: _boundaries){
             boundary->apply(_field);
         }
-        //output_vtk(timestep++, 1);
         _field.calculate_fluxes(_grid, _discretization);
         _field.calculate_rs(_grid);
         while(it < _max_iter && res > _tolerance){

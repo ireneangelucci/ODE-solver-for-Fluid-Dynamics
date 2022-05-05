@@ -48,30 +48,23 @@ void Fields::calculate_velocities(Grid &grid) {
 }
 
 double Fields::calculate_dt(Grid &grid) { 
-    _dt = abs(0.5/_nu)/(1/grid.dx()/grid.dx() + 1/grid.dy()/grid.dy());
+    _dt = std::abs(0.5/_nu)/(1/grid.dx()/grid.dx() + 1/grid.dy()/grid.dy());
     double velmax = 0.0;
     for(auto &cell: grid.fluid_cells()){
         int i = cell->i();
         int j = cell->j();
-        /*
-        double dt1 = abs(grid.dx()/u(i,j));
-        std::cout<< dt1 << " dt1\n";
-        double dt2 = abs(grid.dy()/v(i,j));
-        std::cout<< dt2 << " dt2\n";
-        */
-        if(velmax < abs(u(i,j))){
-            velmax = abs(u(i,j));
-            std::cout<< velmax <<","<< u(i,j) <<"\t";
+        if(velmax < std::abs(u(i,j))){
+            velmax = std::abs(u(i,j));
         }
-        if(velmax < abs(v(i,j))){
-            velmax = abs(v(i,j));
-            std::cout<< velmax <<","<< v(i,j) <<"\t";
+        if(velmax < std::abs(v(i,j))){
+            velmax = std::abs(v(i,j));
         }
     }
-    double dt1 = abs(grid.dx()/velmax);
-    if(_dt<dt1){
+    double dt1 = std::abs(grid.dx()/velmax);
+    if(_dt>dt1){  
         _dt=dt1;
-    }    return _dt*_tau; 
+    }   
+    return _dt*_tau; 
     }
 
 double &Fields::p(int i, int j) { return _P(i, j); }
