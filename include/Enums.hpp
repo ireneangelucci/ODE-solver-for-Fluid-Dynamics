@@ -25,7 +25,6 @@ const int RIGHT = 3;
 } // namespace border
 
 enum class cell_type {
-
     FLUID,
     FIXED_WALL,
     MOVING_WALL,

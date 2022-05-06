@@ -179,20 +179,25 @@ void Case::simulate() {
 
     double t = 0.0;
     double dt = _field.dt();
+    //std::cout << dt << "\n";
     int timestep = 0;
     int output_counter = 0;
     while(t < _t_end){
-        int it = 0;
-        double res = 1.0;
+        
         for(auto &boundary: _boundaries){
             boundary->apply(_field);
         }
+
         _field.calculate_fluxes(_grid);
         _field.calculate_rs(_grid);
+
+        int it = 0;
+        double res = 1.0;
         while(it < _max_iter && res > _tolerance){
             res = _pressure_solver->solve(_field, _grid, _boundaries);
             it++;
-            
+            //std::cout<< it << " uff "<< t <<" fuck\n";
+            //std::cout << res << " residual \n";
             if(it == _max_iter){
                 std::cout<<"Reached max iteration, solution not converged.\n";
                 //return;
