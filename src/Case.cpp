@@ -180,9 +180,9 @@ void Case::simulate() {
     double t = 0.0;
     double dt = _field.dt();
     int timestep = 0;
+    int output_counter = 0;
     while(t < _t_end){
         int it = 0;
-        double output_counter = 0.0;
         double res = 1.0;
         for(auto &boundary: _boundaries){
             boundary->apply(_field);
@@ -191,14 +191,22 @@ void Case::simulate() {
         _field.calculate_rs(_grid);
         while(it < _max_iter && res > _tolerance){
             res = _pressure_solver->solve(_field, _grid, _boundaries);
-            it = it++;
+            it++;
+            
+            if(it == _max_iter){
+                std::cout<<"Reached max iteration, solution not converged.\n";
+                //return;
+            }
+            
         }
         _field.calculate_velocities(_grid);
-        if(t > output_counter*_output_freq){
+        if(t >= output_counter*_output_freq){
+            //std::cout<<_output_freq<<", "<<output_counter<<", "<<_t_end<<"\n";
             output_vtk(timestep, 1);
-            output_counter +=1;
+            output_counter += 1;
         }
         t = t + _field.dt();
+        //std::cout<<"\n"<<_field.dt()<<"\n";
         _field.calculate_dt(_grid);
         timestep +=1;
     }

@@ -6,7 +6,6 @@
 
 Fields::Fields(double nu, double dt, double tau, int imax, int jmax, double UI, double VI, double PI, double GX, double GY)
     : _nu(nu), _dt(dt), _tau(tau) {
-    //std::cout<<_nu<<" nu in fields \n";
     _U = Matrix<double>(imax + 2, jmax + 2, UI);
     _V = Matrix<double>(imax + 2, jmax + 2, VI);
     _P = Matrix<double>(imax + 2, jmax + 2, PI);
@@ -24,8 +23,12 @@ void Fields::calculate_fluxes(Grid &grid) {
     for(auto &cell: grid.fluid_cells()){
         int i = cell->i();
         int j = cell->j();
-        setf(i,j,u(i,j)+dt()*(_nu*(Discretization::diffusion(_U, i, j))-Discretization::convection_u(_U, _V, i, j) + _gx));
-        setg(i,j,v(i,j)+dt()*(_nu*(Discretization::diffusion(_V, i, j))-Discretization::convection_v(_U, _V, i, j) + _gy));
+        if(i != grid.imax()){
+            setf(i,j,u(i,j)+dt()*(_nu*(Discretization::diffusion(_U, i, j))-Discretization::convection_u(_U, _V, i, j) + _gx));
+        }
+        if(j != grid.jmax()){
+            setg(i,j,v(i,j)+dt()*(_nu*(Discretization::diffusion(_V, i, j))-Discretization::convection_v(_U, _V, i, j) + _gy));
+        }
     }
 }
 
@@ -42,8 +45,12 @@ void Fields::calculate_velocities(Grid &grid) {
     for(auto &cell: grid.fluid_cells()){
         int i = cell->i();
         int j = cell->j();
-        setu(i, j, f(i,j) - _dt/grid.dx()*(p(i+1,j)-p(i,j)));
-        setv(i, j, g(i,j) - _dt/grid.dy()*(p(i,j+1)-p(i,j)));       
+        if(i != grid.imax()){
+            setu(i, j, f(i,j) - _dt/grid.dx()*(p(i+1,j)-p(i,j)));
+        }
+        if(j != grid.jmax()){
+            setv(i, j, g(i,j) - _dt/grid.dy()*(p(i,j+1)-p(i,j)));       
+        }
     }
 }
 
