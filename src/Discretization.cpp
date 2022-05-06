@@ -14,17 +14,17 @@ Discretization::Discretization(double dx, double dy, double gamma) {
 
 double Discretization::convection_u(const Matrix<double> &U, const Matrix<double> &V, int i, int j) {
     double u2x = ((U(i,j)+U(i+1,j))/2*(U(i,j)+U(i+1,j))/2 - (U(i,j)+U(i-1,j))/2*(U(i,j)+U(i-1,j))/2 )/_dx 
-                            + _gamma * (abs(U(i,j)+U(i+1,j))/2*(U(i,j)-U(i+1,j))/2 - abs(U(i-1,j)+U(i,j))/2*(U(i-1,j)-U(i,j))/2)/_dx;
+                            + _gamma * (std::abs(U(i,j)+U(i+1,j))/2*(U(i,j)-U(i+1,j))/2 - std::abs(U(i-1,j)+U(i,j))/2*(U(i-1,j)-U(i,j))/2)/_dx;
     double uvy = ((U(i,j)+U(i,j+1))/2 * (V(i,j)+V(i+1,j))/2 - (V(i,j-1)+V(i+1,j-1))/2 * (U(i,j-1)+U(i,j))/2)/_dy
-                        +_gamma*(abs(V(i,j)+V(i+1,j))/2 * (U(i,j)-U(i,j+1))/2 - abs(V(i,j-1)+V(i+1,j-1))/2 * (U(i,j-1)-U(i,j))/2)/_dy;
+                        +_gamma*(std::abs(V(i,j)+V(i+1,j))/2 * (U(i,j)-U(i,j+1))/2 - std::abs(V(i,j-1)+V(i+1,j-1))/2 * (U(i,j-1)-U(i,j))/2)/_dy;
     return u2x+uvy;
 }
 
 double Discretization::convection_v(const Matrix<double> &U, const Matrix<double> &V, int i, int j) {
     double v2y = ((V(i,j)+V(i,j+1))/2*(V(i,j)+V(i,j+1))/2 - (V(i,j)+V(i,j-1))/2*(V(i,j)-V(i,j-1))/2 )/_dy 
-                            + _gamma * (abs(V(i,j)+V(i,j+1))/2*(V(i,j)-V(i,j+1))/2 - abs(V(i,j-1)+V(i,j))/2*(V(i,j-1)-V(i,j))/2)/_dy;
+                            + _gamma * (std::abs(V(i,j)+V(i,j+1))/2*(V(i,j)-V(i,j+1))/2 - std::abs(V(i,j-1)+V(i,j))/2*(V(i,j-1)-V(i,j))/2)/_dy;
     double uvx = ((U(i,j)+U(i,j+1))/2 * (V(i,j)+V(i+1,j))/2 - (U(i-1,j)+U(i-1,j+1))/2 * (V(i-1,j)+V(i,j))/2)/_dx
-                        + _gamma*(abs(U(i,j)+U(i,j+1))/2 * (V(i,j)-V(i+1,j))/2 - abs(U(i-1,j)+U(i-1,j+1))/2 * (V(i-1,j)-V(i,j))/2)/_dx;
+                        + _gamma*(std::abs(U(i,j)+U(i,j+1))/2 * (V(i,j)-V(i+1,j))/2 - std::abs(U(i-1,j)+U(i-1,j+1))/2 * (V(i-1,j)-V(i,j))/2)/_dx;
     return uvx+v2y;
 }
 

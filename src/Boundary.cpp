@@ -41,7 +41,7 @@ MovingWallBoundary::MovingWallBoundary(std::vector<Cell *> cells, std::map<int, 
 
 void MovingWallBoundary::apply(Fields &field) {
     for(const auto c : _cells){
-        if(c->is_border(border_position::BOTTOM)){
+        if(c->is_border(border_position::BOTTOM)){   //Top cells
             field.setv(c->neighbour(border_position::BOTTOM)->i(),c->neighbour(border_position::BOTTOM)->j(),0.0);
             field.setu(c->i(),c->j(),2*_wall_velocity.at(c->wall_id())-(field.u(c->neighbour(border_position::BOTTOM)->i(),c->neighbour(border_position::BOTTOM)->j())));
             field.setp(c->i(),c->j(),field.p(c->neighbour(border_position::BOTTOM)->i(),c->neighbour(border_position::BOTTOM)->j()));
