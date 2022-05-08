@@ -55,21 +55,22 @@ void Fields::calculate_velocities(Grid &grid) {
 }
 
 double Fields::calculate_dt(Grid &grid) { 
-    _dt = std::abs(0.5/_nu)/(1/grid.dx()/grid.dx() + 1/grid.dy()/grid.dy());
+    double dt = std::abs(0.5/_nu)/(1/grid.dx()/grid.dx() + 1/grid.dy()/grid.dy())*_tau;
     for(auto &cell: grid.fluid_cells()){
         int i = cell->i();
         int j = cell->j();
-        double dt1 = std::abs(grid.dx()/u(i,j));
-        double dt2 = std::abs(grid.dy()/v(i,j));
-        if(_dt > dt1){  
-            _dt = dt1;
+        double dt1 = std::abs(grid.dx()/u(i,j))*_tau;
+        double dt2 = std::abs(grid.dy()/v(i,j))*_tau;
+        if(dt > dt1){  
+            dt = dt1;
         }
-        if(_dt > dt2){  
-            _dt = dt2;
+        if(dt > dt2){  
+            dt = dt2;
         }
     }
-    return _dt*_tau; 
-    }
+    _dt = dt;
+    return dt; 
+}
 
 double &Fields::p(int i, int j) { return _P(i, j); }
 double &Fields::u(int i, int j) { return _U(i, j); }

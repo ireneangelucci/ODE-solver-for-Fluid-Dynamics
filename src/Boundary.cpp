@@ -13,27 +13,21 @@ void FixedWallBoundary::apply(Fields &field) {
         if(c->is_border(border_position::TOP)){ //Bottom cells
             field.setv(c->i(),c->j(),0.0);
             field.setu(c->i(),c->j(),-(field.u(c->neighbour(border_position::TOP)->i(),c->neighbour(border_position::TOP)->j())));
-            //if(c->i() != 0 || c->i() != 51){
-                field.setp(c->i(),c->j(),field.p(c->neighbour(border_position::TOP)->i(),c->neighbour(border_position::TOP)->j()));
-                field.setg(c->i(),c->j(),field.v(c->i(),c->j()));
-            //}
+            field.setp(c->i(),c->j(),field.p(c->neighbour(border_position::TOP)->i(),c->neighbour(border_position::TOP)->j()));
+            field.setg(c->i(),c->j(),field.v(c->i(),c->j()));
         }
         
         if(c->is_border(border_position::RIGHT)){   //Left cells
             field.setu(c->i(),c->j(),0.0);
             field.setv(c->i(),c->j(),-(field.v(c->neighbour(border_position::RIGHT)->i(),c->neighbour(border_position::RIGHT)->j())));
-            //if(c->j() != 0 || c->j() != 51){
-                field.setp(c->i(),c->j(),field.p(c->neighbour(border_position::RIGHT)->i(),c->neighbour(border_position::RIGHT)->j()));
-                field.setf(c->i(),c->j(),field.u(c->i(),c->j()));
-            //}
+            field.setp(c->i(),c->j(),field.p(c->neighbour(border_position::RIGHT)->i(),c->neighbour(border_position::RIGHT)->j()));
+            field.setf(c->i(),c->j(),field.u(c->i(),c->j()));
         }       
         if(c->is_border(border_position::LEFT)){    // Right cells
             field.setu(c->neighbour(border_position::LEFT)->i(),c->neighbour(border_position::LEFT)->j(),0.0);
             field.setv(c->i(),c->j(),-(field.v(c->neighbour(border_position::LEFT)->i(),c->neighbour(border_position::LEFT)->j())));
-            //if(c->j() != 0 || c->j() != 51){
-                field.setp(c->i(),c->j(),field.p(c->neighbour(border_position::LEFT)->i(),c->neighbour(border_position::LEFT)->j()));
-                field.setf(c->neighbour(border_position::LEFT)->i(),c->neighbour(border_position::LEFT)->j(),field.u(c->neighbour(border_position::LEFT)->i(),c->neighbour(border_position::LEFT)->j()));
-            //}
+            field.setp(c->i(),c->j(),field.p(c->neighbour(border_position::LEFT)->i(),c->neighbour(border_position::LEFT)->j()));
+            field.setf(c->neighbour(border_position::LEFT)->i(),c->neighbour(border_position::LEFT)->j(),field.u(c->neighbour(border_position::LEFT)->i(),c->neighbour(border_position::LEFT)->j()));
         }
     }
 }
@@ -51,10 +45,8 @@ void MovingWallBoundary::apply(Fields &field) {
         if(c->is_border(border_position::BOTTOM)){   //Top cells
             field.setv(c->neighbour(border_position::BOTTOM)->i(),c->neighbour(border_position::BOTTOM)->j(),0.0);
             field.setu(c->i(),c->j(),2*_wall_velocity.at(c->wall_id())-(field.u(c->neighbour(border_position::BOTTOM)->i(),c->neighbour(border_position::BOTTOM)->j())));
-            //if(c->i() != 0 || c->i() != 51){
-                field.setp(c->i(),c->j(),field.p(c->neighbour(border_position::BOTTOM)->i(),c->neighbour(border_position::BOTTOM)->j()));
-                field.setg(c->neighbour(border_position::BOTTOM)->i(),c->neighbour(border_position::BOTTOM)->j(),field.v(c->neighbour(border_position::BOTTOM)->i(),c->neighbour(border_position::BOTTOM)->j()));
-            //}
+            field.setp(c->i(),c->j(),field.p(c->neighbour(border_position::BOTTOM)->i(),c->neighbour(border_position::BOTTOM)->j()));
+            field.setg(c->neighbour(border_position::BOTTOM)->i(),c->neighbour(border_position::BOTTOM)->j(),field.v(c->neighbour(border_position::BOTTOM)->i(),c->neighbour(border_position::BOTTOM)->j()));
         }
     }
 }
