@@ -7,6 +7,7 @@
 #include <iostream>
 #include <map>
 #include <vector>
+#include <iomanip>
 
 namespace filesystem = std::filesystem;
 
@@ -176,11 +177,14 @@ void Case::set_file_names(std::string file_name) {
  * For information about the classes and functions, you can check the header files.
  */
 void Case::simulate() {
-
+    std::cout << "Simulation started. \n";
     double t = 0.0;
     double dt = _field.dt();
     int timestep = 0;
     int output_counter = 0;
+    std::string convergence;
+    const int numWidth = 15;
+    const char separator = ' ';
     while(t < _t_end){
         
         for(auto &boundary: _boundaries){
@@ -196,6 +200,20 @@ void Case::simulate() {
             res = _pressure_solver->solve(_field, _grid, _boundaries);
             it++;            
         }
+        if(it < _max_iter){
+            convergence = "Converged";
+        }
+        else{
+            convergence = "Not Converged";
+        }
+        std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << " timestep " ;
+        std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << timestep;
+        std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << " time ";
+        std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << t;
+        std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << " residual ";
+        std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << res;
+        std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << convergence;
+        std::cout << std::endl;
 
         _field.calculate_velocities(_grid);
         if(t >= output_counter*_output_freq){
@@ -206,6 +224,7 @@ void Case::simulate() {
         _field.calculate_dt(_grid);
         timestep +=1;
     }
+    std::cout << "Simulation ended. \n";
 }
 
 void Case::output_vtk(int timestep, int my_rank) {
