@@ -1,7 +1,6 @@
 ### Pressure Visualization
 
-![](example_cases/LidDrivenCavity/Plots/contour_pressure_gray.png)
-
+<img src="example_cases/LidDrivenCavity/Plots/contour_pressure_gray.png" width="48">
 
 
 ### Velocity Visualization
