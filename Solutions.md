@@ -5,9 +5,10 @@
 
 ### Velocity Visualization
 
-![](example_cases/LidDrivenCavity/Plots/contour_u_gray.png)
-![](example_cases/LidDrivenCavity/Plots/contour_v_gray.png)
-![](example_cases/LidDrivenCavity/Plots/Glyph_velocity_gray.png)
+
+<img src="example_cases/LidDrivenCavity/Plots/contour_u_gray.png" width="500">
+<img src="example_cases/LidDrivenCavity/Plots/contour_v_gray.png" width="500">
+<img src="example_cases/LidDrivenCavity/Plots/Glyph_velocity_gray.png" width="500">
 
 
 
@@ -71,13 +72,13 @@ imax/jmax | (i,j) | u(i,j) |
 ### Effect of kinematic viscosity
 
 nu = 0.01 :
-![](/example_cases/LidDrivenCavity/Plots/NuComparison/ustream_100_nu01.png) | ![](/example_cases/LidDrivenCavity/Plots/NuComparison/u_100_nu01.png)
+<img src="/example_cases/LidDrivenCavity/Plots/NuComparison/ustream_100_nu01.png" width="500"> | <img src="/example_cases/LidDrivenCavity/Plots/NuComparison/u_100_nu01.png" width="500"> 
 
 nu = 0.002 :
-![](/example_cases/LidDrivenCavity/Plots/NuComparison/ustream_100_nu002.png) | ![](/example_cases/LidDrivenCavity/Plots/NuComparison/u_100_nu002.png)
+<img src="/example_cases/LidDrivenCavity/Plots/NuComparison/ustream_100_nu002.png" width="500"> | <img src="/example_cases/LidDrivenCavity/Plots/NuComparison/u_100_nu002.png" width="500"> 
 
 nu = 0.0005 :
-![](/example_cases/LidDrivenCavity/Plots/NuComparison/ustream_100_nu0005.png) | ![](/example_cases/LidDrivenCavity/Plots/NuComparison/u_100_nu0005.png)
+<img src="/example_cases/LidDrivenCavity/Plots/NuComparison/ustream_100_nu0005.png" width="500"> | <img src="/example_cases/LidDrivenCavity/Plots/NuComparison/u_100_nu0005.png" width="500"> 
 
 nu = 0.0001 :
-![](/example_cases/LidDrivenCavity/Plots/NuComparison/ustream_100_nu0001.png) | ![](/example_cases/LidDrivenCavity/Plots/NuComparison/u_100_nu0001.png)
+<img src="/example_cases/LidDrivenCavity/Plots/NuComparison/ustream_100_nu0001.png" width="500"> | <img src="/example_cases/LidDrivenCavity/Plots/NuComparison/u_100_nu0001.png" width="500"> 
