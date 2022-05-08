@@ -185,6 +185,8 @@ Make sure to use a backtick (\`) to get the `which` command executed. Afterwards
 
 ### Results 
 
+The algorithm’s behavior depending on δt
+
 dt | timestep | stabilitiy condition |
 --- | --- | --- |
 0.05 | 5 | div |
@@ -198,9 +200,10 @@ dt | timestep | stabilitiy condition |
 0.007 | - | conv |
 --- | --- | --- |
 0.009 | - | conv |
---- | --- | --- |
 
 
+
+Examination of SOR solvers behavior depending on ω
 
 ω | max-iter | timestep |
 --- | --- | --- |
@@ -221,7 +224,6 @@ dt | timestep | stabilitiy condition |
 1.95 | 295 | - |
 --- | --- | --- |
 1.99 | 1350 | - |
---- | --- | --- |
 
 
 
@@ -236,6 +238,6 @@ imax/jmax | (i,j) | u(i,j) |
 128 | (64,112) | -nan |
 --- | --- | --- |
 256 | (128,224) | -nan |
---- | --- | --- |
+
 
 
