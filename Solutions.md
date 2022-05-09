@@ -1,13 +1,12 @@
 ### Pressure Visualization
 
-When we look at the pressure contour, it can be observed that the highest pressure is seen in the upper right corner of the lid driven cavity and the lowest pressure can be observed at the left upper corner. The fkuid moves from high pressure to low pressure. For the top, fluid is moving from left to right and left part of the top is the place where the pressure is lowest and the right is the place where the pressure is highest.  
-
+The image below shows the pressure contour for the lid driven cavity simulation, after some thousands time steps. As the picture shows, the highest pressure is in the upper right corner of the lid driven cavity while the lowest pressure is observed at the left upper corner. If ome also takes a look at the glyphs in the velocity profile (next section), then it's obvious that the fluid moves from high pressure to low pressure. The only exception is the top of the cavity. Here the cells used for the discretization are "attached" to the lid and hence move with it (from low pressure to high pressure). 
 <img src="example_cases/LidDrivenCavity/Plots/contour_pressure_gray.png" width="500">
 
 
 ### Velocity Visualization
 
-At boundaires, velocity is observed as zero. 
+A expected, velocity is zero at left, right and bottom boundaries, while it's equal to the lid's velocity (one) at the top boundary, where cells are attached to the lid (as explained in the previous section).
 
 <img src="example_cases/LidDrivenCavity/Plots/contour_u_gray.png" width="500">
 <img src="example_cases/LidDrivenCavity/Plots/contour_v_gray.png" width="500">
@@ -18,7 +17,7 @@ At boundaires, velocity is observed as zero.
 
 ### Examination of SOR solvers behavior depending on ω
 
-When maximum iteration number is observed with respect to ω which is relaxation factor a decrease is increased up to an ω value and after that maximum iteration number will again start to increase.
+To examine the SOR solver's behaviour depending on the relaxation factor ω, we conducted the simulation with different values of ω and for each one of these and for each time step, we searched for the maximum number of iterations necessary for the solver to converge (res < eps). Among the ω values we used, the one that required less iterations to converge was ω=1.9. For very low values of ω a very large number of iterations is necessary to obtain convergence. That's consistent with the SOR solver formulation since p(n+1)->p(n) for ω->0. In the table below we report also the time step at which the max iteration is reached, i.e. the time step that required the maximum number of iterations to converge.
 
 ω | max-iter | timestep |
 --- | --- | --- |
@@ -43,7 +42,7 @@ When maximum iteration number is observed with respect to ω which is relaxation
 
 ### The algorithm’s behavior depending on δt
 
-Stability condition for δt is provided in Equation (13). We observed divergence for the time steps 0.01, 0.03 and 0.05. And convergence is observed for time steps 0.005, 0.007 and 0.009.
+In our code we provided an implementation for adapting the time step size δt in accordance to the stability condition in Equation (13). However, in order to analyse the algorithm's behaviour depending on δt, we kept it constant and equal to the values reported in the table below throughout the whole simulation. We observed divergence for the time steps 0.01, 0.03 and 0.05 and convergence for time steps 0.005, 0.007 and 0.009.
 
 dt | timestep | stabilitiy condition |
 --- | --- | --- |
@@ -59,8 +58,9 @@ dt | timestep | stabilitiy condition |
 --- | --- | --- |
 0.009 | - | conv |
 
+### The algorithm’s behavior depending on i_max = j_max
 
-According to Equation (13) when δx and δt increased, δt will increase. And increase in δt leads to a smaller imax and jmax for stability. In the following case we observed u value for changing imax and jmax. For the increasing values of imax and jmax, we observed divergence.
+We also studied the algorithm's behaviour when using different values of i_max an j_max. The bigger i_max=j_max gets, the finer the grid gets (smaller dx and dy). To ensure the stability condition (Equation 12), δt also has to smaller. We conducted our simulations for varying values of i_max=j_max, but always keeping δt constant to 0.05. We then looked at u(i_max/2, 7*j_max/8) at the end of the simulation for each one of these time steps. The only plausible result we obtained was for i_max=j_max=16. For the increasing values of imax and jmax, we observed divergence. In order to obtain plausible results also for bigger values of i_max=j_max we would need to decrease the time step size δt. 
 
 imax/jmax | (i,j) | u(i,j) |
 --- | --- | --- |
@@ -78,7 +78,7 @@ imax/jmax | (i,j) | u(i,j) |
 
 ### Effect of kinematic viscosity
 
-When the viscosity change is investigated, for lower values of viscosity the motion can be propagate to deeper points of flow but for the higher values of viscosity the motion can propagate less deep into the flow. 
+We investigated the effect of kinematic viscosity on our simulation. We looked at the velocity profile for different values of kinematic viscosity nu. For lower values of viscosity the effect of the moving lid can propagate deeper into the fluid. However, for lower viscosity, the velocity magnitude is very high only for regions of fluid that are very close to the lid. For bigger viscosity, the region of "big" (close to 1) velocity magnitude extends more but is then immediately lost (the rest of the cavity is at values very close to zero).
 
 nu = 0.01 :
 <img src="/example_cases/LidDrivenCavity/Plots/NuComparison/ustream_100_nu01.png" width="500"> | <img src="/example_cases/LidDrivenCavity/Plots/NuComparison/u_100_nu01.png" width="500"> 
