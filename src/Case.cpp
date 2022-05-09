@@ -185,8 +185,10 @@ void Case::simulate() {
     std::string convergence;
     const int numWidth = 15;
     const char separator = ' ';
+    
+    // starting the time loop
     while(t < _t_end){
-        
+        // applying boundary
         for(auto &boundary: _boundaries){
             boundary->apply(_field);
         }
@@ -196,6 +198,7 @@ void Case::simulate() {
 
         int it = 0;
         double res = 1.0;
+        // starting iteration for solving pressure at next time step
         while(it < _max_iter && res > _tolerance){
             res = _pressure_solver->solve(_field, _grid, _boundaries);
             it++;            
@@ -206,6 +209,8 @@ void Case::simulate() {
         else{
             convergence = "Not Converged";
         }
+
+        // output on screen - time, timestep, residual and convergence status of pressure eqn.
         std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << " timestep " ;
         std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << timestep;
         std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << " time ";
@@ -215,6 +220,7 @@ void Case::simulate() {
         std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << convergence;
         std::cout << std::endl;
 
+        // calculating velocities at next timestep 
         _field.calculate_velocities(_grid);
         if(t >= output_counter*_output_freq){
             output_vtk(timestep, 1);

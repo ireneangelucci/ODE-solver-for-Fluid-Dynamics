@@ -6,6 +6,7 @@
 
 Fields::Fields(double nu, double dt, double tau, int imax, int jmax, double UI, double VI, double PI, double GX, double GY)
     : _nu(nu), _dt(dt), _tau(tau) {
+    // intializing u, v and p
     _U = Matrix<double>(imax + 2, jmax + 2, UI);
     _V = Matrix<double>(imax + 2, jmax + 2, VI);
     _P = Matrix<double>(imax + 2, jmax + 2, PI);
@@ -23,10 +24,10 @@ void Fields::calculate_fluxes(Grid &grid) {
     for(auto &currentCell: grid.fluid_cells()){
         int i = currentCell->i();
         int j = currentCell->j();
-        if(i != grid.imax()){
+        if(i != grid.imax()){   //excluding imax as f_imax is part of the fixed boundary and set as 0.0
             setf(i,j,u(i,j)+dt()*(_nu*(Discretization::diffusion(_U, i, j))-Discretization::convection_u(_U, _V, i, j) + _gx));
         }
-        if(j != grid.jmax()){
+        if(j != grid.jmax()){   // excluding jmax as g_jmax is part of the moving boundary and set as 0.0
             setg(i,j,v(i,j)+dt()*(_nu*(Discretization::diffusion(_V, i, j))-Discretization::convection_v(_U, _V, i, j) + _gy));
         }
     }
@@ -36,6 +37,7 @@ void Fields::calculate_rs(Grid &grid) {
     for(auto &currentCell: grid.fluid_cells()){
         int i = currentCell->i();
         int j = currentCell->j();
+        // calculating the rhs of pressure equation
         double val = ((f(i,j)-f(i-1,j))/grid.dx() + (g(i,j)-g(i,j-1))/grid.dy())/dt();
         setrs(i, j, val);        
     }
@@ -45,15 +47,16 @@ void Fields::calculate_velocities(Grid &grid) {
     for(auto &currentCell: grid.fluid_cells()){
         int i = currentCell->i();
         int j = currentCell->j();
-        if(i != grid.imax()){
+        if(i != grid.imax()){   //excluding imax as u_imax is part of the fixed boundary and set as 0.0
             setu(i, j, f(i,j) - _dt/grid.dx()*(p(i+1,j)-p(i,j)));
         }
-        if(j != grid.jmax()){
+        if(j != grid.jmax()){   // excluding jmax as v_jmax is part of the moving boundary (in x direction) and set as 0.0
             setv(i, j, g(i,j) - _dt/grid.dy()*(p(i,j+1)-p(i,j)));       
         }
     }
 }
 
+//calculating the timestep keeping in mind the stability crtiteria
 double Fields::calculate_dt(Grid &grid) { 
     double dt = std::abs(0.5/_nu)/(1/grid.dx()/grid.dx() + 1/grid.dy()/grid.dy())*_tau;
     for(auto &currentCell: grid.fluid_cells()){
@@ -72,6 +75,7 @@ double Fields::calculate_dt(Grid &grid) {
     return dt; 
 }
 
+// get functions
 double &Fields::p(int i, int j) { return _P(i, j); }
 double &Fields::u(int i, int j) { return _U(i, j); }
 double &Fields::v(int i, int j) { return _V(i, j); }
@@ -83,6 +87,7 @@ Matrix<double> &Fields::p_matrix() { return _P; }
 
 double Fields::dt() const { return _dt; }
 
+// set functions
 void Fields::setp(int i, int j, double val) { _P(i, j) = val; }
 void Fields::setu(int i, int j, double val) { _U(i, j) = val; }
 void Fields::setv(int i, int j, double val) { _V(i, j) = val; }

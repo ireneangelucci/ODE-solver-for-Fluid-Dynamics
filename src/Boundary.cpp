@@ -11,8 +11,11 @@ FixedWallBoundary::FixedWallBoundary(std::vector<Cell *> cells, std::map<int, do
 void FixedWallBoundary::apply(Fields &field) {
     for(const auto& currentCell: _cells){
         if(currentCell->is_border(border_position::TOP)){ //Bottom cells
-            field.setv(currentCell->i(),currentCell->j(),0.0);
+            // setting boundary conditions
+            field.setv(currentCell->i(),currentCell->j(),0.0);     // v lies on the boundary, setting it as 0.0
+            // u doesn't lie on the boundary, hence setting average with neighbouring cell on top as 0.0
             field.setu(currentCell->i(),currentCell->j(),-(field.u(currentCell->neighbour(border_position::TOP)->i(),currentCell->neighbour(border_position::TOP)->j())));
+            // setting pressure gradient as 0.0
             field.setp(currentCell->i(),currentCell->j(),field.p(currentCell->neighbour(border_position::TOP)->i(),currentCell->neighbour(border_position::TOP)->j()));
             field.setg(currentCell->i(),currentCell->j(),field.v(currentCell->i(),currentCell->j()));
         }
@@ -44,6 +47,7 @@ void MovingWallBoundary::apply(Fields &field) {
     for(const auto& currentCell: _cells){
         if(currentCell->is_border(border_position::BOTTOM)){   //Top cells
             field.setv(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j(),0.0);
+            // u doesn't lie on boundary, setting the avg value with neighbour (bottom) cell as the specified wall velocity
             field.setu(currentCell->i(),currentCell->j(),2*_wall_velocity.at(currentCell->wall_id())-(field.u(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j())));
             field.setp(currentCell->i(),currentCell->j(),field.p(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j()));
             field.setg(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j(),field.v(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j()));
