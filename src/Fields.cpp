@@ -58,7 +58,7 @@ void Fields::calculate_velocities(Grid &grid) {
 
 //calculating the timestep keeping in mind the stability crtiteria
 double Fields::calculate_dt(Grid &grid) { 
-    double dt = std::abs(0.5/_nu)/(1/grid.dx()/grid.dx() + 1/grid.dy()/grid.dy())*_tau;
+    double dt = 0.5/_nu/(1/grid.dx()/grid.dx() + 1/grid.dy()/grid.dy())*_tau;
     for(auto &currentCell: grid.fluid_cells()){
         int i = currentCell->i();
         int j = currentCell->j();

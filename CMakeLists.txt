@@ -20,7 +20,7 @@ find_package(MPI REQUIRED)
 # find_package(Boost COMPONENTS filesystem REQUIRED)
 
 # VTK Library
-set(VTK_DIR  "/home/irene/TUM/vtk/build")
+set(CMAKE_PREFIX_PATH  /home/manish/Softwares/vtk/build)
 find_package(VTK REQUIRED)
 if (NOT VTK_FOUND)
   message("VTK not found")
@@ -30,7 +30,7 @@ message (STATUS "VTK_VERSION: ${VTK_VERSION}")
 include(${VTK_USE_FILE})
 
 # Filesystem
-set(gpp9 False)
+# set(gpp9 False)
 #set(gpp9 True)
 if(gpp9)
     message("g++ Version is 9 or higher")
@@ -47,7 +47,7 @@ endif()
 include_directories(include)
 
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_MODULE_PATH  /usr/local)
+  set(CMAKE_INSTALL_PREFIX  /usr/local)
 endif()
 
 # Creating the executable of our project and the required dependencies
