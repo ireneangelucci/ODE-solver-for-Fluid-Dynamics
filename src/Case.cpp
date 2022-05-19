@@ -41,7 +41,21 @@ Case::Case(std::string file_name, int argn, char **args) {
     double tau;     /* safety factor for time step*/
     int itermax;    /* max. number of iterations for pressure per time step */
     double eps;     /* accuracy bound for pressure*/
-    
+
+    double dt_value;           /* time for output */
+    std::string  program;
+    std::string geo_file;
+    double TI;                 /* initial temperature  */
+    double Pr;                 /* prandtl number   */
+    double beta;               /* the coefficient of thermal expansion */
+    double alpha;
+    double heatTransfer;       /* Flag to enable heat transfer */
+    double T_h;
+    double T_c;
+    double deltaP;
+    double UIN; 
+    double VIN; 
+    int num_of_walls;
 
     if (file.is_open()) {
 
@@ -69,6 +83,20 @@ Case::Case(std::string file_name, int argn, char **args) {
                 if (var == "itermax") file >> itermax;
                 if (var == "imax") file >> imax;
                 if (var == "jmax") file >> jmax;
+
+                if( var == "program") file >> program;
+                if( var == "geometry") file >> geo_file;
+                if( var == "TI") file >> TI;
+                if( var == "Pr") file >> Pr;
+                if( var == "beta") file >> beta;
+                if( var == "alpha") file >> alpha;
+                if( var == "heatTransfer") file >> heatTransfer;
+                if( var == "T_h") file >> T_h;
+                if( var == "T_c") file >> T_c;
+                if( var == "deltaP") file >> deltaP;
+                if( var == "UIN") file >> UIN;
+                if( var == "VIN") file >> VIN;
+                if( var == "num_of_walls") file >> num_of_walls;
             }
         }
     }
@@ -92,6 +120,7 @@ Case::Case(std::string file_name, int argn, char **args) {
     build_domain(domain, imax, jmax);
 
     _grid = Grid(_geom_name, domain);
+    //std::cout<<nu<<" nu-2 from file \n";
     _field = Fields(nu, dt, tau, _grid.domain().size_x, _grid.domain().size_y, UI, VI, PI, GX, GY);
 
     _discretization = Discretization(domain.dx, domain.dy, gamma);
@@ -157,17 +186,17 @@ void Case::set_file_names(std::string file_name) {
 }
 
 /**
- *  This function is the main simulation loop. In the simulation loop, following steps are required
- *  Calculate and apply boundary conditions for all the boundaries in _boundaries container
- *  using apply() member function of Boundary class
- *  Calculate fluxes (F and G) using calculate_fluxes() member function of Fields class.
- *  Flux consists of diffusion and convection part, which are located in Discretization class
- *  Calculate right-hand-side of PPE using calculate_rs() member function of Fields class
- *  Iterate the pressure poisson equation until the residual becomes smaller than the desired tolerance
- *  or the maximum number of the iterations are performed using solve() member function of PressureSolver class
- *  Calculate the velocities u and v using calculate_velocities() member function of Fields class
- *  Calculat the maximal timestep size for the next iteration using calculate_dt() member function of Fields class
- *  Write vtk files using output_vtk() function
+ * This function is the main simulation loop. In the simulation loop, following steps are required
+ * - c - Calculate and apply boundary conditions for all the boundaries in _boundaries container
+ *   using apply() member function of Boundary class
+ * - c - Calculate fluxes (F and G) using calculate_fluxes() member function of Fields class.
+ *   Flux consists of diffusion and convection part, which are located in Discretization class
+ * - c - Calculate right-hand-side of PPE using calculate_rs() member function of Fields class
+ * - c -  Iterate the pressure poisson equation until the residual becomes smaller than the desired tolerance
+ *   or the maximum number of the iterations are performed using solve() member function of PressureSolver class
+ * - c - Calculate the velocities u and v using calculate_velocities() member function of Fields class
+ * - c -Calculat the maximal timestep size for the next iteration using calculate_dt() member function of Fields class
+ * -c -  Write vtk files using output_vtk() function
  *
  * Please note that some classes such as PressureSolver, Boundary are abstract classes which means they only provide the
  * interface. No member functions should be defined in abstract classes. You need to define functions in inherited
