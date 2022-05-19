@@ -25,7 +25,7 @@ class Fields {
      * @param[in] initial pressure
      *
      */
-    Fields(double _nu, double _dt, double _tau, int imax, int jmax, double UI, double VI, double PI);
+    Fields(double _nu, double _dt, double _tau, int imax, int jmax, double UI, double VI, double PI, double GX, double GY);
 
     /**
      * @brief Calculates the convective and diffusive fluxes in x and y
@@ -85,6 +85,13 @@ class Fields {
 
     /// pressure matrix access and modify
     Matrix<double> &p_matrix();
+
+    void setp(int i, int j, double val);
+    void setu(int i, int j, double val);
+    void setv(int i, int j, double val);
+    void setf(int i, int j, double val);
+    void setg(int i, int j, double val);
+    void setrs(int i, int j, double val);
 
   private:
     /// x-velocity matrix

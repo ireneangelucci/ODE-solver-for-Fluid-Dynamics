@@ -7,6 +7,7 @@
 #include <iostream>
 #include <map>
 #include <vector>
+#include <iomanip>
 
 namespace filesystem = std::filesystem;
 
@@ -21,6 +22,7 @@ namespace filesystem = std::filesystem;
 
 Case::Case(std::string file_name, int argn, char **args) {
     // Read input parameters
+    
     const int MAX_LINE_LENGTH = 1024;
     std::ifstream file(file_name);
     double nu;      /* viscosity   */
@@ -39,6 +41,7 @@ Case::Case(std::string file_name, int argn, char **args) {
     double tau;     /* safety factor for time step*/
     int itermax;    /* max. number of iterations for pressure per time step */
     double eps;     /* accuracy bound for pressure*/
+    
 
     if (file.is_open()) {
 
@@ -89,7 +92,7 @@ Case::Case(std::string file_name, int argn, char **args) {
     build_domain(domain, imax, jmax);
 
     _grid = Grid(_geom_name, domain);
-    _field = Fields(nu, dt, tau, _grid.domain().size_x, _grid.domain().size_y, UI, VI, PI);
+    _field = Fields(nu, dt, tau, _grid.domain().size_x, _grid.domain().size_y, UI, VI, PI, GX, GY);
 
     _discretization = Discretization(domain.dx, domain.dy, gamma);
     _pressure_solver = std::make_unique<SOR>(omg);
@@ -154,17 +157,17 @@ void Case::set_file_names(std::string file_name) {
 }
 
 /**
- * This function is the main simulation loop. In the simulation loop, following steps are required
- * - Calculate and apply boundary conditions for all the boundaries in _boundaries container
- *   using apply() member function of Boundary class
- * - Calculate fluxes (F and G) using calculate_fluxes() member function of Fields class.
- *   Flux consists of diffusion and convection part, which are located in Discretization class
- * - Calculate right-hand-side of PPE using calculate_rs() member function of Fields class
- * - Iterate the pressure poisson equation until the residual becomes smaller than the desired tolerance
- *   or the maximum number of the iterations are performed using solve() member function of PressureSolver class
- * - Calculate the velocities u and v using calculate_velocities() member function of Fields class
- * - Calculat the maximal timestep size for the next iteration using calculate_dt() member function of Fields class
- * - Write vtk files using output_vtk() function
+ *  This function is the main simulation loop. In the simulation loop, following steps are required
+ *  Calculate and apply boundary conditions for all the boundaries in _boundaries container
+ *  using apply() member function of Boundary class
+ *  Calculate fluxes (F and G) using calculate_fluxes() member function of Fields class.
+ *  Flux consists of diffusion and convection part, which are located in Discretization class
+ *  Calculate right-hand-side of PPE using calculate_rs() member function of Fields class
+ *  Iterate the pressure poisson equation until the residual becomes smaller than the desired tolerance
+ *  or the maximum number of the iterations are performed using solve() member function of PressureSolver class
+ *  Calculate the velocities u and v using calculate_velocities() member function of Fields class
+ *  Calculat the maximal timestep size for the next iteration using calculate_dt() member function of Fields class
+ *  Write vtk files using output_vtk() function
  *
  * Please note that some classes such as PressureSolver, Boundary are abstract classes which means they only provide the
  * interface. No member functions should be defined in abstract classes. You need to define functions in inherited
@@ -173,11 +176,60 @@ void Case::set_file_names(std::string file_name) {
  * For information about the classes and functions, you can check the header files.
  */
 void Case::simulate() {
-
+    std::cout << "Simulation started. \n";
     double t = 0.0;
     double dt = _field.dt();
     int timestep = 0;
-    double output_counter = 0.0;
+    int output_counter = 0;
+    std::string convergence;
+    const int numWidth = 15;
+    const char separator = ' ';
+    
+    // starting the time loop
+    while(t < _t_end){
+        // applying boundary
+        for(auto &boundary: _boundaries){
+            boundary->apply(_field);
+        }
+
+        _field.calculate_fluxes(_grid);
+        _field.calculate_rs(_grid);
+
+        int it = 0;
+        double res = 1.0;
+        // starting iteration for solving pressure at next time step
+        while(it < _max_iter && res > _tolerance){
+            res = _pressure_solver->solve(_field, _grid, _boundaries);
+            it++;            
+        }
+        if(it < _max_iter){
+            convergence = "Converged";
+        }
+        else{
+            convergence = "Not Converged";
+        }
+
+        // output on screen - time, timestep, residual and convergence status of pressure eqn.
+        std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << " timestep " ;
+        std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << timestep;
+        std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << " time ";
+        std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << t;
+        std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << " residual ";
+        std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << res;
+        std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << convergence;
+        std::cout << std::endl;
+
+        // calculating velocities at next timestep 
+        _field.calculate_velocities(_grid);
+        if(t >= output_counter*_output_freq){
+            output_vtk(timestep, 1);
+            output_counter += 1;
+        }
+        t = t + _field.dt();
+        _field.calculate_dt(_grid);
+        timestep +=1;
+    }
+    std::cout << "Simulation ended. \n";
 }
 
 void Case::output_vtk(int timestep, int my_rank) {
