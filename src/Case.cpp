@@ -44,7 +44,7 @@ Case::Case(std::string file_name, int argn, char **args) {
 
     double dt_value;           /* time for output */
     std::string  program;
-    std::string geo_file;
+    std::string _geom_file;
     double TI;                 /* initial temperature  */
     double Pr;                 /* prandtl number   */
     double beta;               /* the coefficient of thermal expansion */
@@ -85,7 +85,7 @@ Case::Case(std::string file_name, int argn, char **args) {
                 if (var == "jmax") file >> jmax;
 
                 if( var == "program") file >> program;
-                if( var == "geo_file") file >> geo_file;
+                if( var == "geo_file") file >> _geom_name;
                 if( var == "TI") file >> TI;
                 if( var == "Pr") file >> Pr;
                 if( var == "beta") file >> beta;
