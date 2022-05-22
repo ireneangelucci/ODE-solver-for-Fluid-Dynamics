@@ -90,6 +90,8 @@ class Grid {
     void assign_cell_types(std::vector<std::vector<int>> &geometry_data);
     /// Extract geometry from pgm file and create geometrical data
     void parse_geometry_file(std::string filedoc, std::vector<std::vector<int>> &geometry_data);
+    /// Check that wall cells are not forbidden
+    void check_forbidden_cells();
 
     Matrix<Cell> _cells;
     std::vector<Cell *> _inflow_cells;

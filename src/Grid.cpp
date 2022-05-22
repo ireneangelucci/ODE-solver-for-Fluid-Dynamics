@@ -18,6 +18,7 @@ Grid::Grid(std::string geom_name, Domain &domain) {
                                                     std::vector<int>(_domain.domain_size_y + 2, 0));
         parse_geometry_file(geom_name, geometry_data);
         assign_cell_types(geometry_data);
+        check_forbidden_cells();
     } else {
         build_lid_driven_cavity();
     }
@@ -228,6 +229,17 @@ void Grid::assign_cell_types(std::vector<std::vector<int>> &geometry_data) {
             }
         }
     }
+}
+
+void Grid::check_forbidden_cells() {
+    for (auto & cell : _fixed_wall_cells){
+        if ((cell->borders()).size() >= 3){
+            std::cerr << "Forbidden cell at position (" << cell->i() << "," << cell->j() << ") \n";
+            std::cerr << "Please insert a valid pgm file. A fixed wall cell should have not more than two fluid cells as neighbors. \n";
+            exit(1);
+        }
+    }
+
 }
 
 void Grid::parse_geometry_file(std::string filedoc, std::vector<std::vector<int>> &geometry_data) {
