@@ -38,6 +38,41 @@ class FixedWallBoundary : public Boundary {
     std::map<int, double> _wall_temperature;
 };
 
+class InflowBoundary : public Boundary {
+  public:
+    InflowBoundary(std::vector<Cell *> cells, double inlet_velocity);
+    virtual ~InflowBoundary() = default;
+    virtual void apply(Fields &field);
+
+  private:
+    std::vector<Cell *> _cells;
+    double _inlet_velocity;
+};
+
+class OutflowBoundary : public Boundary {
+  public:
+    OutflowBoundary(std::vector<Cell *> cells, double outflow_pressure);
+    virtual ~OutflowBoundary() = default;
+    virtual void apply(Fields &field);
+
+  private:
+    std::vector<Cell *> _cells;
+    double _outflow_pressure;
+};
+
+/*
+class AdiabaticWall : public Boundary {
+  public:
+    OutflowBoundary(std::vector<Cell *> cells);
+    OutflowBoundary(std::vector<Cell *> cells, std::map<int, double> outflow_pressure);
+    virtual ~OutflowBoundary() = default;
+    virtual void apply(Fields &field);
+
+  private:
+    std::vector<Cell *> _cells;
+    std::map<int, double> _outflow_pressure
+};
+*/
 /**
  * @brief Moving wall boundary condition for the outer boundaries of the domain.
  * Dirichlet for velocities for the given velocity parallel to the fluid,

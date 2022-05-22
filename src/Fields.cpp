@@ -4,12 +4,12 @@
 #include <algorithm>
 #include <iostream>
 
-Fields::Fields(double nu, double dt, double tau, int imax, int jmax, double UI, double VI, double PI, double GX, double GY)
+Fields::Fields(double nu, double dt, double tau, int imax, int jmax, double UI, double VI, double PI, double GX, double GY, Grid &grid)
     : _nu(nu), _dt(dt), _tau(tau) {
     // intializing u, v and p
-    _U = Matrix<double>(imax + 2, jmax + 2, UI);
-    _V = Matrix<double>(imax + 2, jmax + 2, VI);
-    _P = Matrix<double>(imax + 2, jmax + 2, PI);
+    _U = Matrix<double>(imax + 2, jmax + 2, 0.0);
+    _V = Matrix<double>(imax + 2, jmax + 2, 0.0);
+    _P = Matrix<double>(imax + 2, jmax + 2, 0.0);
 
     _F = Matrix<double>(imax + 2, jmax + 2, 0.0);
     _G = Matrix<double>(imax + 2, jmax + 2, 0.0);
@@ -17,6 +17,14 @@ Fields::Fields(double nu, double dt, double tau, int imax, int jmax, double UI, 
 
     _gx = GX;
     _gy = GY;
+
+    for(auto &currentCell: grid.fluid_cells()){
+        int i = currentCell->i();
+        int j = currentCell->j();
+        setu(i,j,UI);
+        setv(i,j,VI);
+        setp(i,j,PI);
+    }
 }
 
 void Fields::calculate_fluxes(Grid &grid) {

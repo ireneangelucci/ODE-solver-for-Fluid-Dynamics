@@ -85,7 +85,7 @@ Case::Case(std::string file_name, int argn, char **args) {
                 if (var == "jmax") file >> jmax;
 
                 if( var == "program") file >> program;
-                if( var == "geometry") file >> geo_file;
+                if( var == "geo_file") file >> geo_file;
                 if( var == "TI") file >> TI;
                 if( var == "Pr") file >> Pr;
                 if( var == "beta") file >> beta;
@@ -120,8 +120,7 @@ Case::Case(std::string file_name, int argn, char **args) {
     build_domain(domain, imax, jmax);
 
     _grid = Grid(_geom_name, domain);
-    //std::cout<<nu<<" nu-2 from file \n";
-    _field = Fields(nu, dt, tau, _grid.domain().size_x, _grid.domain().size_y, UI, VI, PI, GX, GY);
+    _field = Fields(nu, dt, tau, _grid.domain().size_x, _grid.domain().size_y, UI, VI, PI, GX, GY, _grid);
 
     _discretization = Discretization(domain.dx, domain.dy, gamma);
     _pressure_solver = std::make_unique<SOR>(omg);
@@ -135,6 +134,12 @@ Case::Case(std::string file_name, int argn, char **args) {
     }
     if (not _grid.fixed_wall_cells().empty()) {
         _boundaries.push_back(std::make_unique<FixedWallBoundary>(_grid.fixed_wall_cells()));
+    }
+    if (not _grid.inflow_cells().empty()) {
+        _boundaries.push_back(std::make_unique<InflowBoundary>(_grid.inflow_cells(),UIN));
+    }
+    if (not _grid.outflow_cells().empty()) {
+        _boundaries.push_back(std::make_unique<InflowBoundary>(_grid.outflow_cells(),Pr));
     }
 }
 
@@ -187,16 +192,16 @@ void Case::set_file_names(std::string file_name) {
 
 /**
  * This function is the main simulation loop. In the simulation loop, following steps are required
- * - c - Calculate and apply boundary conditions for all the boundaries in _boundaries container
- *   using apply() member function of Boundary class
- * - c - Calculate fluxes (F and G) using calculate_fluxes() member function of Fields class.
- *   Flux consists of diffusion and convection part, which are located in Discretization class
- * - c - Calculate right-hand-side of PPE using calculate_rs() member function of Fields class
- * - c -  Iterate the pressure poisson equation until the residual becomes smaller than the desired tolerance
- *   or the maximum number of the iterations are performed using solve() member function of PressureSolver class
- * - c - Calculate the velocities u and v using calculate_velocities() member function of Fields class
- * - c -Calculat the maximal timestep size for the next iteration using calculate_dt() member function of Fields class
- * -c -  Write vtk files using output_vtk() function
+ * Calculate and apply boundary conditions for all the boundaries in _boundaries container
+ * using apply() member function of Boundary class
+ * Calculate fluxes (F and G) using calculate_fluxes() member function of Fields class.
+ * Flux consists of diffusion and convection part, which are located in Discretization class
+ * Calculate right-hand-side of PPE using calculate_rs() member function of Fields class
+ * Iterate the pressure poisson equation until the residual becomes smaller than the desired tolerance
+ * or the maximum number of the iterations are performed using solve() member function of PressureSolver class
+ * Calculate the velocities u and v using calculate_velocities() member function of Fields class
+ * Calculat the maximal timestep size for the next iteration using calculate_dt() member function of Fields class
+ * Write vtk files using output_vtk() function
  *
  * Please note that some classes such as PressureSolver, Boundary are abstract classes which means they only provide the
  * interface. No member functions should be defined in abstract classes. You need to define functions in inherited
