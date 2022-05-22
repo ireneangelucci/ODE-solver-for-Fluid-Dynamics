@@ -136,10 +136,11 @@ Case::Case(std::string file_name, int argn, char **args) {
         _boundaries.push_back(std::make_unique<FixedWallBoundary>(_grid.fixed_wall_cells()));
     }
     if (not _grid.inflow_cells().empty()) {
-        _boundaries.push_back(std::make_unique<InflowBoundary>(_grid.inflow_cells(),UIN));
+        _boundaries.push_back(std::make_unique<InflowBoundary>(_grid.inflow_cells(),UIN, VIN));
     }
+    double Pout = 0.0;
     if (not _grid.outflow_cells().empty()) {
-        _boundaries.push_back(std::make_unique<InflowBoundary>(_grid.outflow_cells(),Pr));
+        _boundaries.push_back(std::make_unique<OutflowBoundary>(_grid.outflow_cells(),Pout));
     }
 }
 
@@ -212,6 +213,7 @@ void Case::set_file_names(std::string file_name) {
 void Case::simulate() {
     std::cout << "Simulation started. \n";
     double t = 0.0;
+    //_field.calculate_dt(_grid);
     double dt = _field.dt();
     int timestep = 0;
     int output_counter = 0;

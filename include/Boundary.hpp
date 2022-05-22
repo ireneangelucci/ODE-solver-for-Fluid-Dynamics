@@ -40,13 +40,14 @@ class FixedWallBoundary : public Boundary {
 
 class InflowBoundary : public Boundary {
   public:
-    InflowBoundary(std::vector<Cell *> cells, double inlet_velocity);
+    InflowBoundary(std::vector<Cell *> cells, double _inlet_velocity_x, double _inlet_velocity_y);
     virtual ~InflowBoundary() = default;
     virtual void apply(Fields &field);
 
   private:
     std::vector<Cell *> _cells;
-    double _inlet_velocity;
+    double _inlet_velocity_x;
+    double _inlet_velocity_y;
 };
 
 class OutflowBoundary : public Boundary {

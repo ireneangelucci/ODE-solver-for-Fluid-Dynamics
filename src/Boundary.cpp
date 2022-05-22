@@ -10,7 +10,9 @@ FixedWallBoundary::FixedWallBoundary(std::vector<Cell *> cells, std::map<int, do
 
 void FixedWallBoundary::apply(Fields &field) {
     for(const auto& currentCell: _cells){
+        
         if(currentCell->is_border(border_position::TOP)){ //Bottom cells
+            //std::cout<<"Bottom Cells fixed: "<<currentCell->i()<<", "<<currentCell->j()<<"\n";
             // setting boundary conditions
             field.setv(currentCell->i(),currentCell->j(),0.0);     // v lies on the boundary, setting it as 0.0
             // u doesn't lie on the boundary, hence setting average with neighbouring cell on top as 0.0
@@ -21,6 +23,7 @@ void FixedWallBoundary::apply(Fields &field) {
         }
         
         if(currentCell->is_border(border_position::BOTTOM)){ //Top cells
+            //std::cout<<"Top Cells fixed: "<<currentCell->i()<<", "<<currentCell->j()<<"\n";
             // setting boundary conditions
             field.setv(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j(),0.0);     // v lies on the boundary, setting it as 0.0
             // u doesn't lie on the boundary, hence setting average with neighbouring cell on top as 0.0
@@ -31,12 +34,14 @@ void FixedWallBoundary::apply(Fields &field) {
         }
 
         if(currentCell->is_border(border_position::RIGHT)){   //Left cells
+            //std::cout<<"Left Cells fixed: "<<currentCell->i()<<", "<<currentCell->j()<<"\n";
             field.setu(currentCell->i(),currentCell->j(),0.0);
             field.setv(currentCell->i(),currentCell->j(),-(field.v(currentCell->neighbour(border_position::RIGHT)->i(),currentCell->neighbour(border_position::RIGHT)->j())));
             field.setp(currentCell->i(),currentCell->j(),field.p(currentCell->neighbour(border_position::RIGHT)->i(),currentCell->neighbour(border_position::RIGHT)->j()));
             field.setf(currentCell->i(),currentCell->j(),field.u(currentCell->i(),currentCell->j()));
         }       
         if(currentCell->is_border(border_position::LEFT)){    // Right cells
+            //std::cout<<"Right Cells fixed: "<<currentCell->i()<<", "<<currentCell->j()<<"\n";
             field.setu(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j(),0.0);
             field.setv(currentCell->i(),currentCell->j(),-(field.v(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j())));
             field.setp(currentCell->i(),currentCell->j(),field.p(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j()));
@@ -65,22 +70,24 @@ void MovingWallBoundary::apply(Fields &field) {
     }
 }
 
-InflowBoundary::InflowBoundary(std::vector<Cell *> cells, double inlet_velocity) 
-    : _cells(cells), _inlet_velocity(inlet_velocity) {};
+InflowBoundary::InflowBoundary(std::vector<Cell *> cells, double inlet_velocity_x, double inlet_velocity_y) 
+    : _cells(cells), _inlet_velocity_x(inlet_velocity_x), _inlet_velocity_y(inlet_velocity_y) {};
 
 void InflowBoundary::apply(Fields &field) {
     for(const auto& currentCell: _cells){
         if(currentCell->is_border(border_position::RIGHT)){   //Left cells
-            field.setu(currentCell->i(),currentCell->j(),_inlet_velocity);
+            //std::cout<<"Left Cells inflow: "<<currentCell->i()<<", "<<currentCell->j()<<"\n";
+            field.setu(currentCell->i(),currentCell->j(), _inlet_velocity_x);
             // v doesn't lie on boundary, setting the avg value with neighbour (bottom) cell as 0 (inflow perpendicular)
-            field.setv(currentCell->i(),currentCell->j(),-(field.v(currentCell->neighbour(border_position::RIGHT)->i(),currentCell->neighbour(border_position::RIGHT)->j())));
+            field.setv(currentCell->i(),currentCell->j(), 2*_inlet_velocity_y -(field.v(currentCell->neighbour(border_position::RIGHT)->i(),currentCell->neighbour(border_position::RIGHT)->j())));
             field.setp(currentCell->i(),currentCell->j(),field.p(currentCell->neighbour(border_position::RIGHT)->i(),currentCell->neighbour(border_position::RIGHT)->j()));
             field.setf(currentCell->i(),currentCell->j(),field.u(currentCell->i(),currentCell->j()));
         }
         if(currentCell->is_border(border_position::LEFT)){   //RIGHT cells
-            field.setu(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j(),_inlet_velocity);
+            //std::cout<<"Right Cells inflow:\n";
+            field.setu(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j(),_inlet_velocity_x);
             // v doesn't lie on boundary, setting the avg value with neighbour (bottom) cell as 0 (inflow perpendicular)
-            field.setv(currentCell->i(),currentCell->j(),-(field.v(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j())));
+            field.setv(currentCell->i(),currentCell->j(),2*_inlet_velocity_y -(field.v(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j())));
             field.setp(currentCell->i(),currentCell->j(),field.p(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j()));
             field.setf(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j(),field.u(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j()));
         }
@@ -88,11 +95,14 @@ void InflowBoundary::apply(Fields &field) {
 }
 
 OutflowBoundary::OutflowBoundary(std::vector<Cell *> cells, double outflow_pressure) 
-    : _cells(cells), _outflow_pressure(outflow_pressure) {};
+    : _cells(cells), _outflow_pressure(outflow_pressure) {
+        //std::cout<<"Out press is "<<_outflow_pressure<<"\n";
+    };
 
 void OutflowBoundary::apply(Fields &field) {
     for(const auto& currentCell: _cells){
         if(currentCell->is_border(border_position::LEFT)){   //Right cells
+            //std::cout<<"Right Cells outflow: "<<currentCell->i()<<", "<<currentCell->j()<<"\n";
             //field.setu(currentCell->i(),currentCell->j(),field.u(currentCell->neighbour(border_position::LEFT)->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->neighbour(border_position::LEFT)->j()));
             field.setu(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j(),field.u(currentCell->neighbour(border_position::LEFT)->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->neighbour(border_position::LEFT)->j()));
             // v doesn't lie on boundary, setting the avg value with neighbour (bottom) cell as 0 (inflow perpendicular)
@@ -101,6 +111,7 @@ void OutflowBoundary::apply(Fields &field) {
             field.setf(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j(),field.u(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j()));
         }
         if(currentCell->is_border(border_position::RIGHT)){   //Left cells
+            //std::cout<<"Left Cells outflow: "<<currentCell->i()<<", "<<currentCell->j()<<"\n";
             //field.setu(currentCell->i(),currentCell->j(),field.u(currentCell->neighbour(border_position::LEFT)->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->neighbour(border_position::LEFT)->j()));
             field.setu(currentCell->i(),currentCell->j(),field.u(currentCell->neighbour(border_position::RIGHT)->i(),currentCell->neighbour(border_position::RIGHT)->j()));
             // v doesn't lie on boundary, setting the avg value with neighbour (bottom) cell as 0 (inflow perpendicular)

@@ -57,15 +57,15 @@ void Grid::assign_cell_types(std::vector<std::vector<int>> &geometry_data) {
                 _fluid_cells.push_back(&_cells(i, j));
             } else if (geometry_data.at(i_geom).at(j_geom) == 1) {
                 _cells(i, j) = Cell(i, j, cell_type::INFLOW);
-                std::cout << "inflow cell at position " << i << ", " << j<< "\n"; 
+                //std::cout << "inflow cell at position " << i << ", " << j<< "\n"; 
                 _inflow_cells.push_back(&_cells(i, j));
             } else if (geometry_data.at(i_geom).at(j_geom) == 2) {
                 _cells(i, j) = Cell(i, j, cell_type::OUTFLOW);
-                std::cout << "outflow cell at position " << i << ", " << j<< "\n"; 
+                //std::cout << "outflow cell at position " << i << ", " << j<< "\n"; 
                 _outflow_cells.push_back(&_cells(i, j));
             } else if (geometry_data.at(i_geom).at(j_geom) == 3) {
                 _cells(i, j) = Cell(i, j, cell_type::ADIABATIC_WALL);
-                std::cout << "wall cell at position " << i << ", " << j<< "\n"; 
+                //std::cout << "wall cell at position " << i << ", " << j<< "\n"; 
                 _fixed_wall_cells.push_back(&_cells(i, j));     //_adiabatic_wall_cells
             /*} else if (geometry_data.at(i_geom).at(j_geom) == 4) {
                 _cells(i, j) = Cell(i, j, cell_type::HOT_WALL);
