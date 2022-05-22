@@ -47,6 +47,54 @@ void FixedWallBoundary::apply(Fields &field) {
             field.setp(currentCell->i(),currentCell->j(),field.p(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j()));
             field.setf(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j(),field.u(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j()));
         }
+
+        if(currentCell->is_border(border_position::TOP) && currentCell->is_border(border_position::RIGHT)){ //Fluid on top and on right 
+            // setting boundary conditions
+            field.setv(currentCell->i(),currentCell->j(),0.0);     // v lies on the boundary, setting it as 0.0
+            field.setu(currentCell->i(),currentCell->j(),0.0);     // u lies on the boundary, setting it as 0.0
+            field.setu(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j(),-field.u(currentCell->neighbour(border_position::LEFT)->neighbour(border_position::TOP)->i(),currentCell->neighbour(border_position::LEFT)->neighbour(border_position::TOP)->j()));  //U_(i-1,j) = -U_(i-1,j+1)
+            field.setv(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j(),-field.v(currentCell->neighbour(border_position::BOTTOM)->neighbour(border_position::RIGHT)->i(),currentCell->neighbour(border_position::BOTTOM)->neighbour(border_position::RIGHT)->j()));  //V_(i,j-1) = -V_(i+1,j-1)
+            // setting pressure gradient as 0.0
+            field.setp(currentCell->i(),currentCell->j(),(field.p(currentCell->neighbour(border_position::TOP)->i(),currentCell->neighbour(border_position::TOP)->j()) + field.p(currentCell->neighbour(border_position::RIGHT)->i(),currentCell->neighbour(border_position::RIGHT)->j()))*0.5);  //P_(i,j) = (P_(i,j+1)+P_(i+1,j))/2
+            field.setf(currentCell->i(),currentCell->j(),field.u(currentCell->i(),currentCell->j()));
+            field.setg(currentCell->i(),currentCell->j(),field.v(currentCell->i(),currentCell->j()));
+        }
+
+        if(currentCell->is_border(border_position::TOP) && currentCell->is_border(border_position::LEFT)){ //Fluid on top and on left 
+            // setting boundary conditions
+            field.setv(currentCell->i(),currentCell->j(),0.0);     // v lies on the boundary, setting it as 0.0
+            field.setu(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j(),0.0);     // u lies on the boundary, setting it as 0.0
+            field.setu(currentCell->i(),currentCell->j(),-field.u(currentCell->neighbour(border_position::TOP)->i(),currentCell->neighbour(border_position::TOP)->j()));  
+            field.setv(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j(),-field.v(currentCell->neighbour(border_position::BOTTOM)->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::BOTTOM)->neighbour(border_position::LEFT)->j()));  
+            // setting pressure gradient as 0.0
+            field.setp(currentCell->i(),currentCell->j(),(field.p(currentCell->neighbour(border_position::TOP)->i(),currentCell->neighbour(border_position::TOP)->j()) + field.p(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j()))*0.5);  
+            field.setf(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j(),field.u(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j()));
+            field.setg(currentCell->i(),currentCell->j(),field.v(currentCell->i(),currentCell->j()));
+        }
+
+        if(currentCell->is_border(border_position::BOTTOM) && currentCell->is_border(border_position::RIGHT)){
+            // setting boundary conditions
+            field.setv(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j(),0.0);     
+            field.setu(currentCell->i(),currentCell->j(),0.0);     
+            field.setu(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j(),-field.u(currentCell->neighbour(border_position::LEFT)->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::LEFT)->neighbour(border_position::BOTTOM)->j()));  //U_(i-1,j) = -U_(i-1,j+1)
+            field.setv(currentCell->i(),currentCell->j(),-field.v(currentCell->neighbour(border_position::RIGHT)->i(),currentCell->neighbour(border_position::RIGHT)->j()));  //V_(i,j-1) = -V_(i+1,j-1)
+            // setting pressure gradient as 0.0
+            field.setp(currentCell->i(),currentCell->j(),(field.p(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j()) + field.p(currentCell->neighbour(border_position::RIGHT)->i(),currentCell->neighbour(border_position::RIGHT)->j()))*0.5);  //P_(i,j) = (P_(i,j+1)+P_(i+1,j))/2
+            field.setf(currentCell->i(),currentCell->j(),field.u(currentCell->i(),currentCell->j()));
+            field.setg(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j(),field.v(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j()));
+        }
+
+        if(currentCell->is_border(border_position::BOTTOM) && currentCell->is_border(border_position::LEFT)){ 
+            // setting boundary conditions
+            field.setv(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j(),0.0);     
+            field.setu(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j(),0.0);     
+            field.setu(currentCell->i(),currentCell->j(),-field.u(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j()));  
+            field.setv(currentCell->i(),currentCell->j(),-field.v(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j()));  
+            // setting pressure gradient as 0.0
+            field.setp(currentCell->i(),currentCell->j(),(field.p(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j()) + field.p(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j()))*0.5);  //P_(i,j) = (P_(i,j+1)+P_(i+1,j))/2
+            field.setf(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j(),field.u(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j()));
+            field.setg(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j(),field.v(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j()));
+        }
     }
 }
 
