@@ -25,7 +25,7 @@ class Fields {
      * @param[in] initial pressure
      *
      */
-    Fields(double _nu, double _dt, double _tau, int imax, int jmax, double UI, double VI, double PI, double GX, double GY, Grid &grid);
+    Fields(double _nu, double _dt, double _tau, double _alpha, double _beta, int imax, int jmax, double UI, double VI, double PI, double TI, double GX, double GY, Grid &grid);
 
     /**
      * @brief Calculates the convective and diffusive fluxes in x and y
@@ -71,6 +71,9 @@ class Fields {
     /// pressure index based access and modify
     double &p(int i, int j);
 
+    /// pressure index based access and modify
+    double &T(int i, int j);
+
     /// RHS index based access and modify
     double &rs(int i, int j);
 
@@ -87,6 +90,7 @@ class Fields {
     Matrix<double> &p_matrix();
 
     void setp(int i, int j, double val);
+    void setT(int i, int j, double val);
     void setu(int i, int j, double val);
     void setv(int i, int j, double val);
     void setf(int i, int j, double val);
@@ -106,6 +110,8 @@ class Fields {
     Matrix<double> _G;
     /// right hand side matrix
     Matrix<double> _RS;
+    /// Temperature matrix
+    Matrix<double> _T;
 
     /// kinematic viscosity
     double _nu;
@@ -117,4 +123,8 @@ class Fields {
     double _dt;
     /// adaptive timestep coefficient
     double _tau;
+    /// Thermal Diffusivity
+    double _alpha;
+    /// Thermal expansion coefficient
+    double _beta;
 };

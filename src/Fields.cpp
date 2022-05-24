@@ -4,12 +4,13 @@
 #include <algorithm>
 #include <iostream>
 
-Fields::Fields(double nu, double dt, double tau, int imax, int jmax, double UI, double VI, double PI, double GX, double GY, Grid &grid)
-    : _nu(nu), _dt(dt), _tau(tau) {
+Fields::Fields(double nu, double dt, double tau, double alpha, double beta, int imax, int jmax, double UI, double VI, double PI, double TI, double GX, double GY, Grid &grid)
+    : _nu(nu), _dt(dt), _tau(tau), _alpha(alpha), _beta(beta) {
     // intializing u, v and p
     _U = Matrix<double>(imax + 2, jmax + 2, 0.0);
     _V = Matrix<double>(imax + 2, jmax + 2, 0.0);
     _P = Matrix<double>(imax + 2, jmax + 2, 0.0);
+    _T = Matrix<double>(imax + 2, jmax + 2, 0.0);
 
     _F = Matrix<double>(imax + 2, jmax + 2, 0.0);
     _G = Matrix<double>(imax + 2, jmax + 2, 0.0);
@@ -24,6 +25,7 @@ Fields::Fields(double nu, double dt, double tau, int imax, int jmax, double UI, 
         setu(i,j,UI);
         setv(i,j,VI);
         setp(i,j,PI);
+        setT(i,j,TI);
     }
 }
 
@@ -90,6 +92,7 @@ double &Fields::v(int i, int j) { return _V(i, j); }
 double &Fields::f(int i, int j) { return _F(i, j); }
 double &Fields::g(int i, int j) { return _G(i, j); }
 double &Fields::rs(int i, int j) { return _RS(i, j); }
+double &Fields::T(int i, int j) { return _T(i, j); }
 
 Matrix<double> &Fields::p_matrix() { return _P; }
 
@@ -97,6 +100,7 @@ double Fields::dt() const { return _dt; }
 
 // set functions
 void Fields::setp(int i, int j, double val) { _P(i, j) = val; }
+void Fields::setT(int i, int j, double val) { _T(i, j) = val; }
 void Fields::setu(int i, int j, double val) { _U(i, j) = val; }
 void Fields::setv(int i, int j, double val) { _V(i, j) = val; }
 void Fields::setf(int i, int j, double val) { _F(i, j) = val; }
