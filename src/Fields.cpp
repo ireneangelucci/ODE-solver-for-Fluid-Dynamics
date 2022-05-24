@@ -35,10 +35,10 @@ void Fields::calculate_fluxes(Grid &grid) {
         int i = currentCell->i();
         int j = currentCell->j();
         if(i != grid.imax()){   //excluding imax as f_imax is part of the fixed boundary and set as 0.0
-            setf(i,j,u(i,j)+dt()*(_nu*(Discretization::diffusion(_U, i, j))-Discretization::convection_u(_U, _V, i, j) + _gx));
+            setf(i,j,u(i,j)+dt()*(_nu*(Discretization::diffusion(_U, i, j))-Discretization::convection_u(_U, _V, i, j) - 0.5*_beta*_gx*(T(i,j)+T(i+1,j)) ));
         }
         if(j != grid.jmax()){   // excluding jmax as g_jmax is part of the moving boundary and set as 0.0
-            setg(i,j,v(i,j)+dt()*(_nu*(Discretization::diffusion(_V, i, j))-Discretization::convection_v(_U, _V, i, j) + _gy));
+            setg(i,j,v(i,j)+dt()*(_nu*(Discretization::diffusion(_V, i, j))-Discretization::convection_v(_U, _V, i, j) - 0.5*_beta*_gy*(T(i,j)+T(i,j+1)) ));
         }
     }
 }
@@ -66,9 +66,20 @@ void Fields::calculate_velocities(Grid &grid) {
     }
 }
 
+//calculating temperature at new timestep
+void Fields::calculate_Temperature(Grid &grid){
+
+}
+
 //calculating the timestep keeping in mind the stability crtiteria
 double Fields::calculate_dt(Grid &grid) { 
-    double dt = 0.5/_nu/(1/grid.dx()/grid.dx() + 1/grid.dy()/grid.dy())*_tau;
+    double dt;
+    if(_nu > _alpha){
+        dt = 0.5/_nu/(1/grid.dx()/grid.dx() + 1/grid.dy()/grid.dy())*_tau;
+    }else{
+        dt = 0.5/_alpha/(1/grid.dx()/grid.dx() + 1/grid.dy()/grid.dy())*_tau;
+    }
+    
     for(auto &currentCell: grid.fluid_cells()){
         int i = currentCell->i();
         int j = currentCell->j();

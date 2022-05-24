@@ -60,6 +60,7 @@ class Fields {
      * @param[in] grid in which the calculations are done
      *
      */
+    void calculate_Temperature(Grid &grid);
     double calculate_dt(Grid &grid);
 
     /// x-velocity index based access and modify
