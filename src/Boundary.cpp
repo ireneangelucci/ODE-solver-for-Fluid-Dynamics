@@ -95,6 +95,9 @@ void FixedWallBoundary::apply(Fields &field) {
                 if (currentCell->type() == cell_type::ADIABATIC_WALL){
                     field.setT(currentCell->i(),currentCell->j(),field.T(currentCell->neighbour(border_position::TOP)->i(),currentCell->neighbour(border_position::TOP)->j()) + field.T(currentCell->neighbour(border_position::RIGHT)->i(),currentCell->neighbour(border_position::RIGHT)->j()));            
                 }
+                if (currentCell->type() == cell_type::HOT_WALL || currentCell->type() == cell_type::COLD_WALL){
+                    field.setT(currentCell->i(),currentCell->j(),2*_wall_temperature - 0.5* (field.T(currentCell->neighbour(border_position::TOP)->i(),currentCell->neighbour(border_position::TOP)->j()) + field.T(currentCell->neighbour(border_position::RIGHT)->i(),currentCell->neighbour(border_position::RIGHT)->j())));
+                }  
             }  
         }
 
@@ -112,6 +115,9 @@ void FixedWallBoundary::apply(Fields &field) {
                 if (currentCell->type() == cell_type::ADIABATIC_WALL){
                     field.setT(currentCell->i(),currentCell->j(),field.T(currentCell->neighbour(border_position::TOP)->i(),currentCell->neighbour(border_position::TOP)->j()) + field.T(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j()));            
                 }
+                if (currentCell->type() == cell_type::HOT_WALL || currentCell->type() == cell_type::COLD_WALL){
+                    field.setT(currentCell->i(),currentCell->j(),2*_wall_temperature - 0.5* (field.T(currentCell->neighbour(border_position::TOP)->i(),currentCell->neighbour(border_position::TOP)->j()) + field.T(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j())));
+                } 
             } 
         }
 
@@ -129,6 +135,9 @@ void FixedWallBoundary::apply(Fields &field) {
                 if (currentCell->type() == cell_type::ADIABATIC_WALL){
                     field.setT(currentCell->i(),currentCell->j(),field.T(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j()) + field.T(currentCell->neighbour(border_position::RIGHT)->i(),currentCell->neighbour(border_position::RIGHT)->j()));            
                 }
+                if (currentCell->type() == cell_type::HOT_WALL || currentCell->type() == cell_type::COLD_WALL){
+                    field.setT(currentCell->i(),currentCell->j(),2*_wall_temperature - 0.5* (field.T(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j()) + field.T(currentCell->neighbour(border_position::RIGHT)->i(),currentCell->neighbour(border_position::RIGHT)->j())));
+                } 
             } 
         }
 
@@ -146,6 +155,9 @@ void FixedWallBoundary::apply(Fields &field) {
                 if (currentCell->type() == cell_type::ADIABATIC_WALL){
                     field.setT(currentCell->i(),currentCell->j(),field.T(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j()) + field.T(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j()));            
                 }
+                if (currentCell->type() == cell_type::HOT_WALL || currentCell->type() == cell_type::COLD_WALL){
+                    field.setT(currentCell->i(),currentCell->j(),2*_wall_temperature - 0.5* (field.T(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j()) + field.T(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j())));
+                } 
             } 
         }
     }
@@ -177,7 +189,6 @@ InflowBoundary::InflowBoundary(std::vector<Cell *> cells, double inlet_velocity_
 void InflowBoundary::apply(Fields &field) {
     for(const auto& currentCell: _cells){
         if(currentCell->is_border(border_position::RIGHT)){   //Left cells
-            //std::cout<<"Left Cells inflow: "<<currentCell->i()<<", "<<currentCell->j()<<"\n";
             field.setu(currentCell->i(),currentCell->j(), _inlet_velocity_x);
             // v doesn't lie on boundary, setting the avg value with neighbour (bottom) cell as 0 (inflow perpendicular)
             field.setv(currentCell->i(),currentCell->j(), 2*_inlet_velocity_y -(field.v(currentCell->neighbour(border_position::RIGHT)->i(),currentCell->neighbour(border_position::RIGHT)->j())));
@@ -185,12 +196,23 @@ void InflowBoundary::apply(Fields &field) {
             field.setf(currentCell->i(),currentCell->j(),field.u(currentCell->i(),currentCell->j()));
         }
         if(currentCell->is_border(border_position::LEFT)){   //RIGHT cells
-            //std::cout<<"Right Cells inflow:\n";
             field.setu(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j(),_inlet_velocity_x);
             // v doesn't lie on boundary, setting the avg value with neighbour (bottom) cell as 0 (inflow perpendicular)
             field.setv(currentCell->i(),currentCell->j(),2*_inlet_velocity_y -(field.v(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j())));
             field.setp(currentCell->i(),currentCell->j(),field.p(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j()));
             field.setf(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j(),field.u(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j()));
+        }
+        if(currentCell->is_border(border_position::TOP)){   //BOTTOM cells
+            field.setu(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j(),2*_inlet_velocity_x - field.p(currentCell->neighbour(border_position::TOP)->i(),currentCell->neighbour(border_position::TOP)->j()));
+            field.setv(currentCell->i(),currentCell->j(),_inlet_velocity_y);
+            field.setp(currentCell->i(),currentCell->j(),field.p(currentCell->neighbour(border_position::TOP)->i(),currentCell->neighbour(border_position::TOP)->j()));
+            field.setg(currentCell->i(),currentCell->j(),field.v(currentCell->i(),currentCell->j()));
+        }
+        if(currentCell->is_border(border_position::BOTTOM)){   //TOP cells
+            field.setv(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j(),_inlet_velocity_y);
+            field.setu(currentCell->i(),currentCell->j(),2*_inlet_velocity_x -(field.u(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j())));
+            field.setp(currentCell->i(),currentCell->j(),field.p(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j()));
+            field.setg(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j(),field.v(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j()));
         }
     }
 }
@@ -203,8 +225,6 @@ OutflowBoundary::OutflowBoundary(std::vector<Cell *> cells, double outflow_press
 void OutflowBoundary::apply(Fields &field) {
     for(const auto& currentCell: _cells){
         if(currentCell->is_border(border_position::LEFT)){   //Right cells
-            //std::cout<<"Right Cells outflow: "<<currentCell->i()<<", "<<currentCell->j()<<"\n";
-            //field.setu(currentCell->i(),currentCell->j(),field.u(currentCell->neighbour(border_position::LEFT)->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->neighbour(border_position::LEFT)->j()));
             field.setu(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j(),field.u(currentCell->neighbour(border_position::LEFT)->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->neighbour(border_position::LEFT)->j()));
             // v doesn't lie on boundary, setting the avg value with neighbour (bottom) cell as 0 (inflow perpendicular)
             field.setv(currentCell->i(),currentCell->j(),field.v(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j()));
@@ -212,13 +232,25 @@ void OutflowBoundary::apply(Fields &field) {
             field.setf(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j(),field.u(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j()));
         }
         if(currentCell->is_border(border_position::RIGHT)){   //Left cells
-            //std::cout<<"Left Cells outflow: "<<currentCell->i()<<", "<<currentCell->j()<<"\n";
-            //field.setu(currentCell->i(),currentCell->j(),field.u(currentCell->neighbour(border_position::LEFT)->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->neighbour(border_position::LEFT)->j()));
             field.setu(currentCell->i(),currentCell->j(),field.u(currentCell->neighbour(border_position::RIGHT)->i(),currentCell->neighbour(border_position::RIGHT)->j()));
             // v doesn't lie on boundary, setting the avg value with neighbour (bottom) cell as 0 (inflow perpendicular)
             field.setv(currentCell->i(),currentCell->j(),field.v(currentCell->neighbour(border_position::RIGHT)->i(),currentCell->neighbour(border_position::RIGHT)->j()));
             field.setp(currentCell->i(),currentCell->j(),2 * _outflow_pressure - field.p(currentCell->neighbour(border_position::RIGHT)->i(),currentCell->neighbour(border_position::RIGHT)->j()));
             field.setf(currentCell->i(),currentCell->j(),field.u(currentCell->i(),currentCell->j()));
+        }
+        if(currentCell->is_border(border_position::BOTTOM)){   //Top cells
+            field.setv(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j(),field.v(currentCell->neighbour(border_position::BOTTOM)->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->neighbour(border_position::BOTTOM)->j()));
+            // v doesn't lie on boundary, setting the avg value with neighbour (bottom) cell as 0 (inflow perpendicular)
+            field.setu(currentCell->i(),currentCell->j(),field.u(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j()));
+            field.setp(currentCell->i(),currentCell->j(),2 * _outflow_pressure - field.p(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j()));
+            field.setg(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j(),field.v(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j()));
+        }
+        if(currentCell->is_border(border_position::TOP)){   //Bottom cells
+            field.setv(currentCell->i(),currentCell->j(),field.v(currentCell->neighbour(border_position::TOP)->i(),currentCell->neighbour(border_position::TOP)->j()));
+            // v doesn't lie on boundary, setting the avg value with neighbour (bottom) cell as 0 (inflow perpendicular)
+            field.setu(currentCell->i(),currentCell->j(),field.u(currentCell->neighbour(border_position::TOP)->i(),currentCell->neighbour(border_position::TOP)->j()));
+            field.setp(currentCell->i(),currentCell->j(),2 * _outflow_pressure - field.p(currentCell->neighbour(border_position::TOP)->i(),currentCell->neighbour(border_position::TOP)->j()));
+            field.setg(currentCell->i(),currentCell->j(),field.v(currentCell->i(),currentCell->j()));
         }
     }
 }

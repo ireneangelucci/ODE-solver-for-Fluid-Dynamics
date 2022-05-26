@@ -29,6 +29,11 @@ Fields::Fields(double nu, double dt, double tau, double alpha, double beta, int 
             setT(i,j,TI);
         }
     }
+    if(_energy_eq == "on"){
+        for(auto &currentCell: grid.inflow_cells()){
+            setT(currentCell->i(),currentCell->j(),TI);
+        }
+    }
 }
 
 void Fields::calculate_fluxes(Grid &grid) {
