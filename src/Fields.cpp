@@ -70,12 +70,11 @@ void Fields::calculate_velocities(Grid &grid) {
 
 //calculating temperature at new timestep
 void Fields::calculate_Temperature(Grid &grid){
-    //if(_energy_eq != "on") return;
     Matrix<double> tempT = _T;
     for(auto &currentCell: grid.fluid_cells()){
         int i = currentCell->i();
         int j = currentCell->j();
-        tempT(i,j) = _alpha * (Discretization::diffusion(_T,i,j)) - Discretization::convection_T(_T,_U,_V,i,j);
+        tempT(i,j) = _T(i,j) + _dt*(_alpha * (Discretization::diffusion(_T,i,j)) - Discretization::convection_T(_T,_U,_V,i,j));
     }
     _T = tempT;
 }
@@ -113,7 +112,7 @@ double &Fields::f(int i, int j) { return _F(i, j); }
 double &Fields::g(int i, int j) { return _G(i, j); }
 double &Fields::rs(int i, int j) { return _RS(i, j); }
 double &Fields::T(int i, int j) { return _T(i, j); }
-std::string &Fields::Energy() {return _energy_eq;}
+std::string &Fields::Energy() { return _energy_eq; }
 
 Matrix<double> &Fields::p_matrix() { return _P; }
 

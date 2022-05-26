@@ -49,9 +49,6 @@ Case::Case(std::string file_name, int argn, char **args) {
     double Pr;                 /* prandtl number   */
     double beta;               /* the coefficient of thermal expansion */
     double alpha;
-    double heatTransfer;       /* Flag to enable heat transfer */
-    double T_h;
-    double T_c;
     double deltaP;
     double UIN; 
     double VIN; 
@@ -86,22 +83,18 @@ Case::Case(std::string file_name, int argn, char **args) {
                 if (var == "imax") file >> imax;
                 if (var == "jmax") file >> jmax;
 
-                if( var == "program") file >> program;
-                if( var == "geo_file") file >> _geom_name;
-                if( var == "energy_eq") file >> energy_eq;
-                if( var == "TI") file >> TI;
-                if( var == "alpha") file >> alpha;
-                if( var == "beta") file >> beta;
-                if( var == "alpha") file >> alpha;
-                if( var == "heatTransfer") file >> heatTransfer;
-                if( var == "T_h") file >> T_h;
-                if( var == "T_c") file >> T_c;
-                if( var == "deltaP") file >> deltaP;
-                if( var == "UIN") file >> UIN;
-                if( var == "VIN") file >> VIN;
-                if( var == "num_walls") file >> num_walls;
-                if( var == "wall_temp_5") file >> coldwall_temp;
-                if( var == "wall_temp_4") file >> hotwall_temp;
+                if (var == "program") file >> program;
+                if (var == "geo_file") file >> _geom_name;
+                if (var == "TI") file >> TI;
+                if (var == "energy_eq") file >> energy_eq;
+                if (var == "alpha") file >> alpha;
+                if (var == "beta") file >> beta;
+                if (var == "deltaP") file >> deltaP;
+                if (var == "UIN") file >> UIN;
+                if (var == "VIN") file >> VIN;
+                if (var == "num_walls") file >> num_walls;
+                if (var == "wall_temp_3") file >> coldwall_temp;
+                if (var == "wall_temp_4") file >> hotwall_temp;
             }
         }
     }
@@ -238,7 +231,9 @@ void Case::simulate() {
         for(auto &boundary: _boundaries){
             boundary->apply(_field);
         }
-        if(_field.Energy() == "on") _field.calculate_Temperature(_grid);
+        if(_field.Energy() == "on") {
+             _field.calculate_Temperature(_grid); 
+        }
         _field.calculate_fluxes(_grid);
         _field.calculate_rs(_grid);
 
