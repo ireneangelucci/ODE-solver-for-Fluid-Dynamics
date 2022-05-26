@@ -87,7 +87,7 @@ Case::Case(std::string file_name, int argn, char **args) {
                 if( var == "program") file >> program;
                 if( var == "geo_file") file >> _geom_name;
                 if( var == "TI") file >> TI;
-                if( var == "Pr") file >> Pr;
+                if( var == "alpha") file >> alpha;
                 if( var == "beta") file >> beta;
                 if( var == "alpha") file >> alpha;
                 if( var == "heatTransfer") file >> heatTransfer;
@@ -120,7 +120,7 @@ Case::Case(std::string file_name, int argn, char **args) {
     build_domain(domain, imax, jmax);
 
     _grid = Grid(_geom_name, domain);
-    _field = Fields(nu, dt, tau, _grid.domain().size_x, _grid.domain().size_y, UI, VI, PI, GX, GY, _grid);
+    _field = Fields(nu, dt, tau, alpha, beta, _grid.domain().size_x, _grid.domain().size_y, UI, VI, PI, TI, GX, GY, _grid);
 
     _discretization = Discretization(domain.dx, domain.dy, gamma);
     _pressure_solver = std::make_unique<SOR>(omg);
@@ -285,6 +285,7 @@ void Case::output_vtk(int timestep, int my_rank) {
     { x += dx; }
 
     double z = 0;
+    
     for (int col = 0; col < _grid.domain().size_y + 1; col++) {
         x = _grid.domain().imin * dx;
         { x += dx; }
