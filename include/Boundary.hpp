@@ -29,13 +29,13 @@ class Boundary {
 class FixedWallBoundary : public Boundary {
   public:
     FixedWallBoundary(std::vector<Cell *> cells);
-    FixedWallBoundary(std::vector<Cell *> cells, std::map<int, double> wall_temperature);
+    FixedWallBoundary(std::vector<Cell *> cells, double wall_temperature);
     virtual ~FixedWallBoundary() = default;
     virtual void apply(Fields &field);
 
   private:
     std::vector<Cell *> _cells;
-    std::map<int, double> _wall_temperature;
+    double _wall_temperature = -1.0;
 };
 
 class InflowBoundary : public Boundary {

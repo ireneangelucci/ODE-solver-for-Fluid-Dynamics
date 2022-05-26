@@ -68,7 +68,7 @@ void Grid::assign_cell_types(std::vector<std::vector<int>> &geometry_data) {
                 _cells(i, j) = Cell(i, j, cell_type::ADIABATIC_WALL);
                 //std::cout << "wall cell at position " << i << ", " << j<< "\n"; 
                 _fixed_wall_cells.push_back(&_cells(i, j));     //_adiabatic_wall_cells
-            /*} else if (geometry_data.at(i_geom).at(j_geom) == 4) {
+            } else if (geometry_data.at(i_geom).at(j_geom) == 4) {
                 _cells(i, j) = Cell(i, j, cell_type::HOT_WALL);
                 _hot_wall_cells.push_back(&_cells(i, j));
             } else if (geometry_data.at(i_geom).at(j_geom) == 5) {
@@ -77,7 +77,7 @@ void Grid::assign_cell_types(std::vector<std::vector<int>> &geometry_data) {
             } else if (geometry_data.at(i_geom).at(j_geom) == LidDrivenCavity::moving_wall_id || geometry_data.at(i_geom).at(j_geom) == 8) {
                 _cells(i, j) = Cell(i, j, cell_type::MOVING_WALL, geometry_data.at(i_geom).at(j_geom));
                 _moving_wall_cells.push_back(&_cells(i, j));
-            */} else {
+            } else {
                 if (i == 0 or j == 0 or i == _domain.size_x + 1 or j == _domain.size_y + 1) {
                     // Outer walls
                     _cells(i, j) = Cell(i, j, cell_type::FIXED_WALL, geometry_data.at(i_geom).at(j_geom));

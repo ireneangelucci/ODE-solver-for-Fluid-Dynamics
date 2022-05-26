@@ -4,8 +4,8 @@
 #include <algorithm>
 #include <iostream>
 
-Fields::Fields(double nu, double dt, double tau, double alpha, double beta, int imax, int jmax, double UI, double VI, double PI, double TI, double GX, double GY, Grid &grid)
-    : _nu(nu), _dt(dt), _tau(tau), _alpha(alpha), _beta(beta) {
+Fields::Fields(double nu, double dt, double tau, double alpha, double beta, int imax, int jmax, double UI, double VI, double PI, double TI, double GX, double GY, Grid &grid, std::string energy_eq)
+    : _nu(nu), _dt(dt), _tau(tau), _alpha(alpha), _beta(beta), _energy_eq(energy_eq) {
     // intializing u, v and p
     _U = Matrix<double>(imax + 2, jmax + 2, 0.0);
     _V = Matrix<double>(imax + 2, jmax + 2, 0.0);
@@ -25,7 +25,9 @@ Fields::Fields(double nu, double dt, double tau, double alpha, double beta, int 
         setu(i,j,UI);
         setv(i,j,VI);
         setp(i,j,PI);
-        setT(i,j,TI);
+        if(_energy_eq == "on"){
+            setT(i,j,TI);
+        }
     }
 }
 
@@ -68,16 +70,23 @@ void Fields::calculate_velocities(Grid &grid) {
 
 //calculating temperature at new timestep
 void Fields::calculate_Temperature(Grid &grid){
-
+    //if(_energy_eq != "on") return;
+    Matrix<double> tempT = _T;
+    for(auto &currentCell: grid.fluid_cells()){
+        int i = currentCell->i();
+        int j = currentCell->j();
+        tempT(i,j) = _alpha * (Discretization::diffusion(_T,i,j)) - Discretization::convection_T(_T,_U,_V,i,j);
+    }
+    _T = tempT;
 }
 
 //calculating the timestep keeping in mind the stability crtiteria
 double Fields::calculate_dt(Grid &grid) { 
     double dt;
-    if(_nu > _alpha){
-        dt = 0.5/_nu/(1/grid.dx()/grid.dx() + 1/grid.dy()/grid.dy())*_tau;
-    }else{
+    if((_nu < _alpha) && (_energy_eq != "on")){
         dt = 0.5/_alpha/(1/grid.dx()/grid.dx() + 1/grid.dy()/grid.dy())*_tau;
+    }else{
+        dt = 0.5/_nu/(1/grid.dx()/grid.dx() + 1/grid.dy()/grid.dy())*_tau;
     }
     
     for(auto &currentCell: grid.fluid_cells()){
@@ -104,6 +113,7 @@ double &Fields::f(int i, int j) { return _F(i, j); }
 double &Fields::g(int i, int j) { return _G(i, j); }
 double &Fields::rs(int i, int j) { return _RS(i, j); }
 double &Fields::T(int i, int j) { return _T(i, j); }
+std::string &Fields::Energy() {return _energy_eq;}
 
 Matrix<double> &Fields::p_matrix() { return _P; }
 

@@ -25,7 +25,7 @@ class Fields {
      * @param[in] initial pressure
      *
      */
-    Fields(double _nu, double _dt, double _tau, double _alpha, double _beta, int imax, int jmax, double UI, double VI, double PI, double TI, double GX, double GY, Grid &grid);
+    Fields(double _nu, double _dt, double _tau, double _alpha, double _beta, int imax, int jmax, double UI, double VI, double PI, double TI, double GX, double GY, Grid &grid, std::string energy_eq);
 
     /**
      * @brief Calculates the convective and diffusive fluxes in x and y
@@ -60,6 +60,7 @@ class Fields {
      * @param[in] grid in which the calculations are done
      *
      */
+    
     void calculate_Temperature(Grid &grid);
     double calculate_dt(Grid &grid);
 
@@ -86,6 +87,7 @@ class Fields {
 
     /// get timestep size
     double dt() const;
+    std::string &Energy();
 
     /// pressure matrix access and modify
     Matrix<double> &p_matrix();
@@ -128,4 +130,6 @@ class Fields {
     double _alpha;
     /// Thermal expansion coefficient
     double _beta;
+    std::string _energy_eq{"NONE"};
+
 };

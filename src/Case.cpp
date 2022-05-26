@@ -43,8 +43,8 @@ Case::Case(std::string file_name, int argn, char **args) {
     double eps;     /* accuracy bound for pressure*/
 
     double dt_value;           /* time for output */
-    std::string  program;
-    std::string _geom_file;
+    std::string program;
+    std::string energy_eq{"NONE"};
     double TI;                 /* initial temperature  */
     double Pr;                 /* prandtl number   */
     double beta;               /* the coefficient of thermal expansion */
@@ -55,7 +55,9 @@ Case::Case(std::string file_name, int argn, char **args) {
     double deltaP;
     double UIN; 
     double VIN; 
-    int num_of_walls;
+    int num_walls;
+    double coldwall_temp;
+    double hotwall_temp;
 
     if (file.is_open()) {
 
@@ -86,6 +88,7 @@ Case::Case(std::string file_name, int argn, char **args) {
 
                 if( var == "program") file >> program;
                 if( var == "geo_file") file >> _geom_name;
+                if( var == "energy_eq") file >> energy_eq;
                 if( var == "TI") file >> TI;
                 if( var == "alpha") file >> alpha;
                 if( var == "beta") file >> beta;
@@ -96,7 +99,9 @@ Case::Case(std::string file_name, int argn, char **args) {
                 if( var == "deltaP") file >> deltaP;
                 if( var == "UIN") file >> UIN;
                 if( var == "VIN") file >> VIN;
-                if( var == "num_of_walls") file >> num_of_walls;
+                if( var == "num_walls") file >> num_walls;
+                if( var == "wall_temp_5") file >> coldwall_temp;
+                if( var == "wall_temp_4") file >> hotwall_temp;
             }
         }
     }
@@ -120,7 +125,7 @@ Case::Case(std::string file_name, int argn, char **args) {
     build_domain(domain, imax, jmax);
 
     _grid = Grid(_geom_name, domain);
-    _field = Fields(nu, dt, tau, alpha, beta, _grid.domain().size_x, _grid.domain().size_y, UI, VI, PI, TI, GX, GY, _grid);
+    _field = Fields(nu, dt, tau, alpha, beta, _grid.domain().size_x, _grid.domain().size_y, UI, VI, PI, TI, GX, GY, _grid, energy_eq);
 
     _discretization = Discretization(domain.dx, domain.dy, gamma);
     _pressure_solver = std::make_unique<SOR>(omg);
@@ -134,6 +139,12 @@ Case::Case(std::string file_name, int argn, char **args) {
     }
     if (not _grid.fixed_wall_cells().empty()) {
         _boundaries.push_back(std::make_unique<FixedWallBoundary>(_grid.fixed_wall_cells()));
+    }
+    if (not _grid.hot_wall_cells().empty()) {
+        _boundaries.push_back(std::make_unique<FixedWallBoundary>(_grid.hot_wall_cells(), hotwall_temp));
+    }
+    if (not _grid.cold_wall_cells().empty()) {
+        _boundaries.push_back(std::make_unique<FixedWallBoundary>(_grid.cold_wall_cells(), coldwall_temp));
     }
     if (not _grid.inflow_cells().empty()) {
         _boundaries.push_back(std::make_unique<InflowBoundary>(_grid.inflow_cells(),UIN, VIN));
@@ -220,14 +231,14 @@ void Case::simulate() {
     std::string convergence;
     const int numWidth = 15;
     const char separator = ' ';
-    
+
     // starting the time loop
     while(t < _t_end){
         // applying boundary
         for(auto &boundary: _boundaries){
             boundary->apply(_field);
         }
-
+        if(_field.Energy() == "on") _field.calculate_Temperature(_grid);
         _field.calculate_fluxes(_grid);
         _field.calculate_rs(_grid);
 
@@ -305,16 +316,29 @@ void Case::output_vtk(int timestep, int my_rank) {
     Pressure->SetName("pressure");
     Pressure->SetNumberOfComponents(1);
 
+    // Temperature Array
+    vtkDoubleArray *Temperature = vtkDoubleArray::New();
+    Temperature->SetName("Temperature");
+    Temperature->SetNumberOfComponents(1);
+
     // Velocity Array
     vtkDoubleArray *Velocity = vtkDoubleArray::New();
     Velocity->SetName("velocity");
     Velocity->SetNumberOfComponents(3);
 
-    // Print pressure and temperature from bottom to top
+    // Print pressure from bottom to top
     for (int j = 1; j < _grid.domain().size_y + 1; j++) {
         for (int i = 1; i < _grid.domain().size_x + 1; i++) {
             double pressure = _field.p(i, j);
             Pressure->InsertNextTuple(&pressure);
+        }
+    }
+    
+    // Print temperature from bottom to top
+    for (int j = 1; j < _grid.domain().size_y + 1; j++) {
+        for (int i = 1; i < _grid.domain().size_x + 1; i++) {
+            double temp = _field.T(i, j);
+            Temperature->InsertNextTuple(&temp);
         }
     }
 
@@ -333,6 +357,9 @@ void Case::output_vtk(int timestep, int my_rank) {
 
     // Add Pressure to Structured Grid
     structuredGrid->GetCellData()->AddArray(Pressure);
+
+    // Add Temperature to Structured Grid
+    structuredGrid->GetCellData()->AddArray(Temperature);
 
     // Add Velocity to Structured Grid
     structuredGrid->GetPointData()->AddArray(Velocity);

@@ -5,7 +5,7 @@
 
 FixedWallBoundary::FixedWallBoundary(std::vector<Cell *> cells) : _cells(cells) {}
 
-FixedWallBoundary::FixedWallBoundary(std::vector<Cell *> cells, std::map<int, double> wall_temperature)
+FixedWallBoundary::FixedWallBoundary(std::vector<Cell *> cells, double wall_temperature)
     : _cells(cells), _wall_temperature(wall_temperature) {}
 
 void FixedWallBoundary::apply(Fields &field) {
@@ -20,6 +20,14 @@ void FixedWallBoundary::apply(Fields &field) {
             // setting pressure gradient as 0.0
             field.setp(currentCell->i(),currentCell->j(),field.p(currentCell->neighbour(border_position::TOP)->i(),currentCell->neighbour(border_position::TOP)->j()));
             field.setg(currentCell->i(),currentCell->j(),field.v(currentCell->i(),currentCell->j()));
+            if(field.Energy() == "on"){
+                if (currentCell->type() == cell_type::ADIABATIC_WALL){
+                    field.setT(currentCell->i(),currentCell->j(),field.T(currentCell->neighbour(border_position::TOP)->i(),currentCell->neighbour(border_position::TOP)->j()));            
+                }
+                if (currentCell->type() == cell_type::HOT_WALL || currentCell->type() == cell_type::COLD_WALL){
+                    field.setT(currentCell->i(),currentCell->j(),2*_wall_temperature - field.T(currentCell->neighbour(border_position::TOP)->i(),currentCell->neighbour(border_position::TOP)->j()));
+                }  
+            }
         }
         
         if(currentCell->is_border(border_position::BOTTOM)){ //Top cells
@@ -31,6 +39,14 @@ void FixedWallBoundary::apply(Fields &field) {
             // setting pressure gradient as 0.0
             field.setp(currentCell->i(),currentCell->j(),field.p(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j()));
             field.setg(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j(),field.v(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j()));
+            if(field.Energy() == "on"){
+                if (currentCell->type() == cell_type::ADIABATIC_WALL){
+                    field.setT(currentCell->i(),currentCell->j(),field.T(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j()));            
+                }
+                if (currentCell->type() == cell_type::HOT_WALL || currentCell->type() == cell_type::COLD_WALL){
+                    field.setT(currentCell->i(),currentCell->j(),2*_wall_temperature - field.T(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j()));
+                }  
+            }        
         }
 
         if(currentCell->is_border(border_position::RIGHT)){   //Left cells
@@ -39,6 +55,14 @@ void FixedWallBoundary::apply(Fields &field) {
             field.setv(currentCell->i(),currentCell->j(),-(field.v(currentCell->neighbour(border_position::RIGHT)->i(),currentCell->neighbour(border_position::RIGHT)->j())));
             field.setp(currentCell->i(),currentCell->j(),field.p(currentCell->neighbour(border_position::RIGHT)->i(),currentCell->neighbour(border_position::RIGHT)->j()));
             field.setf(currentCell->i(),currentCell->j(),field.u(currentCell->i(),currentCell->j()));
+            if(field.Energy() == "on"){
+                if (currentCell->type() == cell_type::ADIABATIC_WALL){
+                    field.setT(currentCell->i(),currentCell->j(),field.T(currentCell->neighbour(border_position::RIGHT)->i(),currentCell->neighbour(border_position::RIGHT)->j()));            
+                }
+                if (currentCell->type() == cell_type::HOT_WALL || currentCell->type() == cell_type::COLD_WALL){
+                    field.setT(currentCell->i(),currentCell->j(),2*_wall_temperature - field.T(currentCell->neighbour(border_position::RIGHT)->i(),currentCell->neighbour(border_position::RIGHT)->j()));
+                }  
+            }   
         }       
         if(currentCell->is_border(border_position::LEFT)){    // Right cells
             //std::cout<<"Right Cells fixed: "<<currentCell->i()<<", "<<currentCell->j()<<"\n";
@@ -46,6 +70,14 @@ void FixedWallBoundary::apply(Fields &field) {
             field.setv(currentCell->i(),currentCell->j(),-(field.v(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j())));
             field.setp(currentCell->i(),currentCell->j(),field.p(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j()));
             field.setf(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j(),field.u(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j()));
+            if(field.Energy() == "on"){
+                if (currentCell->type() == cell_type::ADIABATIC_WALL){
+                    field.setT(currentCell->i(),currentCell->j(),field.T(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j()));            
+                }
+                if (currentCell->type() == cell_type::HOT_WALL || currentCell->type() == cell_type::COLD_WALL){
+                    field.setT(currentCell->i(),currentCell->j(),2*_wall_temperature - field.T(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j()));
+                }  
+            }  
         }
 
         if(currentCell->is_border(border_position::TOP) && currentCell->is_border(border_position::RIGHT)){ //Fluid on top and on right 
@@ -58,6 +90,11 @@ void FixedWallBoundary::apply(Fields &field) {
             field.setp(currentCell->i(),currentCell->j(),(field.p(currentCell->neighbour(border_position::TOP)->i(),currentCell->neighbour(border_position::TOP)->j()) + field.p(currentCell->neighbour(border_position::RIGHT)->i(),currentCell->neighbour(border_position::RIGHT)->j()))*0.5);  //P_(i,j) = (P_(i,j+1)+P_(i+1,j))/2
             field.setf(currentCell->i(),currentCell->j(),field.u(currentCell->i(),currentCell->j()));
             field.setg(currentCell->i(),currentCell->j(),field.v(currentCell->i(),currentCell->j()));
+            if(field.Energy() == "on"){
+                if (currentCell->type() == cell_type::ADIABATIC_WALL){
+                    field.setT(currentCell->i(),currentCell->j(),field.T(currentCell->neighbour(border_position::TOP)->i(),currentCell->neighbour(border_position::TOP)->j()) + field.T(currentCell->neighbour(border_position::RIGHT)->i(),currentCell->neighbour(border_position::RIGHT)->j()));            
+                }
+            }  
         }
 
         if(currentCell->is_border(border_position::TOP) && currentCell->is_border(border_position::LEFT)){ //Fluid on top and on left 
@@ -70,6 +107,11 @@ void FixedWallBoundary::apply(Fields &field) {
             field.setp(currentCell->i(),currentCell->j(),(field.p(currentCell->neighbour(border_position::TOP)->i(),currentCell->neighbour(border_position::TOP)->j()) + field.p(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j()))*0.5);  
             field.setf(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j(),field.u(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j()));
             field.setg(currentCell->i(),currentCell->j(),field.v(currentCell->i(),currentCell->j()));
+            if(field.Energy() == "on"){
+                if (currentCell->type() == cell_type::ADIABATIC_WALL){
+                    field.setT(currentCell->i(),currentCell->j(),field.T(currentCell->neighbour(border_position::TOP)->i(),currentCell->neighbour(border_position::TOP)->j()) + field.T(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j()));            
+                }
+            } 
         }
 
         if(currentCell->is_border(border_position::BOTTOM) && currentCell->is_border(border_position::RIGHT)){
@@ -82,6 +124,11 @@ void FixedWallBoundary::apply(Fields &field) {
             field.setp(currentCell->i(),currentCell->j(),(field.p(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j()) + field.p(currentCell->neighbour(border_position::RIGHT)->i(),currentCell->neighbour(border_position::RIGHT)->j()))*0.5);  //P_(i,j) = (P_(i,j+1)+P_(i+1,j))/2
             field.setf(currentCell->i(),currentCell->j(),field.u(currentCell->i(),currentCell->j()));
             field.setg(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j(),field.v(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j()));
+            if(field.Energy() == "on"){
+                if (currentCell->type() == cell_type::ADIABATIC_WALL){
+                    field.setT(currentCell->i(),currentCell->j(),field.T(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j()) + field.T(currentCell->neighbour(border_position::RIGHT)->i(),currentCell->neighbour(border_position::RIGHT)->j()));            
+                }
+            } 
         }
 
         if(currentCell->is_border(border_position::BOTTOM) && currentCell->is_border(border_position::LEFT)){ 
@@ -94,6 +141,11 @@ void FixedWallBoundary::apply(Fields &field) {
             field.setp(currentCell->i(),currentCell->j(),(field.p(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j()) + field.p(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j()))*0.5);  //P_(i,j) = (P_(i,j+1)+P_(i+1,j))/2
             field.setf(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j(),field.u(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j()));
             field.setg(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j(),field.v(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j()));
+            if(field.Energy() == "on"){
+                if (currentCell->type() == cell_type::ADIABATIC_WALL){
+                    field.setT(currentCell->i(),currentCell->j(),field.T(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j()) + field.T(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j()));            
+                }
+            } 
         }
     }
 }

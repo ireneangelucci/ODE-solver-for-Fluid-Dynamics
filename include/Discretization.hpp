@@ -62,6 +62,9 @@ class Discretization {
      * @param[out] result
      *
      */
+    
+    static double convection_T(const Matrix<double> &T, const Matrix<double> &U, const Matrix<double> &V, int i, int j);
+
     static double laplacian(const Matrix<double> &P, int i, int j);
 
     /**
