@@ -285,7 +285,7 @@ void Case::output_vtk(int timestep, int my_rank) {
     { x += dx; }
 
     double z = 0;
-    /*
+    
     for (int col = 0; col < _grid.domain().size_y + 1; col++) {
         x = _grid.domain().imin * dx;
         { x += dx; }
@@ -294,12 +294,6 @@ void Case::output_vtk(int timestep, int my_rank) {
             x += dx;
         }
         y += dy;
-    }
-    */
-    for (auto & cell : _grid.fluid_cells()){
-        int i = cell->i();
-        int j = cell->j();
-        points->InsertNextPoint((_grid.domain().imin + i) * dx, (_grid.domain().jmin + i) * dy, z);
     }
 
     // Specify the dimensions of the grid
@@ -315,7 +309,7 @@ void Case::output_vtk(int timestep, int my_rank) {
     vtkDoubleArray *Velocity = vtkDoubleArray::New();
     Velocity->SetName("velocity");
     Velocity->SetNumberOfComponents(3);
-/*
+
     // Print pressure and temperature from bottom to top
     for (int j = 1; j < _grid.domain().size_y + 1; j++) {
         for (int i = 1; i < _grid.domain().size_x + 1; i++) {
@@ -323,11 +317,11 @@ void Case::output_vtk(int timestep, int my_rank) {
             Pressure->InsertNextTuple(&pressure);
         }
     }
-*/
+
     // Temp Velocity
     float vel[3];
     vel[2] = 0; // Set z component to 0
-/*
+
     // Print Velocity from bottom to top
     for (int j = 0; j < _grid.domain().size_y + 1; j++) {
         for (int i = 0; i < _grid.domain().size_x + 1; i++) {
@@ -335,20 +329,6 @@ void Case::output_vtk(int timestep, int my_rank) {
             vel[1] = (_field.v(i, j) + _field.v(i + 1, j)) * 0.5;
             Velocity->InsertNextTuple(vel);
         }
-    }
-*/
-    for (auto & cell : _grid.fluid_cells()){
-        int i = cell->i();
-        int j = cell->j();
-        Pressure->InsertNextTuple(&_field.p(i,j));
-    }
-
-    for (auto & cell : _grid.fluid_cells()){
-        int i = cell->i();
-        int j = cell->j();
-        vel[0] = (_field.u(i, j) + _field.u(i, j + 1)) * 0.5;
-        vel[1] = (_field.v(i, j) + _field.v(i + 1, j)) * 0.5;
-        Velocity->InsertNextTuple(vel);
     }
 
     // Add Pressure to Structured Grid
