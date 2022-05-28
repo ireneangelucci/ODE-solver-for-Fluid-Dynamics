@@ -252,13 +252,15 @@ void Case::simulate() {
         }
 
         // output on screen - time, timestep, residual and convergence status of pressure eqn.
-        std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << " timestep " ;
+        std::cout << std::left << std::setw(12) << std::setfill(separator) << "Timestep: " ;
         std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << timestep;
-        std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << " time ";
+        std::cout << std::left << std::setw(8) << std::setfill(separator) << "Time: ";
         std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << t;
-        std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << " residual ";
+        std::cout << std::left << std::setw(12) << std::setfill(separator) << "Residual: ";
         std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << res;
         std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << convergence;
+        std::cout << std::left << std::setw(12) << std::setfill(separator) << "Iterations:";
+        std::cout << std::left << std::setw(12) << std::setfill(separator) << it;
         std::cout << std::endl;
 
         // calculating velocities at next timestep 
@@ -355,8 +357,9 @@ void Case::output_vtk(int timestep, int my_rank) {
     structuredGrid->GetCellData()->AddArray(Pressure);
 
     // Add Temperature to Structured Grid
-    structuredGrid->GetCellData()->AddArray(Temperature);
-
+    if(_field.Energy() == "on"){
+        structuredGrid->GetCellData()->AddArray(Temperature);
+    }
     // Add Velocity to Structured Grid
     structuredGrid->GetPointData()->AddArray(Velocity);
 
