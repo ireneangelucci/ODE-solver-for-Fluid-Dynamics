@@ -275,6 +275,7 @@ void Case::simulate() {
 }
 
 void Case::output_vtk(int timestep, int my_rank) {
+    
     // Create a new structured grid
     vtkSmartPointer<vtkStructuredGrid> structuredGrid = vtkSmartPointer<vtkStructuredGrid>::New();
 
