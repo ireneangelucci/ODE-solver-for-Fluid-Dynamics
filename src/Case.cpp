@@ -292,22 +292,34 @@ void Case::output_vtk(int timestep, int my_rank) {
 
     { y += dy; }
     { x += dx; }
+    // Specify the dimensions of the grid
+    structuredGrid->SetDimensions(_grid.domain().size_x + 1, _grid.domain().size_y + 1, 1);
 
     double z = 0;
-    
+    std::vector<vtkIdType> current_cell;
+
     for (int col = 0; col < _grid.domain().size_y + 1; col++) {
         x = _grid.domain().imin * dx;
         { x += dx; }
         for (int row = 0; row < _grid.domain().size_x + 1; row++) {
-            points->InsertNextPoint(x, y, z);
+            current_cell.push_back(points->InsertNextPoint(x, y, z));
             x += dx;
         }
         y += dy;
     }
 
-    // Specify the dimensions of the grid
-    structuredGrid->SetDimensions(_grid.domain().size_x + 1, _grid.domain().size_y + 1, 1);
     structuredGrid->SetPoints(points);
+    for (int col = 0; col < _grid.domain().size_y + 1; col++) {
+        x = _grid.domain().imin * dx;
+        { x += dx; }
+        for (int row = 0; row < _grid.domain().size_x + 1; row++) {
+            if(_grid.cell(row,col).type() != cell_type::FLUID){
+                structuredGrid->BlankPoint(current_cell[row + col * _grid.domain().size_x]);
+            }
+            x += dx;
+        }
+        y += dy;
+    }
 
     // Pressure Array
     vtkDoubleArray *Pressure = vtkDoubleArray::New();
