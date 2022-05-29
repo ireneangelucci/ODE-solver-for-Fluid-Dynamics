@@ -24,7 +24,8 @@ class Boundary {
 
 /**
  * @brief Fixed wall boundary condition for the outer boundaries of the domain.
- * Dirichlet for velocities, which is zero, Neumann for pressure
+ * Dirichlet for velocities, which is zero, Neumann for pressure.
+ * When energy equation on, used as Adiabatic Wall.
  */
 class FixedWallBoundary : public Boundary {
   public:
@@ -38,6 +39,10 @@ class FixedWallBoundary : public Boundary {
     double _wall_temperature = -1.0;
 };
 
+/**
+ * @brief Inflow wall boundary condition for the outer boundaries of the domain.
+ * Dirichlet for velocities, which is specified through input file, Neumann for pressure.
+ */
 class InflowBoundary : public Boundary {
   public:
     InflowBoundary(std::vector<Cell *> cells, double _inlet_velocity_x, double _inlet_velocity_y);
@@ -50,6 +55,10 @@ class InflowBoundary : public Boundary {
     double _inlet_velocity_y;
 };
 
+/**
+ * @brief Outflow wall boundary condition for the outer boundaries of the domain.
+ * Neumann for velocities, Dirichlet for pressure, which is zero if not specified in the input file.
+ */
 class OutflowBoundary : public Boundary {
   public:
     OutflowBoundary(std::vector<Cell *> cells, double outflow_pressure);
@@ -61,19 +70,6 @@ class OutflowBoundary : public Boundary {
     double _outflow_pressure;
 };
 
-/*
-class AdiabaticWall : public Boundary {
-  public:
-    OutflowBoundary(std::vector<Cell *> cells);
-    OutflowBoundary(std::vector<Cell *> cells, std::map<int, double> outflow_pressure);
-    virtual ~OutflowBoundary() = default;
-    virtual void apply(Fields &field);
-
-  private:
-    std::vector<Cell *> _cells;
-    std::map<int, double> _outflow_pressure
-};
-*/
 /**
  * @brief Moving wall boundary condition for the outer boundaries of the domain.
  * Dirichlet for velocities for the given velocity parallel to the fluid,

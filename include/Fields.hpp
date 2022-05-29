@@ -92,6 +92,7 @@ class Fields {
     /// pressure matrix access and modify
     Matrix<double> &p_matrix();
 
+    /// setters functions
     void setp(int i, int j, double val);
     void setT(int i, int j, double val);
     void setu(int i, int j, double val);
@@ -130,6 +131,7 @@ class Fields {
     double _alpha;
     /// Thermal expansion coefficient
     double _beta;
+    /// Energz equation (on or off)
     std::string _energy_eq{"NONE"};
 
 };

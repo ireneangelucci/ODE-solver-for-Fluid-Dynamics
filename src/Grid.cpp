@@ -54,20 +54,16 @@ void Grid::assign_cell_types(std::vector<std::vector<int>> &geometry_data) {
         for (int i_geom = _domain.imin; i_geom < _domain.imax; ++i_geom) {
             if (geometry_data.at(i_geom).at(j_geom) == 0) {
                 _cells(i, j) = Cell(i, j, cell_type::FLUID);
-                //std::cout << "fluid cell at position " << i << ", " << j<< "\n"; 
                 _fluid_cells.push_back(&_cells(i, j));
             } else if (geometry_data.at(i_geom).at(j_geom) == 1) {
                 _cells(i, j) = Cell(i, j, cell_type::INFLOW);
-                //std::cout << "inflow cell at position " << i << ", " << j<< "\n"; 
                 _inflow_cells.push_back(&_cells(i, j));
             } else if (geometry_data.at(i_geom).at(j_geom) == 2) {
                 _cells(i, j) = Cell(i, j, cell_type::OUTFLOW);
-                //std::cout << "outflow cell at position " << i << ", " << j<< "\n"; 
                 _outflow_cells.push_back(&_cells(i, j));
             } else if (geometry_data.at(i_geom).at(j_geom) == 3) {
                 _cells(i, j) = Cell(i, j, cell_type::ADIABATIC_WALL);
-                //std::cout << "wall cell at position " << i << ", " << j<< "\n"; 
-                _fixed_wall_cells.push_back(&_cells(i, j));     //_adiabatic_wall_cells
+                _fixed_wall_cells.push_back(&_cells(i, j));     
             } else if (geometry_data.at(i_geom).at(j_geom) == 4) {
                 _cells(i, j) = Cell(i, j, cell_type::HOT_WALL);
                 _hot_wall_cells.push_back(&_cells(i, j));
@@ -272,15 +268,6 @@ void Grid::parse_geometry_file(std::string filedoc, std::vector<std::vector<int>
     for (int col = numcols - 1; col > -1; --col) {
         for (int row = 0; row < numrows; ++row) {
             ss >> geometry_data[row][col];
-            if(geometry_data[row][col] == 1){
-                //std::cout << row << " , "<< col << " " << geometry_data[row][col] << " inflow \n";
-            }
-            if(geometry_data[row][col] == 2){
-                //std::cout  << row << " , "<< col << " " << geometry_data[row][col] << " outflow \n";
-            }
-            if(geometry_data[row][col] == 3){
-                //std::cout  << row << " , "<< col << " " << geometry_data[row][col] << " wall \n";
-            }
         }
     }
 

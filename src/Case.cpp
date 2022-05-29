@@ -252,7 +252,7 @@ void Case::simulate() {
         }
 
         // output on screen - time, timestep, residual and convergence status of pressure eqn.
-        /*std::cout << std::left << std::setw(12) << std::setfill(separator) << "Timestep: " ;
+        std::cout << std::left << std::setw(12) << std::setfill(separator) << "Timestep: " ;
         std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << timestep;
         std::cout << std::left << std::setw(8) << std::setfill(separator) << "Time: ";
         std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << t;
@@ -261,7 +261,7 @@ void Case::simulate() {
         std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << convergence;
         std::cout << std::left << std::setw(12) << std::setfill(separator) << "Iterations:";
         std::cout << std::left << std::setw(12) << std::setfill(separator) << it;
-        std::cout << std::endl;*/
+        std::cout << std::endl;
 
         // calculating velocities at next timestep 
         _field.calculate_velocities(_grid);
@@ -292,9 +292,7 @@ void Case::output_vtk(int timestep, int my_rank) {
 
     { y += dy; }
     { x += dx; }
-    // Specify the dimensions of the grid
-    structuredGrid->SetDimensions(_grid.domain().size_x + 1, _grid.domain().size_y + 1, 1);
-
+    
     double z = 0;
     std::vector<vtkIdType> current_cell;
 
@@ -307,12 +305,17 @@ void Case::output_vtk(int timestep, int my_rank) {
         }
         y += dy;
     }
-    int k=0;
+
+    // Specify the dimensions of the grid
+    structuredGrid->SetDimensions(_grid.domain().size_x + 1, _grid.domain().size_y + 1, 1);
     structuredGrid->SetPoints(points);
+
+
+    // Output obstacle cells as blank cells
+    int k=0;
     for (int col = 0; col < _grid.domain().size_y + 1; col++) {
         for (int row = 0; row < _grid.domain().size_x + 1; row++) {
             if(_grid.cell(row,col).type() != cell_type::FLUID){
-                //std::cout << row << "," << col << " cell type " << (_grid.cell(row,col).type()==cell_type::FLUID) << "\n";
                 structuredGrid->BlankPoint(current_cell[k]);
             }
         k++;
