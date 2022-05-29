@@ -9,8 +9,38 @@
 ### Natural Convection
 
 ### Fluid Trap Simulation
+In this case we simulate a heat driven flow with obstacles. You can observe from the Temperature contour plot that the left wall is the hot wall while the right wall is the cold wall. The flow reaches an equilibrium where the hot fluid from left section is not able to propagate into the cold section on right and cold gas from right section is not able to reach the left section. Further, in the pressure contour, one may not the high pressure region in top-left and bottom-right of the domain. This is because the hot gas in left section moves upwards creating a high pressure region top-left of domain, while high amount of cold gas sinks to bottom in the right section creating high pressure zone. If we observe the velocity glyphs, we can see that some amount of hot gas from left section reaches right and moves upward, causing slight higher temperature in top-right compared to bottom-right. Similar observation can be made for left section. 
+
+<p> 
+<img src="docs/Worksheet2_Plots/FluidTrap_TempContour_VelGlyph.png" width="500">
+</p>
+<em>Temperature Contour plot superimposed with Velocity Glyphs</em>
+
+<p> 
+<img src="docs/Worksheet2_Plots/FluidTrap_PressContour_VelGlyph.png" width="500">
+</p>
+<em>Pressure Contour plot superimposed with Velocity Glyphs</em>
 
 ### Rayleigh Benard Convection
+
+Rayleigh Benard is a natural convection occuring in a horizontal fluid heated from bottom. The fluid in contact with the hot wall at bottom rises up till it reaches the top (typically a fluid-fluid interface). The top boundary is modelled as a cold wall in present simulation. The fluid at top turns to side but cannot move far as it encounters another coloum of fluid around it. It instead forms a loop with itself creating isolated cells called Benard Cells. This is illustrated in the figure below.
+
+<p> 
+<img src="docs/Worksheet2_Plots/ConvectionCells.png" width="500">
+</p>
+<em>Convection Cells or Benard Cells (Source: Wikipedia)</em>
+
+In both the temperature and velocity contour plot, we can observe the formation of convection cells. Glyphs highlight the closed velocity loops as expected for the problem. However, the pattern is not very regular in the present case. This may be due to coarse grids or smaller domain size as Rayleigh Benard convection requires the height of the fluid layer to be much smaller than the horizontal dimensions.
+
+<p> 
+<img src="docs/Worksheet2_Plots/RB_TempContour_VelGlyph.png" width="500">
+</p>
+<em>Temperature Contour plot superimposed with Velocity Glyphs</em>
+
+<p> 
+<img src="docs/Worksheet2_Plots/RB_VelContourGlyph.png" width="500">
+</p>
+<em>Velocity Magnitude Contour and Glyphs</em>
 
 
 ---
