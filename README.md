@@ -152,6 +152,24 @@ export CMAKE_PREFIX_PATH="/usr/local/opt/qt5:$CMAKE_PREFIX_PATH"
 ```
 Please not that your installation might be in another location. The most possible another location is `/usr/local/Cellar/qt@5/5.**.*/`, which depends on the Qt5 version. 
 
+### Dependencies for macOS with M1 chip
+
+MacOS with M1 chip has problems with finding qt5 and it does not support virtual machine. Because of that, Docker should be installed from the following webpage.
+
+https://docs.docker.com/desktop/mac/install/
+
+After installing Docker, the Dockerfile which is already provided in the project should be used. Docker application should always be open during working on the code. 
+To build the code, user should right click on the Dockerfile in the project and select the 'build image' option. After that user should select a name for that image and after selecting, the image is created in the Images section in Docker file. 
+
+To run the code:
+
+```
+docker run -i -p 80:80 -v <path> name
+
+```
+should be run in terminal. Container is generated in container sections in Docker application. 
+Code can be run by using that generated container.
+
 ## Using CMake
 
 CMake is a C++ build system generator, which simplifies the building process compared e.g. to a system-specific Makefile. The CMake configuration is defined in the `CMakeList.txt` file.
