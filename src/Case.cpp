@@ -182,9 +182,15 @@ void Case::set_file_names(std::string file_name) {
     if (_geom_name.compare("NONE") != 0) {
         _geom_name = _prefix + _geom_name;
     }
-
-    // Create output directory
+    
     filesystem::path folder(_dict_name);
+
+    //Check if directory already exists, delete it if it does
+    if (filesystem::exists(_dict_name) == 1){
+        filesystem::remove_all(folder);
+    }
+
+    // Create output directory 
     try {
         filesystem::create_directory(folder);
     } catch (const std::exception &e) {
