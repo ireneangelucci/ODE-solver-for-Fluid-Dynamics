@@ -252,7 +252,7 @@ void Case::simulate() {
         }
 
         // output on screen - time, timestep, residual and convergence status of pressure eqn.
-        std::cout << std::left << std::setw(12) << std::setfill(separator) << "Timestep: " ;
+        /*std::cout << std::left << std::setw(12) << std::setfill(separator) << "Timestep: " ;
         std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << timestep;
         std::cout << std::left << std::setw(8) << std::setfill(separator) << "Time: ";
         std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << t;
@@ -261,7 +261,7 @@ void Case::simulate() {
         std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << convergence;
         std::cout << std::left << std::setw(12) << std::setfill(separator) << "Iterations:";
         std::cout << std::left << std::setw(12) << std::setfill(separator) << it;
-        std::cout << std::endl;
+        std::cout << std::endl;*/
 
         // calculating velocities at next timestep 
         _field.calculate_velocities(_grid);
@@ -307,18 +307,16 @@ void Case::output_vtk(int timestep, int my_rank) {
         }
         y += dy;
     }
-
+    int k=0;
     structuredGrid->SetPoints(points);
     for (int col = 0; col < _grid.domain().size_y + 1; col++) {
-        x = _grid.domain().imin * dx;
-        { x += dx; }
         for (int row = 0; row < _grid.domain().size_x + 1; row++) {
             if(_grid.cell(row,col).type() != cell_type::FLUID){
-                structuredGrid->BlankPoint(current_cell[row + col * _grid.domain().size_x]);
+                //std::cout << row << "," << col << " cell type " << (_grid.cell(row,col).type()==cell_type::FLUID) << "\n";
+                structuredGrid->BlankPoint(current_cell[k]);
             }
-            x += dx;
+        k++;
         }
-        y += dy;
     }
 
     // Pressure Array
