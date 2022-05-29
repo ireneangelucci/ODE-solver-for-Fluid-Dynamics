@@ -93,7 +93,7 @@ Case::Case(std::string file_name, int argn, char **args) {
                 if (var == "UIN") file >> UIN;
                 if (var == "VIN") file >> VIN;
                 if (var == "num_walls") file >> num_walls;
-                if (var == "wall_temp_3") file >> coldwall_temp;
+                if (var == "wall_temp_5") file >> coldwall_temp;
                 if (var == "wall_temp_4") file >> hotwall_temp;
             }
         }
