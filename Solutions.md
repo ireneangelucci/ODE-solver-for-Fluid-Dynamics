@@ -7,6 +7,32 @@
 ### Flow Over a Step
 
 ### Natural Convection
+This is the first case where we simulated a flow sololey due to gravity without prescribing any fixed velocity at the boundary. The simulation domain is a square where top and bottom walls are insulated, left wall is heated and right wall is cooled. Gravity acts on the system.
+We conducted a first simulation with viscosity nu = 0.001 and thermal diffusivity alpha = 0.000142857. In the following picture we can notice how the hot fluid tends to expand more in the higher region of the domain, while the cold fluid expands more in the lower region. Hot fluid is less dense and hence it tends to rise, while on the other hand cold fluid is denser and tends to descend. This is exactly what we can observe through the velocity contour. Glyphs on the left-hot side point upwards, while those on the right-cold side point downwards.
+
+<p> 
+<img src="docs/Worksheet2_Plots/NaturalConvection_Temp_contour_velGlyph_case1.png" width="500">
+</p>
+<em>Temperature Contour plot superimposed with Velocity Glyphs, nu = 0.001 and alpha = 0.000142857.</em>
+
+To understand why the flow moves with a clockwise circular motion we also need to have a look at the pressure profile. Pressure is overall higher in the top region of the domain, and lower on the bottom part. This is due to buoyancy effect. Since hot gas moves upward relative to cold, the region with more hot gas (top) will see pressure building up at top. For both top and bottom region we can still see a horizontal difference in pressure. On the top region pressure is higher on the left corner, while in the bottom region pressure is higher on the right corner. Fluid moves from regions of higher pressure to those of lower pressure, hence in the top region of the domain, gas moves from left to right and in the bottom region it moves from right to left. 
+
+<p> 
+<img src="docs/Worksheet2_Plots/NaturalConvection_Press_contour_velGlyph_case1.png" width="500">
+</p>
+<em>Pressure Contour plot superimposed with Velocity Glyphs, nu = 0.001 and alpha = 0.000142857. </em>
+
+The overall effect is a circular motion. Motion along the y-axis is temperature driven, while motion along the x-axis is pressure driven. Pressure profile is given by the temperature we prescribed at the boundaries.
+
+The same observations can be also made for the second simulation, which we conducted at nu = 0.0002 and alpha = 0.000028571. However, we can point out some substantial differences.
+Due to the lower thermal diffusivity in the second simulation, heat is conducted less quickly and hence heated gas moves less rapidly. This is well showed in the temperature profile, here the region of heated fluid is much more schrinked if compared to simulation one. This also reflects in the pressure profile, where we can observe an over all lower value of pressure. Pressure has a 0 value on most of the domain and presents positive values only in the top left corner.The lower value in viscosity results in less resistance in the fluid, and hence fluid layers moving more easily on top of each other. 
+As an overall result, the vortex center has now moved to the left side of the domain, while in simulation one it was at the exact center of the domain.
+
+<p> 
+<img src="docs/Worksheet2_Plots/NaturalConvection_Temp_contour_velGlyph_case2.png" width="500"> | <img src="docs/Worksheet2_Plots/NaturalConvection_Press_contour_velGlyph_case2.png" width="500">
+</p>
+<em>Temperature Contour plot superimposed with Velocity Glyphs [left] and Pressure Contour plot superimposed with Velocity Glyphs [right], nu = 0.0002 and alpha = 0.000028571. </em>
+
 
 ### Fluid Trap Simulation
 In this case we simulate a heat driven flow with obstacles. You can observe from the Temperature contour plot that the left wall is the hot wall while the right wall is the cold wall. The flow reaches an equilibrium where the hot fluid from left section is not able to propagate into the cold section on right and cold gas from right section is not able to reach the left section. Further, in the pressure contour, one may not the high pressure region in top-left and bottom-right of the domain. This is because the hot gas in left section moves upwards creating a high pressure region top-left of domain, while high amount of cold gas sinks to bottom in the right section creating high pressure zone. If we observe the velocity glyphs, we can see that some amount of hot gas from left section reaches right and moves upward, causing slight higher temperature in top-right compared to bottom-right. Similar observation can be made for left section. 
