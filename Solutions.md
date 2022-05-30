@@ -1,17 +1,33 @@
 ## Worksheet 2
 
 ### Plain Shear Flow
+No slip boundary conditions are used for the Plane shear flow. When pressure contour is examined, it can be observed that the pressure is decreasing. The reason for that decrease in pressure is viscosity. Also, when the velocity contour is examined, it can be observed that the highest velocity is seen in the mid points and the lowest is the points which are close to boundaries. 
+
+<p>
+<img src= "docs/Worksheet2_Plots/PlainShear_Pressure_Contour.png" width="500"> | <img src="docs/Worksheet2_Plots/PlainShear_VelocityX_Contour.png" width="500">
+<img src= "docs/Worksheet2_Plots/PlainShear_VelocityX_Profile.png" width="500"> | <img src="docs/Worksheet2_Plots/PlainShear_Pressure_Profile.png" width="500">
+</p>
 
 ### Karman Vortex Simulation
+In this case the fluid enters from left with a constant velocity. No slip boundary conditions are used in the upper and lower plates. Also, fluid encounters a tilted plate during its motion. When the velocity profile is examined, the lowest velocities are observed at boundaries. Moreover, low velocity is observed just after the tilted plate. 
+
+<p>
+<img src= "docs/Worksheet2_Plots/KarmanVortex_Velocity.avi" width="500"> 
+</p>
 
 ### Flow Over a Step
+In this case the fluid enters from left with a constant velocity. No slip boundary conditions are used in the upper and lower plates. The obstacle is provided in the left bottom entrance of the channel. When the velocity contour is examined, the highest velocity is observed at the entrance. However, due to obstacle at the entrance, in the area right after the obstacle, the velocity is very low. Also because of the no slip boundary conditions, velocity is very low at boundaries. 
+
+<p>
+<img src= "docs/Worksheet2_Plots/Step_Pressure_Contour.png" width="500"> | <img src="docs/Worksheet2_Plots/Step_VelocityMag_Contour.png" width="500">
+</p>
 
 ### Natural Convection
 This is the first case where we simulated a flow sololey due to gravity without prescribing any fixed velocity at the boundary. The simulation domain is a square where top and bottom walls are insulated, left wall is heated and right wall is cooled. Gravity acts on the system.
 We conducted a first simulation with viscosity nu = 0.001 and thermal diffusivity alpha = 0.000142857. In the following picture we can notice how the hot fluid tends to expand more in the higher region of the domain, while the cold fluid expands more in the lower region. Hot fluid is less dense and hence it tends to rise, while on the other hand cold fluid is denser and tends to descend. This is exactly what we can observe through the velocity contour. Glyphs on the left-hot side point upwards, while those on the right-cold side point downwards.
 
 <p> 
-<img src="docs/Worksheet2_Plots/NaturalConvection_Temp_contour_velGlyph_case1.png" width="500">
+<img src="docs/Worksheet2_Plots/NaturalConvection_Temp_contour_velGlyph_case1.png" width="500" >
 </p>
 <em>Temperature Contour plot superimposed with Velocity Glyphs, nu = 0.001 and alpha = 0.000142857.</em>
 
