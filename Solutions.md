@@ -1,26 +1,35 @@
 ## Worksheet 2
 
 ### Plain Shear Flow
-No slip boundary conditions are used for the Plane shear flow. When pressure contour is examined, it can be observed that the pressure is decreasing. The reason for that decrease in pressure is viscosity. Also, when the velocity contour is examined, it can be observed that the highest velocity is seen in the mid points and the lowest is the points which are close to boundaries. 
+We begin with modeling the simple case of Plain Shear Flow in a pipe. No slip boundary conditions are used in this case. It can be observed that the pressure is continuosly decreasing along the length of the pipe. The reason for the decrease in pressure is frictional loss due to the presence of viscosity. From velocity contour, it can be observed that the highest velocity is seen along the centerline after the boundary layer is fully developed and a steady flow is reached. Velocity at wall is zero as expected. The velocity of 1.5 in the center matches with the value obtained from the analytical expression of velocity profile in pipe flow. 
 
 <p>
 <img src= "docs/Worksheet2_Plots/PlainShear_Pressure_Contour.png" width="500"> | <img src="docs/Worksheet2_Plots/PlainShear_VelocityX_Contour.png" width="500">
-<img src= "docs/Worksheet2_Plots/PlainShear_VelocityX_Profile.png" width="500"> | <img src="docs/Worksheet2_Plots/PlainShear_Pressure_Profile.png" width="500">
 </p>
-
-### Karman Vortex Simulation
-In this case the fluid enters from left with a constant velocity. No slip boundary conditions are used in the upper and lower plates. Also, fluid encounters a tilted plate during its motion. When the velocity profile is examined, the lowest velocities are observed at boundaries. Moreover, low velocity is observed just after the tilted plate. 
+<em>Pressure Contour plot for pipe flow [left], and Velocity contour plot [right] </em>
 
 <p>
-<img src= "docs/Worksheet2_Plots/KarmanVortex_Velocity.avi" width="500"> 
+<img src= "docs/Worksheet2_Plots/PlainShear_VelocityX_Profile.png" width="500"> | <img src="docs/Worksheet2_Plots/PlainShear_Pressure_Profile.png" width="500">
 </p>
+<em>Velocity profile along the section [left], and Pressure and Velocity magnitude profile along the centerline [right] </em>
+
+
+### Karman Vortex Simulation
+Karman vortex refers to vortex shedding caused by flow around a blunt obstacle. In present simulation, the fluid enters from left with a constant velocity and encounters a tilted plate. This leads to vortex shedding which can be seen in the velocity or pressure contour. A small recirculation zone behind the obstacle is observed as expected. You can find link to the animation file [here](https://gitlab.lrz.de/00000000014ADC3D/cfd-lab-group-mib/-/blob/Worksheet2/docs/Worksheet2_Plots/KarmanVortex_Velocity.avi)
+
+<p>
+<img src= "docs/Worksheet2_Plots/KarmanVortex.png" width="500"> 
+</p>
+<em>Velocity Contour Plot for flow around the obstacle</em>
 
 ### Flow Over a Step
-In this case the fluid enters from left with a constant velocity. No slip boundary conditions are used in the upper and lower plates. The obstacle is provided in the left bottom entrance of the channel. When the velocity contour is examined, the highest velocity is observed at the entrance. However, due to obstacle at the entrance, in the area right after the obstacle, the velocity is very low. Also because of the no slip boundary conditions, velocity is very low at boundaries. 
+In this case, we simulate the effect of a sudden step in the flow path. The fluid enters from left with a constant velocity. No slip boundary conditions are used in the upper and lower plates. The flow expands on encountering the step. A recirculation zone is formed just downstream of the step. The velocity is higher near the entrance owing to the smaller area to conserve the mass flow rate. However, the velocity is more of less unifrom across the section. In the region towards the outlet, velocity is lower in magnitude and non-uniform across the section (parabolic as seen in the pipe flow case above).
 
 <p>
 <img src= "docs/Worksheet2_Plots/Step_Pressure_Contour.png" width="500"> | <img src="docs/Worksheet2_Plots/Step_VelocityMag_Contour.png" width="500">
 </p>
+<em>Pressure Contour Plot [left], Velocity Contour Plot [right]</em>
+
 
 ### Natural Convection
 This is the first case where we simulated a flow sololey due to gravity without prescribing any fixed velocity at the boundary. The simulation domain is a square where top and bottom walls are insulated, left wall is heated and right wall is cooled. Gravity acts on the system.
@@ -72,7 +81,7 @@ Rayleigh Benard is a natural convection occuring in a horizontal fluid heated fr
 </p>
 <em>Convection Cells or Benard Cells (Source: Wikipedia)</em>
 
-In both the temperature and velocity contour plot, we can observe the formation of convection cells. Glyphs highlight the closed velocity loops as expected for the problem. However, the pattern is not very regular in the present case. This may be due to coarse grids or smaller domain size as Rayleigh Benard convection requires the height of the fluid layer to be much smaller than the horizontal dimensions.
+In both the temperature and velocity contour plot, we can observe the formation of convection cells. Glyphs highlight the closed velocity loops as expected for the problem. However, the pattern is not very regular in the present case. This may be due to coarse grids or smaller domain size as Rayleigh Benard convection requires the height of the fluid layer to be much smaller than the horizontal dimensions. The simulation was repeated with a longer domanin but results obtained were qualitatively similar.
 
 <p> 
 <img src="docs/Worksheet2_Plots/RB_TempContour_VelGlyph.png" width="500">
@@ -84,6 +93,10 @@ In both the temperature and velocity contour plot, we can observe the formation 
 </p>
 <em>Velocity Magnitude Contour and Glyphs</em>
 
+<p> 
+<img src="docs/Worksheet2_Plots/RB_VelContourGlyph_longerdomain.png" width="500">
+</p>
+<em>Velocity Magnitude Contour and Glyphs for case with longer domain</em>
 
 ---
 
