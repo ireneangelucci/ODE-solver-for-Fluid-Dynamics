@@ -18,7 +18,7 @@ We begin with modeling the simple case of Plain Shear Flow in a pipe. No slip bo
 Karman vortex refers to vortex shedding caused by flow around a blunt obstacle. In present simulation, the fluid enters from left with a constant velocity and encounters a tilted plate. This leads to vortex shedding which can be seen in the velocity or pressure contour. A small recirculation zone behind the obstacle is observed as expected. You can find link to the animation file [here](https://gitlab.lrz.de/00000000014ADC3D/cfd-lab-group-mib/-/blob/Worksheet2/docs/Worksheet2_Plots/KarmanVortex_Velocity.avi)
 
 <p>
-<img src= "docs/Worksheet2_Plots/KarmanVortex.png" width="500"> 
+<img src= "docs/Worksheet2_Plots/Obstcle_VelocityMag_Contour.png" width="500"> 
 </p>
 <em>Velocity Contour Plot for flow around the obstacle</em>
 
