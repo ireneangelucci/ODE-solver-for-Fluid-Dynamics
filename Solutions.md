@@ -1,3 +1,106 @@
+## Worksheet 2
+
+### Plain Shear Flow
+We begin with modeling the simple case of Plain Shear Flow in a pipe. No slip boundary conditions are used in this case. It can be observed that the pressure is continuosly decreasing along the length of the pipe. The reason for the decrease in pressure is frictional loss due to the presence of viscosity. From velocity contour, it can be observed that the highest velocity is seen along the centerline after the boundary layer is fully developed and a steady flow is reached. Velocity at wall is zero as expected. The velocity of 1.5 in the center matches with the value obtained from the analytical expression of velocity profile in pipe flow. 
+
+<p>
+<img src= "docs/Worksheet2_Plots/PlainShear_Pressure_Contour.png" width="500"> | <img src="docs/Worksheet2_Plots/PlainShear_VelocityX_Contour.png" width="500">
+</p>
+<em>Pressure Contour plot for pipe flow [left], and Velocity contour plot [right] </em>
+
+<p>
+<img src= "docs/Worksheet2_Plots/PlainShear_VelocityX_Profile.png" width="500"> | <img src="docs/Worksheet2_Plots/PlainShear_Pressure_Profile.png" width="500">
+</p>
+<em>Velocity profile along the section [left], and Pressure and Velocity magnitude profile along the centerline [right] </em>
+
+
+### Karman Vortex Simulation
+Karman vortex refers to vortex shedding caused by flow around a blunt obstacle. In present simulation, the fluid enters from left with a constant velocity and encounters a tilted plate. This leads to vortex shedding which can be seen in the velocity or pressure contour. A small recirculation zone behind the obstacle is observed as expected. You can find link to the animation file [here](https://gitlab.lrz.de/00000000014ADC3D/cfd-lab-group-mib/-/blob/Worksheet2/docs/Worksheet2_Plots/KarmanVortex_Velocity.avi)
+
+<p>
+<img src= "docs/Worksheet2_Plots/Obstcle_VelocityMag_Contour.png" width="500"> 
+</p>
+<em>Velocity Contour Plot for flow around the obstacle</em>
+
+### Flow Over a Step
+In this case, we simulate the effect of a sudden step in the flow path. The fluid enters from left with a constant velocity. No slip boundary conditions are used in the upper and lower plates. The flow expands on encountering the step. A recirculation zone is formed just downstream of the step. The velocity is higher near the entrance owing to the smaller area to conserve the mass flow rate. However, the velocity is more of less unifrom across the section. In the region towards the outlet, velocity is lower in magnitude and non-uniform across the section (parabolic as seen in the pipe flow case above).
+
+<p>
+<img src= "docs/Worksheet2_Plots/Step_Pressure_Contour.png" width="500"> | <img src="docs/Worksheet2_Plots/Step_VelocityMag_Contour.png" width="500">
+</p>
+<em>Pressure Contour Plot [left], Velocity Contour Plot [right]</em>
+
+
+### Natural Convection
+This is the first case where we simulated a flow sololey due to gravity without prescribing any fixed velocity at the boundary. The simulation domain is a square where top and bottom walls are insulated, left wall is heated and right wall is cooled. Gravity acts on the system.
+We conducted a first simulation with viscosity nu = 0.001 and thermal diffusivity alpha = 0.000142857. In the following picture we can notice how the hot fluid tends to expand more in the higher region of the domain, while the cold fluid expands more in the lower region. Hot fluid is less dense and hence it tends to rise, while on the other hand cold fluid is denser and tends to descend. This is exactly what we can observe through the velocity contour. Glyphs on the left-hot side point upwards, while those on the right-cold side point downwards.
+
+<p> 
+<img src="docs/Worksheet2_Plots/NaturalConvection_Temp_contour_velGlyph_case1.png" width="500" >
+</p>
+<em>Temperature Contour plot superimposed with Velocity Glyphs, nu = 0.001 and alpha = 0.000142857.</em>
+
+To understand why the flow moves with a clockwise circular motion we also need to have a look at the pressure profile. Pressure is overall higher in the top region of the domain, and lower on the bottom part. This is due to buoyancy effect. Since hot gas moves upward relative to cold, the region with more hot gas (top) will see pressure building up at top. For both top and bottom region we can still see a horizontal difference in pressure. On the top region pressure is higher on the left corner, while in the bottom region pressure is higher on the right corner. Fluid moves from regions of higher pressure to those of lower pressure, hence in the top region of the domain, gas moves from left to right and in the bottom region it moves from right to left. 
+
+<p> 
+<img src="docs/Worksheet2_Plots/NaturalConvection_Press_contour_velGlyph_case1.png" width="500">
+</p>
+<em>Pressure Contour plot superimposed with Velocity Glyphs, nu = 0.001 and alpha = 0.000142857. </em>
+
+The overall effect is a circular motion. Motion along the y-axis is temperature driven, while motion along the x-axis is pressure driven. Pressure profile is given by the temperature we prescribed at the boundaries.
+
+The same observations can be also made for the second simulation, which we conducted at nu = 0.0002 and alpha = 0.000028571. However, we can point out some substantial differences.
+Due to the lower thermal diffusivity in the second simulation, heat is conducted less quickly and hence heated gas moves less rapidly. This is well showed in the temperature profile, here the region of heated fluid is much more schrinked if compared to simulation one. This also reflects in the pressure profile, where we can observe an over all lower value of pressure. Pressure has a 0 value on most of the domain and presents positive values only in the top left corner.The lower value in viscosity results in fluid layers moving more easily on top of each other. 
+As an overall result, the vortex center has now moved to the left side of the domain, while in simulation one it was at the exact center of the domain.
+
+<p> 
+<img src="docs/Worksheet2_Plots/NaturalConvection_Temp_contour_velGlyph_case2.png" width="500"> | <img src="docs/Worksheet2_Plots/NaturalConvection_Press_contour_velGlyph_case2.png" width="500">
+</p>
+<em>Temperature Contour plot superimposed with Velocity Glyphs [left] and Pressure Contour plot superimposed with Velocity Glyphs [right], nu = 0.0002 and alpha = 0.000028571. </em>
+
+
+### Fluid Trap Simulation
+In this case we simulate a heat driven flow with obstacles. You can observe from the Temperature contour plot that the left wall is the hot wall while the right wall is the cold wall. The flow reaches an equilibrium where the hot fluid from left section is not able to propagate into the cold section on right and cold gas from right section is not able to reach the left section. Further, in the pressure contour, one may not the high pressure region in top-left and bottom-right of the domain. This is because the hot gas in left section moves upwards creating a high pressure region top-left of domain, while high amount of cold gas sinks to bottom in the right section creating high pressure zone. If we observe the velocity glyphs, we can see that some amount of hot gas from left section reaches right and moves upward, causing slight higher temperature in top-right compared to bottom-right. Similar observation can be made for left section. 
+
+<p> 
+<img src="docs/Worksheet2_Plots/FluidTrap_TempContour_VelGlyph.png" width="500">
+</p>
+<em>Temperature Contour plot superimposed with Velocity Glyphs</em>
+
+<p> 
+<img src="docs/Worksheet2_Plots/FluidTrap_PressContour_VelGlyph.png" width="500">
+</p>
+<em>Pressure Contour plot superimposed with Velocity Glyphs</em>
+
+### Rayleigh Benard Convection
+
+Rayleigh Benard is a natural convection occuring in a horizontal fluid heated from bottom. The fluid in contact with the hot wall at bottom rises up till it reaches the top (typically a fluid-fluid interface). The top boundary is modelled as a cold wall in present simulation. The fluid at top turns to side but cannot move far as it encounters another coloum of fluid around it. It instead forms a loop with itself creating isolated cells called Benard Cells. This is illustrated in the figure below.
+
+<p> 
+<img src="docs/Worksheet2_Plots/ConvectionCells.png" width="500">
+</p>
+<em>Convection Cells or Benard Cells (Source: Wikipedia)</em>
+
+In both the temperature and velocity contour plot, we can observe the formation of convection cells. Glyphs highlight the closed velocity loops as expected for the problem. However, the pattern is not very regular in the present case. This may be due to coarse grids or smaller domain size as Rayleigh Benard convection requires the height of the fluid layer to be much smaller than the horizontal dimensions. The simulation was repeated with a longer domanin but results obtained were qualitatively similar.
+
+<p> 
+<img src="docs/Worksheet2_Plots/RB_TempContour_VelGlyph.png" width="500">
+</p>
+<em>Temperature Contour plot superimposed with Velocity Glyphs</em>
+
+<p> 
+<img src="docs/Worksheet2_Plots/RB_VelContourGlyph.png" width="500">
+</p>
+<em>Velocity Magnitude Contour and Glyphs</em>
+
+<p> 
+<img src="docs/Worksheet2_Plots/RB_VelContourGlyph_longerdomain.png" width="500">
+</p>
+<em>Velocity Magnitude Contour and Glyphs for case with longer domain</em>
+
+---
+
+## Worksheet 1
 ### Pressure Visualization
 
 The image below shows the pressure contour for the lid driven cavity simulation, after some thousands time steps. As the picture shows, the highest pressure is in the upper right corner of the lid driven cavity while the lowest pressure is observed at the left upper corner. If one also takes a look at the glyphs in the velocity profile (next section), then it's obvious that the fluid moves from high pressure to low pressure. The only exception is the top of the cavity. Here the cells used for the discretization are "attached" to the lid and hence move with it (from low pressure to high pressure). 

@@ -25,7 +25,7 @@ class Fields {
      * @param[in] initial pressure
      *
      */
-    Fields(double _nu, double _dt, double _tau, int imax, int jmax, double UI, double VI, double PI, double GX, double GY);
+    Fields(double _nu, double _dt, double _tau, double _alpha, double _beta, int imax, int jmax, double UI, double VI, double PI, double TI, double GX, double GY, Grid &grid, std::string energy_eq);
 
     /**
      * @brief Calculates the convective and diffusive fluxes in x and y
@@ -60,6 +60,8 @@ class Fields {
      * @param[in] grid in which the calculations are done
      *
      */
+    
+    void calculate_Temperature(Grid &grid);
     double calculate_dt(Grid &grid);
 
     /// x-velocity index based access and modify
@@ -70,6 +72,9 @@ class Fields {
 
     /// pressure index based access and modify
     double &p(int i, int j);
+
+    /// pressure index based access and modify
+    double &T(int i, int j);
 
     /// RHS index based access and modify
     double &rs(int i, int j);
@@ -82,11 +87,14 @@ class Fields {
 
     /// get timestep size
     double dt() const;
+    std::string &Energy();
 
     /// pressure matrix access and modify
     Matrix<double> &p_matrix();
 
+    /// setters functions
     void setp(int i, int j, double val);
+    void setT(int i, int j, double val);
     void setu(int i, int j, double val);
     void setv(int i, int j, double val);
     void setf(int i, int j, double val);
@@ -106,6 +114,8 @@ class Fields {
     Matrix<double> _G;
     /// right hand side matrix
     Matrix<double> _RS;
+    /// Temperature matrix
+    Matrix<double> _T;
 
     /// kinematic viscosity
     double _nu;
@@ -117,4 +127,11 @@ class Fields {
     double _dt;
     /// adaptive timestep coefficient
     double _tau;
+    /// Thermal Diffusivity
+    double _alpha;
+    /// Thermal expansion coefficient
+    double _beta;
+    /// Energz equation (on or off)
+    std::string _energy_eq{"NONE"};
+
 };

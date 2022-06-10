@@ -18,6 +18,7 @@ Grid::Grid(std::string geom_name, Domain &domain) {
                                                     std::vector<int>(_domain.domain_size_y + 2, 0));
         parse_geometry_file(geom_name, geometry_data);
         assign_cell_types(geometry_data);
+        check_forbidden_cells();
     } else {
         build_lid_driven_cavity();
     }
@@ -54,7 +55,22 @@ void Grid::assign_cell_types(std::vector<std::vector<int>> &geometry_data) {
             if (geometry_data.at(i_geom).at(j_geom) == 0) {
                 _cells(i, j) = Cell(i, j, cell_type::FLUID);
                 _fluid_cells.push_back(&_cells(i, j));
-            } else if (geometry_data.at(i_geom).at(j_geom) == LidDrivenCavity::moving_wall_id) {
+            } else if (geometry_data.at(i_geom).at(j_geom) == 1) {
+                _cells(i, j) = Cell(i, j, cell_type::INFLOW);
+                _inflow_cells.push_back(&_cells(i, j));
+            } else if (geometry_data.at(i_geom).at(j_geom) == 2) {
+                _cells(i, j) = Cell(i, j, cell_type::OUTFLOW);
+                _outflow_cells.push_back(&_cells(i, j));
+            } else if (geometry_data.at(i_geom).at(j_geom) == 3) {
+                _cells(i, j) = Cell(i, j, cell_type::ADIABATIC_WALL);
+                _fixed_wall_cells.push_back(&_cells(i, j));     
+            } else if (geometry_data.at(i_geom).at(j_geom) == 4) {
+                _cells(i, j) = Cell(i, j, cell_type::HOT_WALL);
+                _hot_wall_cells.push_back(&_cells(i, j));
+            } else if (geometry_data.at(i_geom).at(j_geom) == 5) {
+                _cells(i, j) = Cell(i, j, cell_type::COLD_WALL);
+                _cold_wall_cells.push_back(&_cells(i, j));
+            } else if (geometry_data.at(i_geom).at(j_geom) == LidDrivenCavity::moving_wall_id || geometry_data.at(i_geom).at(j_geom) == 8) {
                 _cells(i, j) = Cell(i, j, cell_type::MOVING_WALL, geometry_data.at(i_geom).at(j_geom));
                 _moving_wall_cells.push_back(&_cells(i, j));
             } else {
@@ -211,6 +227,17 @@ void Grid::assign_cell_types(std::vector<std::vector<int>> &geometry_data) {
     }
 }
 
+void Grid::check_forbidden_cells() {
+    for (auto & cell : _fixed_wall_cells){
+        if ((cell->borders()).size() >= 3){
+            std::cerr << "Forbidden cell at position (" << cell->i() << "," << cell->j() << ") \n";
+            std::cerr << "Please insert a valid pgm file. A fixed wall cell should have not more than two fluid cells as neighbors. \n";
+            exit(1);
+        }
+    }
+
+}
+
 void Grid::parse_geometry_file(std::string filedoc, std::vector<std::vector<int>> &geometry_data) {
 
     int numcols, numrows, depth;
@@ -266,3 +293,9 @@ const std::vector<Cell *> &Grid::fluid_cells() const { return _fluid_cells; }
 const std::vector<Cell *> &Grid::fixed_wall_cells() const { return _fixed_wall_cells; }
 
 const std::vector<Cell *> &Grid::moving_wall_cells() const { return _moving_wall_cells; }
+
+const std::vector<Cell *> &Grid::inflow_cells() const { return _inflow_cells; };
+const std::vector<Cell *> &Grid::outflow_cells() const { return _outflow_cells; };
+const std::vector<Cell *> &Grid::adiabatic_wall_cells() const { return _adiabatic_wall_cells; };
+const std::vector<Cell *> &Grid::hot_wall_cells() const { return _hot_wall_cells; };
+const std::vector<Cell *> &Grid::cold_wall_cells() const { return _cold_wall_cells; };
