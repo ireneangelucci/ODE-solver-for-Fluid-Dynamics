@@ -140,6 +140,7 @@ Case::Case(std::string file_name, int argn, char **args) {
     _grid = Grid(_geom_name, domain);
     _field = Fields(nu, dt, tau, alpha, beta, _grid.domain().size_x, _grid.domain().size_y, UI, VI, PI, TI, GX, GY, _grid, energy_eq);
 
+    std::cout<<_my_rank<<" Ran until here\n";
     _discretization = Discretization(domain.dx, domain.dy, gamma);
     _pressure_solver = std::make_unique<SOR>(omg);
     _max_iter = itermax;
@@ -294,7 +295,7 @@ void Case::simulate() {
         // calculating velocities at next timestep 
         _field.calculate_velocities(_grid);
         if(t >= output_counter*_output_freq){
-            output_vtk(timestep, 1);
+            output_vtk(timestep, _my_rank);
             output_counter += 1;
         }
         t = t + _field.dt();
