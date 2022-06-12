@@ -55,6 +55,8 @@ Case::Case(std::string file_name, int argn, char **args) {
     int num_walls;
     double coldwall_temp;
     double hotwall_temp;
+    int iproc;
+    int jproc;
 
     if (file.is_open()) {
 
@@ -82,7 +84,8 @@ Case::Case(std::string file_name, int argn, char **args) {
                 if (var == "itermax") file >> itermax;
                 if (var == "imax") file >> imax;
                 if (var == "jmax") file >> jmax;
-
+                if (var == "iproc") file >> iproc;
+                if (var == "jproc") file >> jproc;
                 if (var == "program") file >> program;
                 if (var == "geo_file") file >> _geom_name;
                 if (var == "TI") file >> TI;
@@ -99,6 +102,16 @@ Case::Case(std::string file_name, int argn, char **args) {
         }
     }
     file.close();
+
+    int my_rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
+
+    int nprocs;
+    MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
+    if (nprocs != iproc*jproc && my_rank == 0){
+        std::cerr << "No. of processes not compatible with input file: Nprocs must be Iprocs*Jprocs \n"<<"Iprocs: "<<iproc<<", Jprocs: "<<jproc<<"\n";
+        exit(1);
+    }
 
     std::map<int, double> wall_vel;
     if (_geom_name.compare("NONE") == 0) {
@@ -221,7 +234,9 @@ void Case::set_file_names(std::string file_name) {
  * For information about the classes and functions, you can check the header files.
  */
 void Case::simulate() {
-    std::cout << "Simulation started. \n";
+    if(rank == 0){
+        std::cout << "Simulation started. \n";
+    }
     double t = 0.0;
     //_field.calculate_dt(_grid);
     double dt = _field.dt();
@@ -256,7 +271,7 @@ void Case::simulate() {
         else{
             convergence = "Not Converged";
         }
-
+/*
         // output on screen - time, timestep, residual and convergence status of pressure eqn.
         std::cout << std::left << std::setw(12) << std::setfill(separator) << "Timestep: " ;
         std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << timestep;
@@ -268,7 +283,7 @@ void Case::simulate() {
         std::cout << std::left << std::setw(12) << std::setfill(separator) << "Iterations:";
         std::cout << std::left << std::setw(12) << std::setfill(separator) << it;
         std::cout << std::endl;
-
+*/
         // calculating velocities at next timestep 
         _field.calculate_velocities(_grid);
         if(t >= output_counter*_output_freq){
