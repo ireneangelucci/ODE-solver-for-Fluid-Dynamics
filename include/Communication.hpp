@@ -1,9 +1,11 @@
+#ifndef COMMUNICATION_HPP
+#define COMMUNICATION_HPP
+
 #include "Fields.hpp"
 
 class Communication{
-
     public:
-        
+
         Communication() = default;
         /**
          * @brief Constructor
@@ -27,18 +29,23 @@ class Communication{
          * @brief Communication
          * 
          */
-        static void communicate(Fields &field);
+        //static void communicate(Fields &field);
 
         /**
          * @brief Find minimum value across all procresses
          * 
          */
-        static double reduce_min(double dt);
+        static double reduce_min(double min_dt);
 
         /**
          * @brief Find sum across all processed
          * 
          */
         static double reduce_sum(double sum);
+    
+    private:
+        static int _my_rank;
 
 };
+
+#endif

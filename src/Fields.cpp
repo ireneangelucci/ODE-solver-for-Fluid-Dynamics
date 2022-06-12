@@ -1,4 +1,5 @@
 #include "Fields.hpp"
+#include "Communication.hpp"
 
 #include<cmath>
 #include <algorithm>

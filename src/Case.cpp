@@ -139,7 +139,7 @@ Case::Case(std::string file_name, int argn, char **args) {
 
     _grid = Grid(_geom_name, domain);
     _field = Fields(nu, dt, tau, alpha, beta, _grid.domain().size_x, _grid.domain().size_y, UI, VI, PI, TI, GX, GY, _grid, energy_eq);
-
+    _communication = Communication(_my_rank);
     _discretization = Discretization(domain.dx, domain.dy, gamma);
     _pressure_solver = std::make_unique<SOR>(omg);
     _max_iter = itermax;
@@ -242,7 +242,7 @@ void Case::set_file_names(std::string file_name) {
  */
 void Case::simulate() {
     if(_my_rank == 0){
-        std::cout << "Simulation started. \n";
+        std::cout << "Simulation started, rank "<< _my_rank <<  "\n";
     }
     double t = 0.0;
     //_field.calculate_dt(_grid);
@@ -260,9 +260,10 @@ void Case::simulate() {
             boundary->apply(_field);
         }
         if(_field.Energy() == "on") {
-             _field.calculate_Temperature(_grid); 
+            _field.calculate_Temperature(_grid);         
         }
         _field.calculate_fluxes(_grid);
+        std::cout << "helper , rank "<< _my_rank <<  "\n";
         _field.calculate_rs(_grid);
 
         int it = 0;
@@ -462,4 +463,5 @@ void Case::build_domain(Domain &domain, int imax_domain, int jmax_domain, int ip
         //std::cout<<_my_rank<<" Imin: "<<domain.imin<<" Jmin: "<<domain.jmin<<"\n";
         //std::cout<<_my_rank<<" Imax: "<<domain.imax<<" Jmax: "<<domain.jmax<<"\n";         
     }
+    std::cout << "exiting build domain, rank "<< _my_rank <<  "\n";
 }

@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 
-#include <Communication.hpp>
+#include "Communication.hpp"
 #include "Case.hpp"
 
 void printProgressBar( double t, double t_end ){
