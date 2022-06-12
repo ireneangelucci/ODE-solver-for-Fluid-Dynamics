@@ -16,7 +16,7 @@ Grid::Grid(std::string geom_name, Domain &domain) {
     if (geom_name.compare("NONE")) {
         std::vector<std::vector<int>> geometry_data(_domain.domain_size_x + 2,
                                                     std::vector<int>(_domain.domain_size_y + 2, 0));
-        parse_geometry_file(geom_name, geometry_data);
+        parse_geometry_file(geom_name, geometry_data);  
         assign_cell_types(geometry_data);
         check_forbidden_cells();
     } else {

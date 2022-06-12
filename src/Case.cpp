@@ -128,7 +128,14 @@ Case::Case(std::string file_name, int argn, char **args) {
     domain.domain_size_x = imax;
     domain.domain_size_y = jmax;
 
-    build_domain(domain, imax, jmax);
+    build_domain(domain, imax, jmax, iproc, jproc);
+    /*if(_my_rank == 0){
+        std::cout<<domain.neighbours[3]<<"\n";
+    }
+    if(_my_rank == 1){
+        std::cout<<domain.neighbours[3]<<"\n";
+    }*/
+
 
     _grid = Grid(_geom_name, domain);
     _field = Fields(nu, dt, tau, alpha, beta, _grid.domain().size_x, _grid.domain().size_y, UI, VI, PI, TI, GX, GY, _grid, energy_eq);
@@ -409,11 +416,50 @@ void Case::output_vtk(int timestep, int my_rank) {
     writer->Write();
 }
 
-void Case::build_domain(Domain &domain, int imax_domain, int jmax_domain) {
-    domain.imin = 0;
-    domain.jmin = 0;
-    domain.imax = imax_domain + 2;
-    domain.jmax = jmax_domain + 2;
-    domain.size_x = imax_domain;
-    domain.size_y = jmax_domain;
+void Case::build_domain(Domain &domain, int imax_domain, int jmax_domain, int iproc, int jproc) {
+    if(_my_rank == 0){
+        domain.imin = 0;
+        domain.jmin = 0;
+        domain.imax = imax_domain/iproc + 2;
+        domain.jmax = jmax_domain/jproc + 2;
+        domain.size_x = imax_domain/iproc;
+        domain.size_y = jmax_domain/jproc;
+        if(iproc > 1){ domain.neighbours[2]=1; }
+        if(jproc > 1){ domain.neighbours[3]=iproc; }
+
+        int imin, jmin, imax, jmax, curr_rank;
+        std::array<int, 4> neighbours{MPI_PROC_NULL, MPI_PROC_NULL, MPI_PROC_NULL, MPI_PROC_NULL}; 
+        for(int j = 0; j < jproc; j++){
+            for(int i = 0; i < iproc; i++){
+                if(i==0 && j==0){continue;}
+                imin = i * (imax_domain/iproc);
+                jmin = j * (jmax_domain/jproc);
+                imax = (i+1) * (imax_domain/iproc)+2;  
+                jmax = (j+1) * (jmax_domain/jproc)+2;
+                curr_rank = i+j*iproc;
+                if(i<iproc){neighbours[2] = (i+1)+j*iproc; }
+                if(i>0){neighbours[0] = (i-1)+j*iproc; }
+                if(j<jproc){neighbours[3] = i+(j+1)*iproc; }
+                if(j>0){neighbours[1] = i+(j-1)*iproc; }
+                MPI_Send(&neighbours, 4, MPI_INT, curr_rank, 123, MPI_COMM_WORLD);
+                MPI_Send(&imin, 1, MPI_INT, curr_rank, 1, MPI_COMM_WORLD);
+                MPI_Send(&jmin, 1, MPI_INT, curr_rank, 2, MPI_COMM_WORLD);
+                MPI_Send(&imax, 1, MPI_INT, curr_rank, 3, MPI_COMM_WORLD);
+                MPI_Send(&jmax, 1, MPI_INT, curr_rank, 4, MPI_COMM_WORLD);
+                MPI_Send(&domain.size_x, 1, MPI_INT, curr_rank, 5, MPI_COMM_WORLD);
+                MPI_Send(&domain.size_y, 1, MPI_INT, curr_rank, 6, MPI_COMM_WORLD);
+            }
+        }        
+    }else{
+        MPI_Status status;
+        MPI_Recv(&domain.neighbours, 4, MPI_INT, 0, 123, MPI_COMM_WORLD, &status);
+        MPI_Recv(&domain.imin, 1, MPI_INT, 0, 1, MPI_COMM_WORLD, &status);
+        MPI_Recv(&domain.jmin, 1, MPI_INT, 0, 2, MPI_COMM_WORLD, &status);
+        MPI_Recv(&domain.imax, 1, MPI_INT, 0, 3, MPI_COMM_WORLD, &status);
+        MPI_Recv(&domain.jmax, 1, MPI_INT, 0, 4, MPI_COMM_WORLD, &status);
+        MPI_Recv(&domain.size_x, 1, MPI_INT, 0, 5, MPI_COMM_WORLD, &status);
+        MPI_Recv(&domain.size_y, 1, MPI_INT, 0, 6, MPI_COMM_WORLD, &status);
+        //std::cout<<_my_rank<<" Imin: "<<domain.imin<<" Jmin: "<<domain.jmin<<"\n";
+        //std::cout<<_my_rank<<" Imax: "<<domain.imax<<" Jmax: "<<domain.jmax<<"\n";         
+    }
 }
