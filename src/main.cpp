@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 
+#include <Communication.hpp>
 #include "Case.hpp"
 
 void printProgressBar( double t, double t_end ){
@@ -24,8 +25,9 @@ void printProgressBar( double t, double t_end ){
 
 int main(int argn, char **args) {
     if (argn > 1) {
-        std::string file_name{args[1]};
+        std::string file_name{args[2]};
         Case problem(file_name, argn, args);
+        Communication::init_parallel(argn, args);
         problem.simulate();
     
 
