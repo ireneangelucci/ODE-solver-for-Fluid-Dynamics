@@ -103,12 +103,12 @@ Case::Case(std::string file_name, int argn, char **args) {
     }
     file.close();
 
-    int my_rank;
-    MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
-
+    //int my_rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &_my_rank);
+    
     int nprocs;
     MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
-    if (nprocs != iproc*jproc && my_rank == 0){
+    if (nprocs != iproc*jproc && _my_rank == 0){
         std::cerr << "No. of processes not compatible with input file: Nprocs must be Iprocs*Jprocs \n"<<"Iprocs: "<<iproc<<", Jprocs: "<<jproc<<"\n";
         exit(1);
     }
@@ -234,7 +234,7 @@ void Case::set_file_names(std::string file_name) {
  * For information about the classes and functions, you can check the header files.
  */
 void Case::simulate() {
-    if(rank == 0){
+    if(_my_rank == 0){
         std::cout << "Simulation started. \n";
     }
     double t = 0.0;
