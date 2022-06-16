@@ -2,6 +2,7 @@
 #define COMMUNICATION_HPP
 
 #include "Fields.hpp"
+#include "Domain.hpp"
 
 class Communication{
     public:
@@ -11,7 +12,7 @@ class Communication{
          * @brief Constructor
          * 
          */
-        Communication(int my_rank);
+        Communication(int my_rank, Domain domain);
 
         /**
          * @brief Initializing
@@ -29,7 +30,7 @@ class Communication{
          * @brief Communication
          * 
          */
-        //static void communicate(Fields &field);
+        static void communicate(Fields &field);
 
         /**
          * @brief Find minimum value across all procresses
@@ -44,6 +45,7 @@ class Communication{
         static double reduce_sum(double sum);
     
         static int _my_rank;
+        static Domain _domain;
 
 };
 

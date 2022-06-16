@@ -129,8 +129,8 @@ Case::Case(std::string file_name, int argn, char **args) {
     domain.domain_size_y = jmax;
 
     build_domain(domain, imax, jmax, iproc, jproc);
-
-    _communication = Communication(_my_rank);
+    //std::cout<<_my_rank<<" Size x"<<domain.size_x<<"\n";
+    _communication = Communication(_my_rank, domain);
     _grid = Grid(_geom_name, domain);
     _field = Fields(nu, dt, tau, alpha, beta, _grid.domain().size_x, _grid.domain().size_y, UI, VI, PI, TI, GX, GY, _grid, energy_eq);
     
@@ -272,6 +272,23 @@ void Case::simulate() {
             res = _pressure_solver->solve(_field, _grid, _boundaries);
             it++;            
         }
+        //exchanging pressure values across processes
+        if(_my_rank == 0){
+            _field.p(26,5) = 5;
+            std::cout<<_field.p(26,5)<<" rank: "<<_my_rank<<" \n";
+        }
+        if(_my_rank == 1){
+            _field.p(1,5) = 15;
+            std::cout<<_field.p(1,5)<<" rank: "<<_my_rank<<" \n";
+        }
+        Communication::communicate(_field);
+        if(_my_rank == 0){
+            std::cout<<_field.p(26,5)<<" rank: "<<_my_rank<<" \n";
+        }
+        if(_my_rank == 1){
+            std::cout<<_field.p(1,5)<<" rank: "<<_my_rank<<" \n";
+        }
+
         if(it < _max_iter){
             convergence = "Converged";
         }

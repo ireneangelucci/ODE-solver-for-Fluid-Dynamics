@@ -133,6 +133,12 @@ double &Fields::T(int i, int j) { return _T(i, j); }
 std::string &Fields::Energy() { return _energy_eq; }
 
 Matrix<double> &Fields::p_matrix() { return _P; }
+Matrix<double> &Fields::u_matrix() { return _U; }
+Matrix<double> &Fields::v_matrix() { return _V; }
+Matrix<double> &Fields::T_matrix() { return _T; }
+Matrix<double> &Fields::f_matrix() { return _F; }
+Matrix<double> &Fields::g_matrix() { return _G; }
+Matrix<double> &Fields::rs_matrix() { return _RS; }
 
 double Fields::dt() const { return _dt; }
 
