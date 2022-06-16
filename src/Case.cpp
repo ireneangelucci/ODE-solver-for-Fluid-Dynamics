@@ -274,17 +274,24 @@ void Case::simulate() {
 
         /*if(_my_rank==1){
             _field.setp(1, 4, 15);
-            std::cout<< "p(1,4)" << _field.p(1,4) << " on rank " << _my_rank << "\n";
+            _field.setp(0, 4, 16);
+            std::cout<< "p(1,4) " << _field.p(1,4) << " on rank " << _my_rank << "\n";
+            std::cout<< "p(0,4) " << _field.p(0,4) << " on rank " << _my_rank << "\n";
         }
         if(_my_rank==0){
             _field.setp(26, 4, 10);
-            std::cout<< "p(26,4)" << _field.p(26,4) << " on rank " << _my_rank << "\n";
+            _field.setp(25, 4, 11);
+            std::cout<< "p(26,4) " << _field.p(26,4) << " on rank " << _my_rank << "\n";
+            std::cout<< "p(25,4) " << _field.p(25,4) << " on rank " << _my_rank << "\n";
         }*/
         MPI_Barrier(MPI_COMM_WORLD);
         Communication::communicate(_field.p_matrix());
         MPI_Barrier(MPI_COMM_WORLD);
         /*if(_my_rank==0){
-            std::cout<< "p(26,4)" << _field.p(26,4) << " on rank " << _my_rank << "\n";
+            std::cout<< "p(26,4) " << _field.p(26,4) << " on rank " << _my_rank << "\n";
+        }
+        if(_my_rank==1){
+            std::cout<< "p(0,4) " << _field.p(0,4) << " on rank " << _my_rank << "\n";
         }*/
         if(it < _max_iter){
             convergence = "Converged";
