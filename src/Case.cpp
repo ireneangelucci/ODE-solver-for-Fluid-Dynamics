@@ -253,7 +253,7 @@ void Case::simulate() {
     const char separator = ' ';
 
     // starting the time loop
-    while(t < _t_end){
+    while(t < _t_end && timestep < 1){
         // applying boundary
         for(auto &boundary: _boundaries){
             boundary->apply(_field);
@@ -285,9 +285,12 @@ void Case::simulate() {
         if(_my_rank == 3){
             std::cout << "working on rank " << _my_rank;
         }*/
+        std::cout<<"-------------\n";
+        MPI_Barrier(MPI_COMM_WORLD);
         Communication::communicate(_field);
-
-        std::cout << t << "\n";
+        MPI_Barrier(MPI_COMM_WORLD);
+        std::cout << "Rank : "<< _my_rank <<" Done with communication\n";
+        //std::cout << t << "\n";
 
         if(it < _max_iter){
             convergence = "Converged";
@@ -318,6 +321,7 @@ void Case::simulate() {
         _field.calculate_dt(_grid);
         timestep +=1;
     }
+    MPI_Barrier(MPI_COMM_WORLD);
     std::cout << "Simulation ended. \n";
 }
 
