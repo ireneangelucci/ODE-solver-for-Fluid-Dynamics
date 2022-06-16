@@ -139,12 +139,9 @@ Case::Case(std::string file_name, int argn, char **args) {
 
     _grid = Grid(_geom_name, domain);
     _field = Fields(nu, dt, tau, alpha, beta, _grid.domain().size_x, _grid.domain().size_y, UI, VI, PI, TI, GX, GY, _grid, energy_eq);
-<<<<<<< HEAD
     _communication = Communication(_my_rank);
-=======
 
     std::cout<<_my_rank<<" Ran until here\n";
->>>>>>> 1185f796de92d41cf895860b29f6ae8bb6f2f99d
     _discretization = Discretization(domain.dx, domain.dy, gamma);
     _pressure_solver = std::make_unique<SOR>(omg);
     _max_iter = itermax;
