@@ -20,7 +20,17 @@ Fields::Fields(double nu, double dt, double tau, double alpha, double beta, int 
     _gx = GX;
     _gy = GY;
 
-    for(auto &currentCell: grid.fluid_cells()){  //also fro cells in boundary_fluid
+    for(auto &currentCell: grid.fluid_cells()){  
+        int i = currentCell->i();
+        int j = currentCell->j();
+        setu(i,j,UI);
+        setv(i,j,VI);
+        setp(i,j,PI);
+        if(_energy_eq == "on"){
+            setT(i,j,TI);
+        }
+    }
+    for(auto &currentCell: grid.boundary_fluid_cells()){  
         int i = currentCell->i();
         int j = currentCell->j();
         setu(i,j,UI);
