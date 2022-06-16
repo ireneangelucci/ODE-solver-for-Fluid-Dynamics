@@ -47,14 +47,23 @@ void Grid::assign_cell_types(std::vector<std::vector<int>> &geometry_data) {
 
     int i = 0;
     int j = 0;
+    int my_rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
     for (int j_geom = _domain.jmin; j_geom < _domain.jmax; ++j_geom) {
         {
             i = 0;
         }
         for (int i_geom = _domain.imin; i_geom < _domain.imax; ++i_geom) {
             if (geometry_data.at(i_geom).at(j_geom) == 0) {
-                _cells(i, j) = Cell(i, j, cell_type::FLUID);
-                _fluid_cells.push_back(&_cells(i, j));
+                //std::cout << _domain.imin << " imin "<<_domain.imax << " imax \n";
+                if(i_geom != _domain.imin && i_geom != _domain.imax-1 && j_geom != _domain.jmin && j_geom != _domain.jmax-1){
+                    _cells(i, j) = Cell(i, j, cell_type::FLUID);
+                    _fluid_cells.push_back(&_cells(i, j));
+                }
+                else{
+                    _cells(i, j) = Cell(i, j, cell_type::BOUNDARY_FLUID);
+                    _boundary_fluid_cells.push_back(&_cells(i, j));
+                }
             } else if (geometry_data.at(i_geom).at(j_geom) == 1) {
                 _cells(i, j) = Cell(i, j, cell_type::INFLOW);
                 _inflow_cells.push_back(&_cells(i, j));
@@ -294,6 +303,7 @@ const std::vector<Cell *> &Grid::fixed_wall_cells() const { return _fixed_wall_c
 
 const std::vector<Cell *> &Grid::moving_wall_cells() const { return _moving_wall_cells; }
 
+const std::vector<Cell *> &Grid::boundary_fluid_cells() const { return _boundary_fluid_cells; };
 const std::vector<Cell *> &Grid::inflow_cells() const { return _inflow_cells; };
 const std::vector<Cell *> &Grid::outflow_cells() const { return _outflow_cells; };
 const std::vector<Cell *> &Grid::adiabatic_wall_cells() const { return _adiabatic_wall_cells; };

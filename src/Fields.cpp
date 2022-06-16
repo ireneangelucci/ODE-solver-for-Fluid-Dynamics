@@ -20,7 +20,7 @@ Fields::Fields(double nu, double dt, double tau, double alpha, double beta, int 
     _gx = GX;
     _gy = GY;
 
-    for(auto &currentCell: grid.fluid_cells()){
+    for(auto &currentCell: grid.fluid_cells()){  //also fro cells in boundary_fluid
         int i = currentCell->i();
         int j = currentCell->j();
         setu(i,j,UI);
@@ -40,8 +40,10 @@ Fields::Fields(double nu, double dt, double tau, double alpha, double beta, int 
 void Fields::calculate_fluxes(Grid &grid) {
 
     for(auto &currentCell: grid.fluid_cells()){
+        //std::cout << "entered for loop \n";
         int i = currentCell->i();
         int j = currentCell->j();
+        //std::cout << "(i,j) = " << i << ", " << j << "\n";
         if(i != grid.imax()){   //excluding imax as f_imax is part of the fixed boundary and set as 0.0
             setf(i,j,u(i,j)+dt()*(_nu*(Discretization::diffusion(_U, i, j))-Discretization::convection_u(_U, _V, i, j) - 0.5*_beta*_gx*(T(i,j)+T(i+1,j)) ));
         }

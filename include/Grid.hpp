@@ -70,6 +70,7 @@ class Grid {
      *
      * @param[out] vector of fixed wall cells
      */
+    const std::vector<Cell *> &boundary_fluid_cells() const;
     const std::vector<Cell *> &fixed_wall_cells() const;
     const std::vector<Cell *> &inflow_cells() const;
     const std::vector<Cell *> &outflow_cells() const;
@@ -97,6 +98,7 @@ class Grid {
     std::vector<Cell *> _inflow_cells;
     std::vector<Cell *> _outflow_cells;
     std::vector<Cell *> _fluid_cells;
+    std::vector<Cell *> _boundary_fluid_cells;
     std::vector<Cell *> _adiabatic_wall_cells;
     std::vector<Cell *> _hot_wall_cells;
     std::vector<Cell *> _cold_wall_cells;

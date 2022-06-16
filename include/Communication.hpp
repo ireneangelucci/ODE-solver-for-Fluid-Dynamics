@@ -43,7 +43,6 @@ class Communication{
          */
         static double reduce_sum(double sum);
     
-    private:
         static int _my_rank;
 
 };

@@ -88,3 +88,19 @@ class MovingWallBoundary : public Boundary {
     std::map<int, double> _wall_velocity;
     std::map<int, double> _wall_temperature;
 };
+
+/**
+ * @brief Fluid boundaries for parallelization
+ * 
+ * 
+ */
+class FluidBoundary : public Boundary {
+  public:
+    FluidBoundary(std::vector<Cell *> cells);
+    virtual ~FluidBoundary() = default;
+    virtual void apply(Fields &field);
+
+  private:
+    std::vector<Cell *> _cells;
+    //std::map<int, double> _wall_temperature;
+};

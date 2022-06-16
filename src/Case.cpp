@@ -129,25 +129,22 @@ Case::Case(std::string file_name, int argn, char **args) {
     domain.domain_size_y = jmax;
 
     build_domain(domain, imax, jmax, iproc, jproc);
-    /*if(_my_rank == 0){
-        std::cout<<domain.neighbours[3]<<"\n";
-    }
-    if(_my_rank == 1){
-        std::cout<<domain.neighbours[3]<<"\n";
-    }*/
 
-
+    _communication = Communication(_my_rank);
     _grid = Grid(_geom_name, domain);
     _field = Fields(nu, dt, tau, alpha, beta, _grid.domain().size_x, _grid.domain().size_y, UI, VI, PI, TI, GX, GY, _grid, energy_eq);
-    _communication = Communication(_my_rank);
+    
 
-    std::cout<<_my_rank<<" Ran until here\n";
     _discretization = Discretization(domain.dx, domain.dy, gamma);
     _pressure_solver = std::make_unique<SOR>(omg);
     _max_iter = itermax;
     _tolerance = eps;
 
     // Construct boundaries
+    if (not _grid.boundary_fluid_cells().empty()) {
+        _boundaries.push_back(
+            std::make_unique<FluidBoundary>(_grid.boundary_fluid_cells()));
+    }
     if (not _grid.moving_wall_cells().empty()) {
         _boundaries.push_back(
             std::make_unique<MovingWallBoundary>(_grid.moving_wall_cells(), LidDrivenCavity::wall_velocity));
@@ -265,7 +262,7 @@ void Case::simulate() {
             _field.calculate_Temperature(_grid);         
         }
         _field.calculate_fluxes(_grid);
-        std::cout << "helper , rank "<< _my_rank <<  "\n";
+        //std::cout << "helper , rank "<< _my_rank <<  "\n";
         _field.calculate_rs(_grid);
 
         int it = 0;
@@ -465,5 +462,5 @@ void Case::build_domain(Domain &domain, int imax_domain, int jmax_domain, int ip
         //std::cout<<_my_rank<<" Imin: "<<domain.imin<<" Jmin: "<<domain.jmin<<"\n";
         //std::cout<<_my_rank<<" Imax: "<<domain.imax<<" Jmax: "<<domain.jmax<<"\n";         
     }
-    std::cout << "exiting build domain, rank "<< _my_rank <<  "\n";
+    //std::cout << "exiting build domain, rank "<< _my_rank <<  "\n";
 }
