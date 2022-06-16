@@ -262,7 +262,6 @@ void Case::simulate() {
             _field.calculate_Temperature(_grid);         
         }
         _field.calculate_fluxes(_grid);
-        std::cout << "helper , rank "<< _my_rank <<  "\n";
         _field.calculate_rs(_grid);
 
         int it = 0;
@@ -272,25 +271,10 @@ void Case::simulate() {
             res = _pressure_solver->solve(_field, _grid, _boundaries);
             it++;            
         }
-        //exchanging pressure values across processes
-        /*if(_my_rank == 0){
-            std::cout << "working on rank " << _my_rank;
-        }
-        if(_my_rank == 1){
-            std::cout << "working on rank " << _my_rank;
-        }
-        if(_my_rank == 2){
-            std::cout << "working on rank " << _my_rank;
-        }
-        if(_my_rank == 3){
-            std::cout << "working on rank " << _my_rank;
-        }*/
-        std::cout<<"-------------\n";
+        
         MPI_Barrier(MPI_COMM_WORLD);
         Communication::communicate(_field);
         MPI_Barrier(MPI_COMM_WORLD);
-        std::cout << "Rank : "<< _my_rank <<" Done with communication\n";
-        //std::cout << t << "\n";
 
         if(it < _max_iter){
             convergence = "Converged";
@@ -449,9 +433,9 @@ void Case::build_domain(Domain &domain, int imax_domain, int jmax_domain, int ip
         if(jproc > 1){ domain.neighbours[3]=iproc; }
 
         int imin, jmin, imax, jmax, curr_rank;
-        std::array<int, 4> neighbours{MPI_PROC_NULL, MPI_PROC_NULL, MPI_PROC_NULL, MPI_PROC_NULL}; 
         for(int j = 0; j < jproc; j++){
             for(int i = 0; i < iproc; i++){
+                std::array<int, 4> neighbours{MPI_PROC_NULL, MPI_PROC_NULL, MPI_PROC_NULL, MPI_PROC_NULL}; 
                 if(i==0 && j==0){continue;}
                 imin = i * (imax_domain/iproc);
                 jmin = j * (jmax_domain/jproc);
