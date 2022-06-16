@@ -21,14 +21,14 @@ void Communication::finalize() {
 
 void Communication::communicate(Fields &field){
     std::cout<<"Entering communicate: "<< _my_rank << "\n";
+    std::vector<double> p(_domain.size_y+2);
     // Transfering data to left
     if(_domain.neighbours[0]!= MPI_PROC_NULL){
         if(_my_rank==1){
             std::cout<<"Sending data: "<< _my_rank << "\n";
         }
-        auto p = field.p_matrix().get_col(1);
-        std::cout<<p.size()<<", "<<_domain.size_y<<"\n";
-        MPI_Send(&p, p.size(), MPI_DOUBLE, _my_rank, 1, MPI_COMM_WORLD);
+        p = field.p_matrix().get_col(1);
+        MPI_Send(&p, _domain.size_y+2, MPI_DOUBLE, _domain.neighbours[0], 51, MPI_COMM_WORLD);
         if(_my_rank==1){
             std::cout<<"Existing send data: "<< _my_rank << "\n";
         }
@@ -36,18 +36,17 @@ void Communication::communicate(Fields &field){
     // Recieving data from right
     if(_domain.neighbours[2]!= MPI_PROC_NULL){
         MPI_Status status;
-        std::cout<<_domain.imax-1<<" \n";
         if(_my_rank==0){
-            std::cout<<"R'ing data: "<< _my_rank << "\n";
+            //std::cout<<"R'ing data: "<< _my_rank << "\n";
         }
-        auto p = field.p_matrix().get_col(_domain.imax-1);
-        MPI_Recv(&p, p.size(), MPI_DOUBLE, _domain.neighbours[2], 1, MPI_COMM_WORLD, &status);
-        //(field.p_matrix()).set_col(p, _domain.imax-1);
+        int tag = _my_rank + 10*static_cast<int>(field.dt());
+        MPI_Recv(&p, _domain.size_y+2, MPI_DOUBLE, _domain.neighbours[2], tag, MPI_COMM_WORLD, &status);
+        (field.p_matrix()).set_col(p, _domain.imax-1);
         if(_my_rank==0){
-            std::cout<<"exit R'ing data: "<< _my_rank << "\n";
+            //std::cout<<"exit R'ing data: "<< _my_rank << "\n";
         }
     }
-
+    //std::cout<<"exit communicate: "<< _my_rank << "\n";
 }
 
 double Communication::reduce_min(double min_dt){

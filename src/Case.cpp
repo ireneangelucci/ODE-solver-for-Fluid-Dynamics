@@ -262,7 +262,7 @@ void Case::simulate() {
             _field.calculate_Temperature(_grid);         
         }
         _field.calculate_fluxes(_grid);
-        //std::cout << "helper , rank "<< _my_rank <<  "\n";
+        std::cout << "helper , rank "<< _my_rank <<  "\n";
         _field.calculate_rs(_grid);
 
         int it = 0;
@@ -273,21 +273,21 @@ void Case::simulate() {
             it++;            
         }
         //exchanging pressure values across processes
-        if(_my_rank == 0){
-            _field.p(26,5) = 5;
-            std::cout<<_field.p(26,5)<<" rank: "<<_my_rank<<" \n";
+        /*if(_my_rank == 0){
+            std::cout << "working on rank " << _my_rank;
         }
         if(_my_rank == 1){
-            _field.p(1,5) = 15;
-            std::cout<<_field.p(1,5)<<" rank: "<<_my_rank<<" \n";
+            std::cout << "working on rank " << _my_rank;
         }
+        if(_my_rank == 2){
+            std::cout << "working on rank " << _my_rank;
+        }
+        if(_my_rank == 3){
+            std::cout << "working on rank " << _my_rank;
+        }*/
         Communication::communicate(_field);
-        if(_my_rank == 0){
-            std::cout<<_field.p(26,5)<<" rank: "<<_my_rank<<" \n";
-        }
-        if(_my_rank == 1){
-            std::cout<<_field.p(1,5)<<" rank: "<<_my_rank<<" \n";
-        }
+
+        std::cout << t << "\n";
 
         if(it < _max_iter){
             convergence = "Converged";
@@ -454,9 +454,9 @@ void Case::build_domain(Domain &domain, int imax_domain, int jmax_domain, int ip
                 imax = (i+1) * (imax_domain/iproc)+2;  
                 jmax = (j+1) * (jmax_domain/jproc)+2;
                 curr_rank = i+j*iproc;
-                if(i<iproc){neighbours[2] = (i+1)+j*iproc; }
+                if(i<iproc-1){neighbours[2] = (i+1)+j*iproc; }
                 if(i>0){neighbours[0] = (i-1)+j*iproc; }
-                if(j<jproc){neighbours[3] = i+(j+1)*iproc; }
+                if(j<jproc-1){neighbours[3] = i+(j+1)*iproc; }
                 if(j>0){neighbours[1] = i+(j-1)*iproc; }
                 MPI_Send(&neighbours, 4, MPI_INT, curr_rank, 123, MPI_COMM_WORLD);
                 MPI_Send(&imin, 1, MPI_INT, curr_rank, 1, MPI_COMM_WORLD);
