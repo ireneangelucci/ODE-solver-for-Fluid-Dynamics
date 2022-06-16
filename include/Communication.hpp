@@ -30,7 +30,7 @@ class Communication{
          * @brief Communication
          * 
          */
-        static void communicate(Fields &field);
+        static void communicate(Matrix<double>& matrix);
 
         /**
          * @brief Find minimum value across all procresses
