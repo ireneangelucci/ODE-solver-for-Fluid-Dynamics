@@ -118,8 +118,8 @@ double Fields::calculate_dt(Grid &grid) {
             dt = dt2;
         }
     }
-    _dt = dt;
-    return dt; 
+    _dt = Communication::reduce_min(dt);
+    return _dt; 
 }
 
 // get functions
