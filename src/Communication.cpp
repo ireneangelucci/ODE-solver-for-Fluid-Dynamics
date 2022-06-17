@@ -65,7 +65,7 @@ void Communication::communicate(Matrix<double>& matrix){
         auto send = matrix.get_row(_domain.jmax-2);
         MPI_Send(send.data(), _domain.size_y+2, MPI_DOUBLE, _domain.neighbours[3], 51, MPI_COMM_WORLD);
     }
-    // Recieving data from top
+    // Recieving data from bottom
     if(_domain.neighbours[1]!= MPI_PROC_NULL){
         MPI_Status status;
         auto recv = matrix.get_row(0);

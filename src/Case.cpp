@@ -259,19 +259,30 @@ void Case::simulate() {
             boundary->apply(_field);
         }
         if(_field.Energy() == "on") {
-            _field.calculate_Temperature(_grid);         
+            _field.calculate_Temperature(_grid);
+            Communication::communicate(_field.T_matrix());
         }
         _field.calculate_fluxes(_grid);
+        Communication::communicate(_field.f_matrix());
+        Communication::communicate(_field.g_matrix());
+
         _field.calculate_rs(_grid);
 
         int it = 0;
         double res = 1.0;
+        double max_res;
         // starting iteration for solving pressure at next time step
         while(it < _max_iter && res > _tolerance){
             res = _pressure_solver->solve(_field, _grid, _boundaries);
-            it++;            
+            it++;
+            Communication::communicate(_field.p_matrix());
+            max_res = res;
+            //std::cout<<_my_rank<<" Rank - before Res: "<<res<<"\n";
+            MPI_Allreduce(&res, &max_res, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+            res = max_res;
+            //std::cout<<_my_rank<<" Rank - after Res: "<<res<<"\n";
         }
-
+        //MPI_Barrier(MPI_COMM_WORLD);
         /*if(_my_rank==1){
             _field.setp(1, 4, 15);
             _field.setp(0, 4, 16);
@@ -284,9 +295,6 @@ void Case::simulate() {
             std::cout<< "p(26,4) " << _field.p(26,4) << " on rank " << _my_rank << "\n";
             std::cout<< "p(25,4) " << _field.p(25,4) << " on rank " << _my_rank << "\n";
         }*/
-        MPI_Barrier(MPI_COMM_WORLD);
-        Communication::communicate(_field.p_matrix());
-        MPI_Barrier(MPI_COMM_WORLD);
         /*if(_my_rank==0){
             std::cout<< "p(26,4) " << _field.p(26,4) << " on rank " << _my_rank << "\n";
         }
@@ -314,6 +322,9 @@ void Case::simulate() {
 */
         // calculating velocities at next timestep 
         _field.calculate_velocities(_grid);
+        Communication::communicate(_field.u_matrix());
+        Communication::communicate(_field.v_matrix());
+
         if(t >= output_counter*_output_freq){
             output_vtk(timestep, _my_rank);
             output_counter += 1;
