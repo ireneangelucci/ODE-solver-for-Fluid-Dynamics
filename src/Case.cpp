@@ -253,7 +253,7 @@ void Case::simulate() {
     const char separator = ' ';
 
     // starting the time loop
-    while(t < _t_end && timestep < 1){
+    while(t < _t_end && timestep < 100){
         // applying boundary
         for(auto &boundary: _boundaries){
             boundary->apply(_field);
@@ -270,17 +270,16 @@ void Case::simulate() {
 
         int it = 0;
         double res = 1.0;
-        double max_res;
+        double max_res = res;
         // starting iteration for solving pressure at next time step
-        while(it < _max_iter && res > _tolerance){
+        while(it < _max_iter && max_res > _tolerance){
             res = _pressure_solver->solve(_field, _grid, _boundaries);
-            it++;
             Communication::communicate(_field.p_matrix());
             max_res = res;
             //std::cout<<_my_rank<<" Rank - before Res: "<<res<<"\n";
             MPI_Allreduce(&res, &max_res, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
-            res = max_res;
             //std::cout<<_my_rank<<" Rank - after Res: "<<res<<"\n";
+            it++;
         }
         //MPI_Barrier(MPI_COMM_WORLD);
         /*if(_my_rank==1){
@@ -376,7 +375,7 @@ void Case::output_vtk(int timestep, int my_rank) {
     int k=0;
     for (int col = 0; col < _grid.domain().size_y + 1; col++) {
         for (int row = 0; row < _grid.domain().size_x + 1; row++) {
-            if(_grid.cell(row,col).type() != cell_type::FLUID){
+            if((_grid.cell(row,col).type() != cell_type::FLUID) && (_grid.cell(row,col).type() != cell_type::BOUNDARY_FLUID)){
                 structuredGrid->BlankPoint(current_cell[k]);
             }
         k++;
