@@ -129,7 +129,7 @@ Case::Case(std::string file_name, int argn, char **args) {
     domain.domain_size_y = jmax;
 
     build_domain(domain, imax, jmax, iproc, jproc);
-    //std::cout<<_my_rank<<" Size x"<<domain.size_x<<"\n";
+    //std::cout<<_my_rank<<" imax"<<domain.imax<<"\n";
     _communication = Communication(_my_rank, domain);
     _grid = Grid(_geom_name, domain);
     _field = Fields(nu, dt, tau, alpha, beta, _grid.domain().size_x, _grid.domain().size_y, UI, VI, PI, TI, GX, GY, _grid, energy_eq);
@@ -241,7 +241,7 @@ void Case::set_file_names(std::string file_name) {
  */
 void Case::simulate() {
     if(_my_rank == 0){
-        std::cout << "Simulation started, rank "<< _my_rank <<  "\n";
+        std::cout << "Simulation started \n";
     }
     double t = 0.0;
     //_field.calculate_dt(_grid);
@@ -313,16 +313,18 @@ void Case::simulate() {
         }
 /*
         // output on screen - time, timestep, residual and convergence status of pressure eqn.
-        std::cout << std::left << std::setw(12) << std::setfill(separator) << "Timestep: " ;
-        std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << timestep;
-        std::cout << std::left << std::setw(8) << std::setfill(separator) << "Time: ";
-        std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << t;
-        std::cout << std::left << std::setw(12) << std::setfill(separator) << "Residual: ";
-        std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << res;
-        std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << convergence;
-        std::cout << std::left << std::setw(12) << std::setfill(separator) << "Iterations:";
-        std::cout << std::left << std::setw(12) << std::setfill(separator) << it;
-        std::cout << std::endl;
+        if(_my_rank == 0){
+            std::cout << std::left << std::setw(12) << std::setfill(separator) << "Timestep: " ;
+            std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << timestep;
+            std::cout << std::left << std::setw(8) << std::setfill(separator) << "Time: ";
+            std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << t;
+            std::cout << std::left << std::setw(12) << std::setfill(separator) << "Residual: ";
+            std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << res;
+            std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << convergence;
+            std::cout << std::left << std::setw(12) << std::setfill(separator) << "Iterations:";
+            std::cout << std::left << std::setw(12) << std::setfill(separator) << it;
+            std::cout << std::endl;
+        }
 */
         // calculating velocities at next timestep 
         _field.calculate_velocities(_grid);
@@ -336,7 +338,10 @@ void Case::simulate() {
         timestep +=1;
     }
     MPI_Barrier(MPI_COMM_WORLD);
-    std::cout << "Simulation ended. \n";
+    if(Communication::_my_rank == 0)
+    {
+        std::cout << "Simulation Ended \n";
+    }
 }
 
 void Case::output_vtk(int timestep, int my_rank) {
@@ -462,15 +467,23 @@ void Case::build_domain(Domain &domain, int imax_domain, int jmax_domain, int ip
         if(iproc > 1){ domain.neighbours[2]=1; }
         if(jproc > 1){ domain.neighbours[3]=iproc; }
 
-        int imin, jmin, imax, jmax, curr_rank;
+        int imin, jmin, imax, jmax, curr_rank, size_x, size_y;
         for(int j = 0; j < jproc; j++){
             for(int i = 0; i < iproc; i++){
                 std::array<int, 4> neighbours{MPI_PROC_NULL, MPI_PROC_NULL, MPI_PROC_NULL, MPI_PROC_NULL}; 
                 if(i==0 && j==0){continue;}
                 imin = i * (imax_domain/iproc);
                 jmin = j * (jmax_domain/jproc);
-                imax = (i+1) * (imax_domain/iproc)+2;  
+                imax = (i+1) * (imax_domain/iproc)+2;
                 jmax = (j+1) * (jmax_domain/jproc)+2;
+                if((i+1) == iproc){
+                    imax = imax_domain+2;
+                }
+                if((j+1) == jproc){
+                    jmax = jmax_domain+2;
+                }   
+                size_x = imax - imin -2;
+                size_y = jmax - jmin -2;
                 curr_rank = i+j*iproc;
                 if(i<iproc-1){neighbours[2] = (i+1)+j*iproc; }
                 if(i>0){neighbours[0] = (i-1)+j*iproc; }
@@ -481,8 +494,8 @@ void Case::build_domain(Domain &domain, int imax_domain, int jmax_domain, int ip
                 MPI_Send(&jmin, 1, MPI_INT, curr_rank, 2, MPI_COMM_WORLD);
                 MPI_Send(&imax, 1, MPI_INT, curr_rank, 3, MPI_COMM_WORLD);
                 MPI_Send(&jmax, 1, MPI_INT, curr_rank, 4, MPI_COMM_WORLD);
-                MPI_Send(&domain.size_x, 1, MPI_INT, curr_rank, 5, MPI_COMM_WORLD);
-                MPI_Send(&domain.size_y, 1, MPI_INT, curr_rank, 6, MPI_COMM_WORLD);
+                MPI_Send(&size_x, 1, MPI_INT, curr_rank, 5, MPI_COMM_WORLD);
+                MPI_Send(&size_y, 1, MPI_INT, curr_rank, 6, MPI_COMM_WORLD);
             }
         }        
     }else{
