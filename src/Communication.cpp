@@ -56,3 +56,5 @@ double Communication::reduce_min(double dt){
     MPI_Allreduce(&dt, &min_dt, 1, MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD);
     return min_dt;
 }
+
+int Communication::getrank() {return _my_rank;}

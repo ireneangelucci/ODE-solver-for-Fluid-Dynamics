@@ -43,7 +43,8 @@ class Communication{
          * 
          */
         static double reduce_sum(double sum);
-    
+        static int getrank();
+
         static int _my_rank;
         static Domain _domain;
 

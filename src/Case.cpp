@@ -256,7 +256,7 @@ void Case::simulate() {
     const char separator = ' ';
 
     // starting the time loop
-    while(t < _t_end){
+    while(t < _t_end && timestep < 1){
         
         Communication::communicate(_field.u_matrix());
         Communication::communicate(_field.v_matrix());
