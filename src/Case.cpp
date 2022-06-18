@@ -221,6 +221,10 @@ void Case::set_file_names(std::string file_name) {
  * For information about the classes and functions, you can check the header files.
  */
 void Case::simulate() {
+    std::vector<double> times;
+    std::vector<int> iterations;
+    std::ofstream myfile ("convergence2.dat");
+
     std::cout << "Simulation started. \n";
     double t = 0.0;
     //_field.calculate_dt(_grid);
@@ -246,10 +250,14 @@ void Case::simulate() {
         int it = 0;
         double res = 1.0;
         // starting iteration for solving pressure at next time step
-        while(it < _max_iter && res > _tolerance){
+        while(res > _tolerance){
             res = _pressure_solver->solve(_field, _grid, _boundaries);
             it++;            
         }
+
+        times.push_back(t);
+        iterations.push_back(it);
+
         if(it < _max_iter){
             convergence = "Converged";
         }
@@ -280,6 +288,13 @@ void Case::simulate() {
         timestep +=1;
     }
     std::cout << "Simulation ended. \n";
+
+    if (myfile.is_open()){
+        for(int count = 0; count < times.size(); count ++){
+            myfile << times[count] << "     " << iterations[count] << std::endl ;
+        }
+         myfile.close();
+    }
 }
 
 void Case::output_vtk(int timestep, int my_rank) {
