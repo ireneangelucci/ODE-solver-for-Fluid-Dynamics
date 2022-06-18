@@ -55,8 +55,8 @@ Case::Case(std::string file_name, int argn, char **args) {
     int num_walls;
     double coldwall_temp;
     double hotwall_temp;
-    int iproc;
-    int jproc;
+    int iproc=1;
+    int jproc=1;
 
     if (file.is_open()) {
 
@@ -108,7 +108,11 @@ Case::Case(std::string file_name, int argn, char **args) {
     
     int nprocs;
     MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
-    if (nprocs != iproc*jproc && _my_rank == 0){
+    if (nprocs == 1){
+        iproc = 1;
+        jproc = 1;
+    }
+    else if(nprocs != iproc*jproc && _my_rank == 0){
         std::cerr << "No. of processes not compatible with input file: Nprocs must be Iprocs*Jprocs \n"<<"Iprocs: "<<iproc<<", Jprocs: "<<jproc<<"\n";
         exit(1);
     }
@@ -129,7 +133,6 @@ Case::Case(std::string file_name, int argn, char **args) {
     domain.domain_size_y = jmax;
 
     build_domain(domain, imax, jmax, iproc, jproc);
-    //std::cout<<_my_rank<<" imax"<<domain.imax<<"\n";
     _communication = Communication(_my_rank, domain);
     _grid = Grid(_geom_name, domain);
     _field = Fields(nu, dt, tau, alpha, beta, _grid.domain().size_x, _grid.domain().size_y, UI, VI, PI, TI, GX, GY, _grid, energy_eq);
@@ -279,37 +282,17 @@ void Case::simulate() {
             res = _pressure_solver->solve(_field, _grid, _boundaries);
             Communication::communicate(_field.p_matrix());
             max_res = res;
-            //std::cout<<_my_rank<<" Rank - before Res: "<<res<<"\n";
             MPI_Allreduce(&res, &max_res, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
-            //std::cout<<_my_rank<<" Rank - after Res: "<<res<<"\n";
             it++;
         }
-        //MPI_Barrier(MPI_COMM_WORLD);
-        /*if(_my_rank==1){
-            _field.setp(1, 4, 15);
-            _field.setp(0, 4, 16);
-            std::cout<< "p(1,4) " << _field.p(1,4) << " on rank " << _my_rank << "\n";
-            std::cout<< "p(0,4) " << _field.p(0,4) << " on rank " << _my_rank << "\n";
-        }
-        if(_my_rank==0){
-            _field.setp(26, 4, 10);
-            _field.setp(25, 4, 11);
-            std::cout<< "p(26,4) " << _field.p(26,4) << " on rank " << _my_rank << "\n";
-            std::cout<< "p(25,4) " << _field.p(25,4) << " on rank " << _my_rank << "\n";
-        }*/
-        /*if(_my_rank==0){
-            std::cout<< "p(26,4) " << _field.p(26,4) << " on rank " << _my_rank << "\n";
-        }
-        if(_my_rank==1){
-            std::cout<< "p(0,4) " << _field.p(0,4) << " on rank " << _my_rank << "\n";
-        }*/
+
         if(it < _max_iter){
             convergence = "Converged";
         }
         else{
             convergence = "Not Converged";
         }
-/*
+
         // output on screen - time, timestep, residual and convergence status of pressure eqn.
         if(_my_rank == 0){
             std::cout << std::left << std::setw(12) << std::setfill(separator) << "Timestep: " ;
@@ -323,7 +306,7 @@ void Case::simulate() {
             std::cout << std::left << std::setw(12) << std::setfill(separator) << it;
             std::cout << std::endl;
         }
-*/
+
         // calculating velocities at next timestep 
         _field.calculate_velocities(_grid);
 

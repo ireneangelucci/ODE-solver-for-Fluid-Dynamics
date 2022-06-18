@@ -53,8 +53,6 @@ void Communication::communicate(Matrix<double>& matrix){
 
 double Communication::reduce_min(double dt){
     double min_dt = dt;
-    //std::cout<<_my_rank<<" Rank - before dt: "<<min_dt<<"\n";
     MPI_Allreduce(&dt, &min_dt, 1, MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD);
-    //std::cout<<_my_rank<<" Rank - after dt: "<<min_dt<<"\n";
     return min_dt;
 }
