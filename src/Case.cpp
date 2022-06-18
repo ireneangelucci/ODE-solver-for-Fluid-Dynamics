@@ -243,6 +243,10 @@ void Case::set_file_names(std::string file_name) {
  * For information about the classes and functions, you can check the header files.
  */
 void Case::simulate() {
+    std::vector<double> times;
+    std::vector<int> iterations;
+    std::ofstream myfile ("convergence3.dat");
+
     if(_my_rank == 0){
         std::cout << "Simulation started \n";
     }
@@ -278,13 +282,16 @@ void Case::simulate() {
         double res = 1.0;
         double max_res = res;
         // starting iteration for solving pressure at next time step
-        while(it < _max_iter && max_res > _tolerance){
+        while(max_res > _tolerance){
             res = _pressure_solver->solve(_field, _grid, _boundaries);
             Communication::communicate(_field.p_matrix());
             max_res = res;
             MPI_Allreduce(&res, &max_res, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
             it++;
         }
+
+        times.push_back(t);
+        iterations.push_back(it);
 
         if(it < _max_iter){
             convergence = "Converged";
@@ -318,12 +325,21 @@ void Case::simulate() {
         _field.calculate_dt(_grid);
         timestep +=1;
     }
+    
     MPI_Barrier(MPI_COMM_WORLD);
     if(Communication::_my_rank == 0)
     {
         std::cout << "Simulation Ended \n";
     }
+
+    if (myfile.is_open()){
+        for(int count = 0; count < times.size(); count ++){
+            myfile << times[count] << "     " << iterations[count] << std::endl ;
+        }
+    myfile.close();
+    }
 }
+
 
 void Case::output_vtk(int timestep, int my_rank) {
     
