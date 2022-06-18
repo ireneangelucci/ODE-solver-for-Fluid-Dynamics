@@ -20,7 +20,7 @@ void Communication::finalize() {
 }
 
 void Communication::communicate(Matrix<double>& matrix){
-    // Transfering data to left
+    /* // Transfering data to left
     if(_domain.neighbours[0]!= MPI_PROC_NULL){
         auto send = matrix.get_col(1);
         MPI_Send(send.data(), send.size(), MPI_DOUBLE, _domain.neighbours[0], 51, MPI_COMM_WORLD);
@@ -31,8 +31,27 @@ void Communication::communicate(Matrix<double>& matrix){
         auto recv = matrix.get_col(_domain.size_x+1);
         auto st = MPI_Recv(recv.data(), recv.size(), MPI_DOUBLE, _domain.neighbours[2], 51, MPI_COMM_WORLD, &status);
         matrix.set_col(recv, _domain.size_x+1);
+    }*/
+    // Transfering data to left
+    if(_domain.neighbours[0]!= MPI_PROC_NULL || _domain.neighbours[2]!= MPI_PROC_NULL){
+        MPI_Status status;
+        auto send_left = matrix.get_col(1);
+        auto recv_left = matrix.get_col(_domain.size_x+1);
+        MPI_Sendrecv(send_left.data(), send_left.size(), MPI_DOUBLE, _domain.neighbours[0], 51,
+                     recv_left.data(), recv_left.size(), MPI_DOUBLE, _domain.neighbours[2], 51, MPI_COMM_WORLD, &status);
+        matrix.set_col(recv_left, _domain.size_x+1);
     }
+    MPI_Barrier(MPI_COMM_WORLD);
 
+    if(_domain.neighbours[0]!= MPI_PROC_NULL || _domain.neighbours[2]!= MPI_PROC_NULL){
+        MPI_Status status;
+        auto send_right = matrix.get_col(0);
+        auto recv_right = matrix.get_col(_domain.size_x);
+        MPI_Sendrecv(send_right.data(), send_right.size(), MPI_DOUBLE, _domain.neighbours[2], 151,
+                     recv_right.data(), recv_right.size(), MPI_DOUBLE, _domain.neighbours[0], 151, MPI_COMM_WORLD, &status);
+        matrix.set_col(recv_right, _domain.size_x);
+    }
+    /*
     // Transfering data to right
     if(_domain.neighbours[2]!= MPI_PROC_NULL){
         auto send = matrix.get_col(_domain.size_x);
@@ -45,7 +64,7 @@ void Communication::communicate(Matrix<double>& matrix){
         auto st = MPI_Recv(recv.data(), recv.size(), MPI_DOUBLE, _domain.neighbours[0], 51, MPI_COMM_WORLD, &status);
         matrix.set_col(recv, 0);
     }
-
+    */
     // Transfering data to bottom
     if(_domain.neighbours[1]!= MPI_PROC_NULL){
         auto send = matrix.get_row(1);

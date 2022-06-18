@@ -270,9 +270,7 @@ void Case::simulate() {
         Communication::communicate(_field.g_matrix());
 
         _field.calculate_rs(_grid);
-        if(_my_rank == 3){
-            std::cout<<"Pressure at top middle: "<<_field.p(2,24)<<"\n";
-        }
+
         int it = 0;
         double res = 1.0;
         double max_res = res;
