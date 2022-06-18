@@ -309,7 +309,7 @@ void Case::simulate() {
         else{
             convergence = "Not Converged";
         }
-/*
+
         // output on screen - time, timestep, residual and convergence status of pressure eqn.
         if(_my_rank == 0){
             std::cout << std::left << std::setw(12) << std::setfill(separator) << "Timestep: " ;
@@ -323,7 +323,7 @@ void Case::simulate() {
             std::cout << std::left << std::setw(12) << std::setfill(separator) << it;
             std::cout << std::endl;
         }
-*/
+
         // calculating velocities at next timestep 
         _field.calculate_velocities(_grid);
 
