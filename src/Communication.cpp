@@ -20,7 +20,6 @@ void Communication::finalize() {
 }
 
 void Communication::communicate(Matrix<double>& matrix){
-    std::cout << _domain.size_x << " , " << _domain.size_y << " rank " << _my_rank<< "\n";
     // Transfering data to left
     if(_domain.neighbours[0]!= MPI_PROC_NULL){
         auto send = matrix.get_col(1);
@@ -29,14 +28,14 @@ void Communication::communicate(Matrix<double>& matrix){
     // Recieving data from right
     if(_domain.neighbours[2]!= MPI_PROC_NULL){
         MPI_Status status;
-        auto recv = matrix.get_col(_domain.imax-1);
+        auto recv = matrix.get_col(_domain.size_x+1);
         auto st = MPI_Recv(recv.data(), _domain.size_y+2, MPI_DOUBLE, _domain.neighbours[2], 51, MPI_COMM_WORLD, &status);
-        matrix.set_col(recv, _domain.imax-1);
+        matrix.set_col(recv, _domain.size_x+1);
     }
 
     // Transfering data to right
     if(_domain.neighbours[2]!= MPI_PROC_NULL){
-        auto send = matrix.get_col(_domain.imax-2);
+        auto send = matrix.get_col(_domain.size_x);
         MPI_Send(send.data(), _domain.size_y+2, MPI_DOUBLE, _domain.neighbours[2], 51, MPI_COMM_WORLD);
     }
     // Recieving data from left
@@ -55,14 +54,14 @@ void Communication::communicate(Matrix<double>& matrix){
     // Recieving data from top
     if(_domain.neighbours[3]!= MPI_PROC_NULL){
         MPI_Status status;
-        auto recv = matrix.get_row(_domain.jmax-1);
+        auto recv = matrix.get_row(_domain.size_y+1);
         auto st = MPI_Recv(recv.data(), _domain.size_y+2, MPI_DOUBLE, _domain.neighbours[3], 51, MPI_COMM_WORLD, &status);
-        matrix.set_row(recv, _domain.jmax-2);
+        matrix.set_row(recv, _domain.size_y+1);
     }
 
     // Transfering data to top
     if(_domain.neighbours[3]!= MPI_PROC_NULL){
-        auto send = matrix.get_row(_domain.jmax-2);
+        auto send = matrix.get_row(_domain.size_y);
         MPI_Send(send.data(), _domain.size_y+2, MPI_DOUBLE, _domain.neighbours[3], 51, MPI_COMM_WORLD);
     }
     // Recieving data from bottom

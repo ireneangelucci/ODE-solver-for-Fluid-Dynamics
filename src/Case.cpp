@@ -254,6 +254,9 @@ void Case::simulate() {
 
     // starting the time loop
     while(t < _t_end && timestep < 100){
+        
+        Communication::communicate(_field.u_matrix());
+        Communication::communicate(_field.v_matrix());
         // applying boundary
         for(auto &boundary: _boundaries){
             boundary->apply(_field);
@@ -267,7 +270,9 @@ void Case::simulate() {
         Communication::communicate(_field.g_matrix());
 
         _field.calculate_rs(_grid);
-
+        if(_my_rank == 3){
+            std::cout<<"Pressure at top middle: "<<_field.p(2,24)<<"\n";
+        }
         int it = 0;
         double res = 1.0;
         double max_res = res;
@@ -321,8 +326,6 @@ void Case::simulate() {
 */
         // calculating velocities at next timestep 
         _field.calculate_velocities(_grid);
-        Communication::communicate(_field.u_matrix());
-        Communication::communicate(_field.v_matrix());
 
         if(t >= output_counter*_output_freq){
             output_vtk(timestep, _my_rank);
