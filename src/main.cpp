@@ -4,7 +4,7 @@
 #include "Communication.hpp"
 #include "Case.hpp"
 
-void printProgressBar( double t, double t_end ){
+/*void printProgressBar( double t, double t_end ){
 
     std::string bar;
     int percent = (t/t_end) * 100;
@@ -21,7 +21,7 @@ void printProgressBar( double t, double t_end ){
     std::cout<< "\r" "[" << bar << "] ";
     std::cout.width( 3 );
     std::cout<< percent << "%     \r" << std::flush;
-  }
+}*/
 
 int main(int argn, char **args) {
 
