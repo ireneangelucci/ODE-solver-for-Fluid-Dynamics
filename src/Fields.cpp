@@ -54,10 +54,10 @@ void Fields::calculate_fluxes(Grid &grid) {
         int i = currentCell->i();
         int j = currentCell->j();
         //std::cout << "(i,j) = " << i << ", " << j << "\n";
-        if(i != grid.imax()){   //excluding imax as f_imax is part of the fixed boundary and set as 0.0
+        if(i != grid.imax() || (i == grid.imax() && currentCell->neighbour(border_position::RIGHT)->type() == cell_type::BOUNDARY_FLUID) ){   //excluding imax as f_imax is part of the fixed boundary and set as 0.0
             setf(i,j,u(i,j)+dt()*(_nu*(Discretization::diffusion(_U, i, j))-Discretization::convection_u(_U, _V, i, j) - 0.5*_beta*_gx*(T(i,j)+T(i+1,j)) ));
         }
-        if(j != grid.jmax()){   // excluding jmax as g_jmax is part of the moving boundary and set as 0.0
+        if(j != grid.jmax() || (j == grid.jmax() && currentCell->neighbour(border_position::TOP)->type() == cell_type::BOUNDARY_FLUID)){   // excluding jmax as g_jmax is part of the moving boundary and set as 0.0
             setg(i,j,v(i,j)+dt()*(_nu*(Discretization::diffusion(_V, i, j))-Discretization::convection_v(_U, _V, i, j) - 0.5*_beta*_gy*(T(i,j)+T(i,j+1)) ));
         }
     }
@@ -77,10 +77,10 @@ void Fields::calculate_velocities(Grid &grid) {
     for(auto &currentCell: grid.fluid_cells()){
         int i = currentCell->i();
         int j = currentCell->j();
-        if(i != grid.imax()){   //excluding imax as u_imax is part of the fixed boundary and set as 0.0
+        if(i != grid.imax() || (i == grid.imax() && currentCell->neighbour(border_position::RIGHT)->type() == cell_type::BOUNDARY_FLUID)){   //excluding imax as u_imax is part of the fixed boundary and set as 0.0
             setu(i, j, f(i,j) - _dt/grid.dx()*(p(i+1,j)-p(i,j)));
         }
-        if(j != grid.jmax()){   // excluding jmax as v_jmax is part of the moving boundary (in x direction) and set as 0.0
+        if(j != grid.jmax() || (j == grid.jmax() && currentCell->neighbour(border_position::TOP)->type() == cell_type::BOUNDARY_FLUID)){   // excluding jmax as v_jmax is part of the moving boundary (in x direction) and set as 0.0
             setv(i, j, g(i,j) - _dt/grid.dy()*(p(i,j+1)-p(i,j)));       
         }
     }
