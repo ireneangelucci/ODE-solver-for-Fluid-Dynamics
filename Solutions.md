@@ -1,3 +1,37 @@
+## Worksheet 3: Parallelizing Fluidchen using MPI
+
+### Validation
+
+#### Lid-Driven Cavity
+
+The prpblem of Lid-driven cavity from Worksheet 1 was used for validating the parallel implementation with imax = 300, jmax = 300. A very low timestep size was obtained for xlength, ylength = 1. To reduce the total computation time, xlength, ylength was changed to 10 units. The table below shows the runtime for different combination of (iproc, jproc) with other parameters kept same as in the Worksheet 1.
+
+(iproc, jproc) | Time(s) |
+--- | --- |
+(1, 1) | 3205.33  |
+(2, 2) | 1185.01  |
+(1, 4) | 2.0  |
+(3, 2) | 2.0  | 
+
+#### Fluid Trap
+Fluid Trap problem from Worksheet 2 was used as validation for parallel implementation with energy equation. The simulation was run on different combination of (iproc, jproc) with other parameters kept same as Worksheet 2. It was observed that for the (iproc, jproc) = (3,2), the result diverged with relaxation factor, w = 1.7. However, convergence was obtained for w < 1.66. The computation is tabulated for w = 1.5 and w = 1.7 below.
+
+(iproc, jproc) | Time(s), w = 1.5  | Time(s), w = 1.7 |
+--- | --- | --- |
+(1, 1) | 72.29  | 81.01 |
+(2, 3) | 26.84  | 31.76 |
+(3, 2) | 27.84  | 28.17 (Not converged) |
+
+#### Comparison of Convergence Behavior for single-core case across versions
+To compare the convergence behavior across the different versions for a single-core case, we removed the condition on maximum iteration for inner while loop (implicit part for solving pressure) and plotted no. of iterations for residual to drop below the tolerance level for each timestep. For Lid-driven cavity case, we compared the result from Worksheet 1, 2 & 3, while for Fluid Trap case, we compared the result for Worksheet 2 & 3. Similar trend is observed across the versions. This confirms that parallelizing the code has no effect on the numerics on a single-core simulation.
+
+### Performance Analysis
+
+#### Strong Scaling Analysis for Rayleigh Benard
+
+#### Weak Scaling Analysis for Lid-Driven Cavity
+
+---
 ## Worksheet 2
 
 ### Plain Shear Flow
