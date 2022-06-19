@@ -24,6 +24,15 @@ Fluid Trap problem from Worksheet 2 was used as validation for parallel implemen
 
 #### Comparison of Convergence Behavior for single-core case across versions
 To compare the convergence behavior across the different versions for a single-core case, we removed the condition on maximum iteration for inner while loop (implicit part for solving pressure) and plotted no. of iterations for residual to drop below the tolerance level for each timestep. For Lid-driven cavity case, we compared the result from Worksheet 1, 2 & 3, while for Fluid Trap case, we compared the result for Worksheet 2 & 3. Similar trend is observed across the versions. This confirms that parallelizing the code has no effect on the numerics on a single-core simulation.
+<p>
+<img src= "validation/LDC_conv_WS1.png" width="500"> | <img src= "validation/LDC_conv_WS.png" width="500"> | <img src= "validation/LDC_conv_W3.png" width="500">
+</p>
+<em>Covergence comparison for Lid-driven Cavity.</em>
+
+<p>
+<img src= "validation/FT_conv_WS.png" width="500"> | <img src= "validation/FT_conv_W3.png" width="500">
+</p>
+<em>Covergence comparison for Fluid Trap.</em>
 
 ### Performance Analysis
 
