@@ -43,6 +43,11 @@ Case | (iproc, jproc) |  Time(s) | Speedup | Parallel Efficiency |
 5 |(1, 2) |  1505.52  | 1.70 | 0.85 |
 6 |(2, 2) |  957.81   | 2.68 | 0.67 |
 
+<p> 
+<img src="docs/Worksheet3_Plots/StrongScalingAnalysis.png" width="500">
+</p>
+<em>Speedup with increasing parallel processes (considering only Cases 1-4)</em>
+
 Interesting result is the comparison between Case 4 and Case 6, each with 4 parallel processes. Case 4 (4,1) gives a much higher parallel efficiency than Case 6 (2,2). This can be explained by considering the total communication overhead. In this case we have (imax, jmax) = (85, 18). Therefore total number of cells across which results must be shared is, 54 cells (3*jmax) in Case 4 and 103 cells (imax + jmax) in Case 6.
 
 #### Weak Scaling Analysis for Lid-Driven Cavity
@@ -64,7 +69,14 @@ As you can clearly observe, weak scaling does not hold as per the above observat
 (1, 2) | (100, 50) | (2, 1) | 175.10 |
 (2, 2) | (100, 100) | (2, 2) | 217.11 |
 
+<p> 
+<img src="docs/Worksheet3_Plots/WeakScalingAnalysis.png" width="500">
+</p>
+<em>Computation time with increasing parallel processes with workload per process kept constant</em>
+
 We can already observe that weak scaling results are much better. However, we still see a significant difference. Keeping in mind the effect of relaxation factor (w) in the validation cases above, we attribute the difference to the numerical algorithm solving the implicit pressure equation. In the parallel case, we use the old values for the cells on boundary connecting the domains in one step. This essentially means that we are no longer solving the equations with a "pure" SOR method.  
+
+We observed that the run time was very sensitive to the other applications running in the computer. We tried our best to run the simulations with minimum applications open and kept it consistent across all simulations in one test, however the effect cannot be completely neglected. A better but time consuming way would be to run each simulation multiple times and take average. 
 
 ---
 ## Worksheet 2
