@@ -8,10 +8,10 @@ The prpblem of Lid-driven cavity from Worksheet 1 was used for validating the pa
 
 (iproc, jproc) | Time(s) |
 --- | --- |
-(1, 1) | 3205.33  |
-(2, 2) | 1185.01  |
-(1, 4) | 2.0  |
-(3, 2) | 2.0  | 
+(1, 1) | -  |
+(2, 2) | -  |
+(1, 4) | -  |
+(3, 2) | 1461.94  | 
 
 #### Fluid Trap
 Fluid Trap problem from Worksheet 2 was used as validation for parallel implementation with energy equation. The simulation was run on different combination of (iproc, jproc) with other parameters kept same as Worksheet 2. It was observed that for the (iproc, jproc) = (3,2), the result diverged with relaxation factor, w = 1.7. However, convergence was obtained for w < 1.66. The computation is tabulated for w = 1.5 and w = 1.7 below.
@@ -28,8 +28,43 @@ To compare the convergence behavior across the different versions for a single-c
 ### Performance Analysis
 
 #### Strong Scaling Analysis for Rayleigh Benard
+Strong scaling analysis refers to analysing speedup and parallel efficiency with increasing number of parallel processes. In this section, we carry out the strong scaling analysis considering the Rayleigh Benard convection case from Worksheet 2. We consider the longer domain and keep all the parameters same as in the previous worksheet.
+
+Speedup refers to the reduction factor for computation time compared to the single-core case, and parallel efficiency refers to speedup per process.
+
+Results for strong scaling analysis are tabulated below. We obtain a significant speedup with increasing the number of cores. However, the speedup does not increase linearly as expected because of the linear part of the execution (for eg. domain decomposition) and communication overhead. Parallel efficiency also decreases with increasing no. of parallel processes. 
+
+Case | (iproc, jproc) |  Time(s) | Speedup | Parallel Efficiency |
+--- | --- | --- | --- | --- |
+1 |(1, 1) |  2564.68  | 1 | - |
+2 |(2, 1) |  1477.03  | 1.74 | 0.87 |
+3 |(3, 1) |  1052.06  | 2.44 | 0.81 |
+4 |(4, 1) |  865.12   | 2.96 | 0.74 |
+5 |(1, 2) |  1505.52  | 1.70 | 0.85 |
+6 |(2, 2) |  957.81   | 2.68 | 0.67 |
+
+Interesting result is the comparison between Case 4 and Case 6, each with 4 parallel processes. Case 4 (4,1) gives a much higher parallel efficiency than Case 6 (2,2). This can be explained by considering the total communication overhead. In this case we have (imax, jmax) = (85, 18). Therefore total number of cells across which results must be shared is, 54 cells (3*jmax) in Case 4 and 103 cells (imax + jmax) in Case 6.
 
 #### Weak Scaling Analysis for Lid-Driven Cavity
+
+Weak scaling analysis refers to comparison of total computation time with increasing the number of parallel processes while keeping the workload per process same. In this section, we carry out the weak scaling analysis on the Lid-driven cavity case. The parameters are kept same as in the Worksheet 1. We increase the workload by increasing the number of points in the domain such that each process works with same number of points as in the original domain.
+
+(iproc, jproc) | (imax, jmax) | Time(s) |
+--- | --- | --- |
+(1, 1) | (50, 50) | 129.21  |
+(1, 2) | (50, 100) | 333.90  |
+(2, 2) | (100, 100) | 712.29 |
+
+As you can clearly observe, weak scaling does not hold as per the above observation. However, there is another factor in play here, the adaptive time stepping. In the simulations above, we kept the domain size fixed, (xlength, ylength) = (1, 1). Increasing the number of points leads to smaller cell size, which in turn leads to, smaller time step. This means, we take much larger number of steps for same end time of simulation leading to a much larger communication overhead. To compensate for the adaptive time stepping, we repeated the weak scaling analysis with changing domain size to ensure that cell size remains same as in the original problem.
+  
+(iproc, jproc) | (imax, jmax) | (xlen, ylen) | Time(s) |
+--- | --- | --- | --- |
+(1, 1) | (50, 50) | (1, 1) | 129.21  |
+(1, 2) | (50, 100) | (1, 2) | 137.28  |
+(1, 2) | (100, 50) | (2, 1) | 175.10 |
+(2, 2) | (100, 100) | (2, 2) | 217.11 |
+
+We can already observe that weak scaling results are much better. However, we still see a significant difference. Keeping in mind the effect of relaxation factor (w) in the validation cases above, we attribute the difference to the numerical algorithm solving the implicit pressure equation. In the parallel case, we use the old values for the cells on boundary connecting the domains in one step. This essentially means that we are no longer solving the equations with a "pure" SOR method.  
 
 ---
 ## Worksheet 2
