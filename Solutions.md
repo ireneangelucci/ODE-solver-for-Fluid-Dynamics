@@ -13,6 +13,11 @@ The prpblem of Lid-driven cavity from Worksheet 1 was used for validating the pa
 (1, 4) | -  |
 (3, 2) | 1461.94  | 
 
+<p> 
+<img src="docs/Worksheet3_Plots/LidDrivenCavity_VelContour_2x2.png" width="500">
+</p>
+<em>Velocity contour plot with Glyphs for Lid Driven Cavity simulation in parallel with (iproc, jproc) = (2, 2)</em>
+
 #### Fluid Trap
 Fluid Trap problem from Worksheet 2 was used as validation for parallel implementation with energy equation. The simulation was run on different combination of (iproc, jproc) with other parameters kept same as Worksheet 2. It was observed that for the (iproc, jproc) = (3,2), the result diverged with relaxation factor, w = 1.7. However, convergence was obtained for w < 1.66. The computation is tabulated for w = 1.5 and w = 1.7 below.
 
@@ -21,6 +26,11 @@ Fluid Trap problem from Worksheet 2 was used as validation for parallel implemen
 (1, 1) | 72.29  | 81.01 |
 (2, 3) | 26.84  | 31.76 |
 (3, 2) | 27.84  | 28.17 (Not converged) |
+
+<p> 
+<img src="docs/Worksheet3_Plots/FluidTrap_TempContour_3x2.png" width="500">
+</p>
+<em>Temperature contour plot with Velocity Glyphs for Fluid Trap simulation in parallel with (iproc, jproc) = (3, 2)</em>
 
 #### Comparison of Convergence Behavior for single-core case across versions
 To compare the convergence behavior across the different versions for a single-core case, we removed the condition on maximum iteration for inner while loop (implicit part for solving pressure) and plotted no. of iterations for residual to drop below the tolerance level for each timestep. For Lid-driven cavity case, we compared the result from Worksheet 1, 2 & 3, while for Fluid Trap case, we compared the result for Worksheet 2 & 3. Similar trend is observed across the versions. This confirms that parallelizing the code has no effect on the numerics on a single-core simulation.
@@ -70,7 +80,7 @@ As you can clearly observe, weak scaling does not hold as per the above observat
 (2, 2) | (100, 100) | (2, 2) | 217.11 |
 
 <p> 
-<img src="docs/Worksheet3_Plots/WeakScalingAnalysis.png" width="500">
+<img src="docs/Worksheet3_Plots/WeakScalingAnalysis.svg" width="500">
 </p>
 <em>Computation time with increasing parallel processes with workload per process kept constant</em>
 
