@@ -89,7 +89,7 @@ As you can clearly observe, weak scaling does not hold as per the above observat
 (2, 2) | (100, 100) | (2, 2) | 217.11 |
 
 <p> 
-<img src="docs/Worksheet3_Plots/WeakScalingAnalysis.svg" width="500">
+<img src="docs/Worksheet3_Plots/WeakScalingAnalysis.png" width="500">
 </p>
 <em>Computation time with increasing parallel processes with workload per process kept constant</em>
 
