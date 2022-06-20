@@ -8,10 +8,10 @@ The prpblem of Lid-driven cavity from Worksheet 1 was used for validating the pa
 
 (iproc, jproc) | Time(s) |
 --- | --- |
-(1, 1) | -  |
-(2, 2) | -  |
-(1, 4) | -  |
-(3, 2) | 1461.94  | 
+(1, 1) | 3767.00  |
+(2, 2) | 1444.43  |
+(1, 4) | 1414.71  |
+(3, 2) | 1429.90  | 
 
 #### Fluid Trap
 Fluid Trap problem from Worksheet 2 was used as validation for parallel implementation with energy equation. The simulation was run on different combination of (iproc, jproc) with other parameters kept same as Worksheet 2. It was observed that for the (iproc, jproc) = (3,2), the result diverged with relaxation factor, w = 1.7. However, convergence was obtained for w < 1.66. The computation is tabulated for w = 1.5 and w = 1.7 below.
