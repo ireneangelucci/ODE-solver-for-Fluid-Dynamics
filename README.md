@@ -58,10 +58,15 @@ For Serial:
 ```shell
 fluidchen /path/to/fluidchen/example_cases/LidDrivenCavity/LidDrivenCavity.dat
 ```
-
+For Parallel:
+```shell
+mpirun -np <nprocs> fluidchen /path/to/fluidchen/example_cases/LidDrivenCavity/LidDrivenCavity.dat
+``` 
 This will run the case file and create the output folder `/path/to/case/case_name_Output` which holds the `.vtk` files of the solution. The output folder is created in the same location as your case file. Note that this may require write permissions in the given directory.
 
 If input file does not contain a geometry file, fluidchen will run lid-driven cavity case with given parameters.
+
+In case, you are running in parallel with more cores than available, you may use the same command with `--oversubscribe` to continue execution on maximum available cores.
 
 ### GCC version
 
