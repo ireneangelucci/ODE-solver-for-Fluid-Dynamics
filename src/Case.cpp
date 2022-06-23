@@ -55,6 +55,8 @@ Case::Case(std::string file_name, int argn, char **args) {
     int num_walls;
     double coldwall_temp;
     double hotwall_temp;
+    int iproc=1;
+    int jproc=1;
 
     if (file.is_open()) {
 
@@ -82,7 +84,8 @@ Case::Case(std::string file_name, int argn, char **args) {
                 if (var == "itermax") file >> itermax;
                 if (var == "imax") file >> imax;
                 if (var == "jmax") file >> jmax;
-
+                if (var == "iproc") file >> iproc;
+                if (var == "jproc") file >> jproc;
                 if (var == "program") file >> program;
                 if (var == "geo_file") file >> _geom_name;
                 if (var == "TI") file >> TI;
@@ -100,6 +103,20 @@ Case::Case(std::string file_name, int argn, char **args) {
     }
     file.close();
 
+    //int my_rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &_my_rank);
+    
+    int nprocs;
+    MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
+    if (nprocs == 1){
+        iproc = 1;
+        jproc = 1;
+    }
+    else if(nprocs != iproc*jproc && _my_rank == 0){
+        std::cerr << "No. of processes not compatible with input file: Nprocs must be Iprocs*Jprocs \n"<<"Iprocs: "<<iproc<<", Jprocs: "<<jproc<<"\n";
+        exit(1);
+    }
+
     std::map<int, double> wall_vel;
     if (_geom_name.compare("NONE") == 0) {
         wall_vel.insert(std::pair<int, double>(LidDrivenCavity::moving_wall_id, LidDrivenCavity::wall_velocity));
@@ -115,10 +132,11 @@ Case::Case(std::string file_name, int argn, char **args) {
     domain.domain_size_x = imax;
     domain.domain_size_y = jmax;
 
-    build_domain(domain, imax, jmax);
-
+    build_domain(domain, imax, jmax, iproc, jproc);
+    _communication = Communication(_my_rank, domain);
     _grid = Grid(_geom_name, domain);
     _field = Fields(nu, dt, tau, alpha, beta, _grid.domain().size_x, _grid.domain().size_y, UI, VI, PI, TI, GX, GY, _grid, energy_eq);
+    
 
     _discretization = Discretization(domain.dx, domain.dy, gamma);
     _pressure_solver = std::make_unique<SOR>(omg);
@@ -126,6 +144,10 @@ Case::Case(std::string file_name, int argn, char **args) {
     _tolerance = eps;
 
     // Construct boundaries
+    if (not _grid.boundary_fluid_cells().empty()) {
+        _boundaries.push_back(
+            std::make_unique<FluidBoundary>(_grid.boundary_fluid_cells()));
+    }
     if (not _grid.moving_wall_cells().empty()) {
         _boundaries.push_back(
             std::make_unique<MovingWallBoundary>(_grid.moving_wall_cells(), LidDrivenCavity::wall_velocity));
@@ -221,7 +243,9 @@ void Case::set_file_names(std::string file_name) {
  * For information about the classes and functions, you can check the header files.
  */
 void Case::simulate() {
-    std::cout << "Simulation started. \n";
+    if(_my_rank == 0){
+        std::cout << "Simulation started \n";
+    }
     double t = 0.0;
     //_field.calculate_dt(_grid);
     double dt = _field.dt();
@@ -233,23 +257,35 @@ void Case::simulate() {
 
     // starting the time loop
     while(t < _t_end){
+        
+        Communication::communicate(_field.u_matrix());
+        Communication::communicate(_field.v_matrix());
         // applying boundary
         for(auto &boundary: _boundaries){
             boundary->apply(_field);
         }
         if(_field.Energy() == "on") {
-             _field.calculate_Temperature(_grid); 
+            _field.calculate_Temperature(_grid);
+            Communication::communicate(_field.T_matrix());
         }
         _field.calculate_fluxes(_grid);
+        Communication::communicate(_field.f_matrix());
+        Communication::communicate(_field.g_matrix());
+
         _field.calculate_rs(_grid);
 
         int it = 0;
         double res = 1.0;
+        double max_res = res;
         // starting iteration for solving pressure at next time step
-        while(it < _max_iter && res > _tolerance){
+        while(it < _max_iter && max_res > _tolerance){
             res = _pressure_solver->solve(_field, _grid, _boundaries);
-            it++;            
+            Communication::communicate(_field.p_matrix());
+            max_res = res;
+            MPI_Allreduce(&res, &max_res, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+            it++;
         }
+
         if(it < _max_iter){
             convergence = "Converged";
         }
@@ -258,28 +294,35 @@ void Case::simulate() {
         }
 
         // output on screen - time, timestep, residual and convergence status of pressure eqn.
-        std::cout << std::left << std::setw(12) << std::setfill(separator) << "Timestep: " ;
-        std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << timestep;
-        std::cout << std::left << std::setw(8) << std::setfill(separator) << "Time: ";
-        std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << t;
-        std::cout << std::left << std::setw(12) << std::setfill(separator) << "Residual: ";
-        std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << res;
-        std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << convergence;
-        std::cout << std::left << std::setw(12) << std::setfill(separator) << "Iterations:";
-        std::cout << std::left << std::setw(12) << std::setfill(separator) << it;
-        std::cout << std::endl;
+        if(_my_rank == 0){
+            std::cout << std::left << std::setw(12) << std::setfill(separator) << "Timestep: " ;
+            std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << timestep;
+            std::cout << std::left << std::setw(8) << std::setfill(separator) << "Time: ";
+            std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << t;
+            std::cout << std::left << std::setw(12) << std::setfill(separator) << "Residual: ";
+            std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << res;
+            std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << convergence;
+            std::cout << std::left << std::setw(12) << std::setfill(separator) << "Iterations:";
+            std::cout << std::left << std::setw(12) << std::setfill(separator) << it;
+            std::cout << std::endl;
+        }
 
         // calculating velocities at next timestep 
         _field.calculate_velocities(_grid);
+
         if(t >= output_counter*_output_freq){
-            output_vtk(timestep, 1);
+            output_vtk(timestep, _my_rank);
             output_counter += 1;
         }
         t = t + _field.dt();
         _field.calculate_dt(_grid);
         timestep +=1;
     }
-    std::cout << "Simulation ended. \n";
+    MPI_Barrier(MPI_COMM_WORLD);
+    if(Communication::_my_rank == 0)
+    {
+        std::cout << "Simulation Ended \n";
+    }
 }
 
 void Case::output_vtk(int timestep, int my_rank) {
@@ -321,7 +364,7 @@ void Case::output_vtk(int timestep, int my_rank) {
     int k=0;
     for (int col = 0; col < _grid.domain().size_y + 1; col++) {
         for (int row = 0; row < _grid.domain().size_x + 1; row++) {
-            if(_grid.cell(row,col).type() != cell_type::FLUID){
+            if((_grid.cell(row,col).type() != cell_type::FLUID) && (_grid.cell(row,col).type() != cell_type::BOUNDARY_FLUID)){
                 structuredGrid->BlankPoint(current_cell[k]);
             }
         k++;
@@ -394,11 +437,59 @@ void Case::output_vtk(int timestep, int my_rank) {
     writer->Write();
 }
 
-void Case::build_domain(Domain &domain, int imax_domain, int jmax_domain) {
-    domain.imin = 0;
-    domain.jmin = 0;
-    domain.imax = imax_domain + 2;
-    domain.jmax = jmax_domain + 2;
-    domain.size_x = imax_domain;
-    domain.size_y = jmax_domain;
+void Case::build_domain(Domain &domain, int imax_domain, int jmax_domain, int iproc, int jproc) {
+    if(_my_rank == 0){
+        domain.imin = 0;
+        domain.jmin = 0;
+        domain.imax = imax_domain/iproc + 2;
+        domain.jmax = jmax_domain/jproc + 2;
+        domain.size_x = imax_domain/iproc;
+        domain.size_y = jmax_domain/jproc;
+        if(iproc > 1){ domain.neighbours[2]=1; }
+        if(jproc > 1){ domain.neighbours[3]=iproc; }
+
+        int imin, jmin, imax, jmax, curr_rank, size_x, size_y;
+        for(int j = 0; j < jproc; j++){
+            for(int i = 0; i < iproc; i++){
+                std::array<int, 4> neighbours{MPI_PROC_NULL, MPI_PROC_NULL, MPI_PROC_NULL, MPI_PROC_NULL}; 
+                if(i==0 && j==0){continue;}
+                imin = i * (imax_domain/iproc);
+                jmin = j * (jmax_domain/jproc);
+                imax = (i+1) * (imax_domain/iproc)+2;
+                jmax = (j+1) * (jmax_domain/jproc)+2;
+                if((i+1) == iproc){
+                    imax = imax_domain+2;
+                }
+                if((j+1) == jproc){
+                    jmax = jmax_domain+2;
+                }   
+                size_x = imax - imin -2;
+                size_y = jmax - jmin -2;
+                curr_rank = i+j*iproc;
+                if(i<iproc-1){neighbours[2] = (i+1)+j*iproc; }
+                if(i>0){neighbours[0] = (i-1)+j*iproc; }
+                if(j<jproc-1){neighbours[3] = i+(j+1)*iproc; }
+                if(j>0){neighbours[1] = i+(j-1)*iproc; }
+                MPI_Send(&neighbours, 4, MPI_INT, curr_rank, 123, MPI_COMM_WORLD);
+                MPI_Send(&imin, 1, MPI_INT, curr_rank, 1, MPI_COMM_WORLD);
+                MPI_Send(&jmin, 1, MPI_INT, curr_rank, 2, MPI_COMM_WORLD);
+                MPI_Send(&imax, 1, MPI_INT, curr_rank, 3, MPI_COMM_WORLD);
+                MPI_Send(&jmax, 1, MPI_INT, curr_rank, 4, MPI_COMM_WORLD);
+                MPI_Send(&size_x, 1, MPI_INT, curr_rank, 5, MPI_COMM_WORLD);
+                MPI_Send(&size_y, 1, MPI_INT, curr_rank, 6, MPI_COMM_WORLD);
+            }
+        }        
+    }else{
+        MPI_Status status;
+        MPI_Recv(&domain.neighbours, 4, MPI_INT, 0, 123, MPI_COMM_WORLD, &status);
+        MPI_Recv(&domain.imin, 1, MPI_INT, 0, 1, MPI_COMM_WORLD, &status);
+        MPI_Recv(&domain.jmin, 1, MPI_INT, 0, 2, MPI_COMM_WORLD, &status);
+        MPI_Recv(&domain.imax, 1, MPI_INT, 0, 3, MPI_COMM_WORLD, &status);
+        MPI_Recv(&domain.jmax, 1, MPI_INT, 0, 4, MPI_COMM_WORLD, &status);
+        MPI_Recv(&domain.size_x, 1, MPI_INT, 0, 5, MPI_COMM_WORLD, &status);
+        MPI_Recv(&domain.size_y, 1, MPI_INT, 0, 6, MPI_COMM_WORLD, &status);
+        //std::cout<<_my_rank<<" Imin: "<<domain.imin<<" Jmin: "<<domain.jmin<<"\n";
+        //std::cout<<_my_rank<<" Imax: "<<domain.imax<<" Jmax: "<<domain.jmax<<"\n";         
+    }
+    //std::cout << "exiting build domain, rank "<< _my_rank <<  "\n";
 }

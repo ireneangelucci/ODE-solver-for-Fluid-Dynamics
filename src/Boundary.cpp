@@ -321,3 +321,11 @@ void OutflowBoundary::apply(Fields &field) {
         }
     }
 }
+
+
+FluidBoundary::FluidBoundary(std::vector<Cell *> cells) 
+    : _cells(cells) {
+    };
+
+void FluidBoundary::apply(Fields &field){
+}

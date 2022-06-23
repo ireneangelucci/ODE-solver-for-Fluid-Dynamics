@@ -10,6 +10,7 @@
 #include "Fields.hpp"
 #include "Grid.hpp"
 #include "PressureSolver.hpp"
+#include "Communication.hpp"
 
 /**
  * @brief Class to hold and orchestrate the simulation flow.
@@ -52,8 +53,11 @@ class Case {
     /// Solution file outputting frequency
     double _output_freq;
 
+    int _my_rank;
+    //int _nprocs;
     Fields _field;
     Grid _grid;
+    Communication _communication;
     Discretization _discretization;
     std::unique_ptr<PressureSolver> _pressure_solver;
     std::vector<std::unique_ptr<Boundary>> _boundaries;
@@ -85,6 +89,6 @@ class Case {
      */
     void output_vtk(int t, int my_rank = 0);
 
-    void build_domain(Domain &domain, int imax_domain, int jmax_domain);
+    void build_domain(Domain &domain, int imax_domain, int jmax_domain, int iproc, int jproc);
     
 };
