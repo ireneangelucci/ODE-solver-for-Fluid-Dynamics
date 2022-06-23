@@ -47,8 +47,6 @@ void Grid::assign_cell_types(std::vector<std::vector<int>> &geometry_data) {
 
     int i = 0;
     int j = 0;
-    int my_rank;
-    MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
     for (int j_geom = _domain.jmin; j_geom < _domain.jmax; ++j_geom) {
         {
             i = 0;

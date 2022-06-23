@@ -3,7 +3,7 @@
 #include "Communication.hpp"
 #include "mpi.h"
 
-int Communication::_my_rank = 0;
+int Communication::_my_rank = -1;
 Domain Communication::_domain;
 
 Communication::Communication(int my_rank, Domain domain){
