@@ -11,6 +11,9 @@ Communication::Communication(int my_rank, Domain domain){
     _domain = domain;
 }
 
+Communication::~Communication(){
+    MPI_Finalize();
+}    
 void Communication::init_parallel(int argn, char** args) {
     MPI_Init(&argn, &args);
 }
@@ -51,10 +54,10 @@ void Communication::communicate(Matrix<double>& matrix){
     return;
 }
 
-double Communication::reduce_min(double dt){
-    double min_dt = dt;
-    MPI_Allreduce(&dt, &min_dt, 1, MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD);
-    return min_dt;
+double Communication::reduce_min(double x){
+    double min_x = x;
+    MPI_Allreduce(&x, &min_x, 1, MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD);
+    return min_x;
 }
 
 int Communication::getrank() {return _my_rank;}

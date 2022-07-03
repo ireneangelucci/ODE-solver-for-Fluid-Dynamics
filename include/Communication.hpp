@@ -7,7 +7,8 @@
 class Communication{
     public:
 
-        Communication() = default;
+        Communication() = delete;
+        ~Communication();
         /**
          * @brief Constructor
          * 
