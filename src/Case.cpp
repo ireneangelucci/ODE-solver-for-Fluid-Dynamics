@@ -379,6 +379,11 @@ void Case::output_vtk(int timestep, int my_rank) {
     Pressure->SetName("pressure");
     Pressure->SetNumberOfComponents(1);
 
+    // Viscosity Array
+    vtkDoubleArray *Viscosity = vtkDoubleArray::New();
+    Viscosity->SetName("viscosity");
+    Viscosity->SetNumberOfComponents(1);
+
     // Temperature Array
     vtkDoubleArray *Temperature = vtkDoubleArray::New();
     Temperature->SetName("Temperature");
@@ -395,6 +400,16 @@ void Case::output_vtk(int timestep, int my_rank) {
             double pressure = _field.p(i, j);
             Pressure->InsertNextTuple(&pressure);
         }
+    }
+
+    // Print viscosity from bottom to top
+    if(_field.NonNewtonian() == "on"){
+    for (int j = 1; j < _grid.domain().size_y + 1; j++) {
+        for (int i = 1; i < _grid.domain().size_x + 1; i++) {
+            double viscosity = _field.nu(i, j);
+            Viscosity->InsertNextTuple(&viscosity);
+        }
+    }
     }
     
     // Print temperature from bottom to top
@@ -420,6 +435,11 @@ void Case::output_vtk(int timestep, int my_rank) {
 
     // Add Pressure to Structured Grid
     structuredGrid->GetCellData()->AddArray(Pressure);
+
+    // Add Viscosity to Structured Grid
+    if(_field.NonNewtonian() == "on"){
+    structuredGrid->GetCellData()->AddArray(Viscosity);
+    }
 
     // Add Temperature to Structured Grid
     if(_field.Energy() == "on"){
