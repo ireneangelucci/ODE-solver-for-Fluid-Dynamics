@@ -445,8 +445,8 @@ void Case::build_domain(Domain &domain, int imax_domain, int jmax_domain, int ip
         domain.jmax = jmax_domain/jproc + 2;
         domain.size_x = imax_domain/iproc;
         domain.size_y = jmax_domain/jproc;
-        if(iproc > 1){ domain.neighbours[2]=1; }
-        if(jproc > 1){ domain.neighbours[3]=iproc; }
+        if(iproc > 1){ domain.neighbours[neighbour::RIGHT]=1; }
+        if(jproc > 1){ domain.neighbours[neighbour::TOP]=iproc; }
 
         int imin, jmin, imax, jmax, curr_rank, size_x, size_y;
         for(int j = 0; j < jproc; j++){
@@ -466,10 +466,10 @@ void Case::build_domain(Domain &domain, int imax_domain, int jmax_domain, int ip
                 size_x = imax - imin -2;
                 size_y = jmax - jmin -2;
                 curr_rank = i+j*iproc;
-                if(i<iproc-1){neighbours[2] = (i+1)+j*iproc; }
-                if(i>0){neighbours[0] = (i-1)+j*iproc; }
-                if(j<jproc-1){neighbours[3] = i+(j+1)*iproc; }
-                if(j>0){neighbours[1] = i+(j-1)*iproc; }
+                if(i<iproc-1){neighbours[neighbour::RIGHT] = (i+1)+j*iproc; }
+                if(i>0){neighbours[neighbour::LEFT] = (i-1)+j*iproc; }
+                if(j<jproc-1){neighbours[neighbour::TOP] = i+(j+1)*iproc; }
+                if(j>0){neighbours[neighbour::BOTTOM] = i+(j-1)*iproc; }
                 MPI_Send(&neighbours, 4, MPI_INT, curr_rank, 123, MPI_COMM_WORLD);
                 MPI_Send(&imin, 1, MPI_INT, curr_rank, 1, MPI_COMM_WORLD);
                 MPI_Send(&jmin, 1, MPI_INT, curr_rank, 2, MPI_COMM_WORLD);
@@ -487,9 +487,6 @@ void Case::build_domain(Domain &domain, int imax_domain, int jmax_domain, int ip
         MPI_Recv(&domain.imax, 1, MPI_INT, 0, 3, MPI_COMM_WORLD, &status);
         MPI_Recv(&domain.jmax, 1, MPI_INT, 0, 4, MPI_COMM_WORLD, &status);
         MPI_Recv(&domain.size_x, 1, MPI_INT, 0, 5, MPI_COMM_WORLD, &status);
-        MPI_Recv(&domain.size_y, 1, MPI_INT, 0, 6, MPI_COMM_WORLD, &status);
-        //std::cout<<_my_rank<<" Imin: "<<domain.imin<<" Jmin: "<<domain.jmin<<"\n";
-        //std::cout<<_my_rank<<" Imax: "<<domain.imax<<" Jmax: "<<domain.jmax<<"\n";         
+        MPI_Recv(&domain.size_y, 1, MPI_INT, 0, 6, MPI_COMM_WORLD, &status);    
     }
-    //std::cout << "exiting build domain, rank "<< _my_rank <<  "\n";
 }
