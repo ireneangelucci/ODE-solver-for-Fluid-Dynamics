@@ -96,7 +96,7 @@ void Fields::calculate_viscosity(Grid &grid){
         if (x || y){
             uy = (u(i,j+1)-u(i,j))/grid.dy();
             vx = (v(i+1,j)-v(i,j))/grid.dx(); 
-            gamma = 0.5 * (uy + vx);
+            gamma = 0.5 * (std::abs(uy) + std::abs(vx));
             if (pow(gamma, -0.0225) > 0.0034 ) {
                 setnu(i,j,pow(gamma, -0.0225) );
             }
@@ -120,10 +120,18 @@ void Fields::calculate_Temperature(Grid &grid){
 //calculating the timestep keeping in mind the stability crtiteria
 double Fields::calculate_dt(Grid &grid) { 
     double dt;
-    if((_nu < _alpha) && (_energy_eq != "on")){
+    double nu_max = _nu;
+    if(_nonnewton_vis == "on"){
+        for(auto &currentCell: grid.fluid_cells()){
+        int i = currentCell->i();
+        int j = currentCell->j();
+        if (nu(i,j) > nu_max) {nu_max = nu(i,j);}
+        }
+    }
+    if((nu_max < _alpha) && (_energy_eq != "on")){
         dt = 0.5/_alpha/(1/grid.dx()/grid.dx() + 1/grid.dy()/grid.dy())*_tau;
     }else{
-        dt = 0.5/_nu/(1/grid.dx()/grid.dx() + 1/grid.dy()/grid.dy())*_tau;
+        dt = 0.5/nu_max/(1/grid.dx()/grid.dx() + 1/grid.dy()/grid.dy())*_tau;
     }
     
     for(auto &currentCell: grid.fluid_cells()){
