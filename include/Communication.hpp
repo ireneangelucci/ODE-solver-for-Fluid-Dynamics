@@ -3,6 +3,7 @@
 
 #include "Fields.hpp"
 #include "Domain.hpp"
+#include "Enums.hpp"
 
 class Communication{
     public:
@@ -48,6 +49,7 @@ class Communication{
 
         static int _my_rank;
         static Domain _domain;
+        static std::array<int, 4> neighbours;
 
 };
 
