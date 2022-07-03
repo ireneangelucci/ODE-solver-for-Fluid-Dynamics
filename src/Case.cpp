@@ -134,6 +134,7 @@ Case::Case(std::string file_name, int argn, char **args) {
 
     build_domain(domain, imax, jmax, iproc, jproc);
     _communication = Communication(_my_rank, domain);
+    std::cout<<"here \n"<<_my_rank;
     _grid = Grid(_geom_name, domain);
     _field = Fields(nu, dt, tau, alpha, beta, _grid.domain().size_x, _grid.domain().size_y, UI, VI, PI, TI, GX, GY, _grid, energy_eq);
     
@@ -281,8 +282,7 @@ void Case::simulate() {
         while(it < _max_iter && max_res > _tolerance){
             res = _pressure_solver->solve(_field, _grid, _boundaries);
             Communication::communicate(_field.p_matrix());
-            max_res = res;
-            MPI_Allreduce(&res, &max_res, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+            max_res = Communication::reduce_max(res);
             it++;
         }
 

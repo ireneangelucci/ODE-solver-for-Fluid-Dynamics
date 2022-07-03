@@ -11,14 +11,17 @@ Communication::Communication(int my_rank, Domain domain){
     _domain = domain;
 }
 
-Communication::~Communication(){
-    MPI_Finalize();
-}    
+//Communication::~Communication(){
+//    std::cout<<"Destructor comm\n";
+//    MPI_Finalize();
+//}
+
 void Communication::init_parallel(int argn, char** args) {
     MPI_Init(&argn, &args);
 }
 
 void Communication::finalize() {
+    //Communication::~Communication();
     MPI_Finalize();
 }
 
@@ -58,6 +61,12 @@ double Communication::reduce_min(double x){
     double min_x = x;
     MPI_Allreduce(&x, &min_x, 1, MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD);
     return min_x;
+}
+
+double Communication::reduce_max(double x){
+    double max_x = x;
+    MPI_Allreduce(&x, &max_x, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+    return max_x;
 }
 
 int Communication::getrank() {return _my_rank;}

@@ -7,8 +7,8 @@
 class Communication{
     public:
 
-        Communication() = delete;
-        ~Communication();
+        Communication() = default;
+        //~Communication();
         /**
          * @brief Constructor
          * 
@@ -37,13 +37,13 @@ class Communication{
          * @brief Find minimum value across all procresses
          * 
          */
-        static double reduce_min(double min_dt);
+        static double reduce_min(double x);
 
         /**
          * @brief Find sum across all processed
          * 
          */
-        static double reduce_sum(double sum);
+        static double reduce_max(double x);
         static int getrank();
 
         static int _my_rank;
