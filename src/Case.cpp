@@ -45,6 +45,7 @@ Case::Case(std::string file_name, int argn, char **args) {
     double dt_value;           /* time for output */
     std::string program;
     std::string energy_eq{"NONE"};
+    std::string nonnewton_vis{"NONE"};
     double TI;                 /* initial temperature  */
     double Pr;                 /* prandtl number   */
     double beta;               /* the coefficient of thermal expansion */
@@ -90,6 +91,7 @@ Case::Case(std::string file_name, int argn, char **args) {
                 if (var == "geo_file") file >> _geom_name;
                 if (var == "TI") file >> TI;
                 if (var == "energy_eq") file >> energy_eq;
+                if (var == "nonnewton_vis") file >> nonnewton_vis;
                 if (var == "alpha") file >> alpha;
                 if (var == "beta") file >> beta;
                 if (var == "deltaP") file >> deltaP;
@@ -135,7 +137,7 @@ Case::Case(std::string file_name, int argn, char **args) {
     build_domain(domain, imax, jmax, iproc, jproc);
     _communication = Communication(_my_rank, domain);
     _grid = Grid(_geom_name, domain);
-    _field = Fields(nu, dt, tau, alpha, beta, _grid.domain().size_x, _grid.domain().size_y, UI, VI, PI, TI, GX, GY, _grid, energy_eq);
+    _field = Fields(nu, dt, tau, alpha, beta, _grid.domain().size_x, _grid.domain().size_y, UI, VI, PI, TI, GX, GY, _grid, energy_eq, nonnewton_vis);
     
 
     _discretization = Discretization(domain.dx, domain.dy, gamma);

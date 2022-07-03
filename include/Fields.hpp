@@ -26,7 +26,7 @@ class Fields {
      * @param[in] initial pressure
      *
      */
-    Fields(double _nu, double _dt, double _tau, double _alpha, double _beta, int imax, int jmax, double UI, double VI, double PI, double TI, double GX, double GY, Grid &grid, std::string energy_eq);
+    Fields(double _nu, double _dt, double _tau, double _alpha, double _beta, int imax, int jmax, double UI, double VI, double PI, double TI, double GX, double GY, Grid &grid, std::string energy_eq, std::string nonnewton_vis);
 
     /**
      * @brief Calculates the convective and diffusive fluxes in x and y
@@ -53,6 +53,14 @@ class Fields {
      *
      */
     void calculate_velocities(Grid &grid);
+
+    /**
+     * @brief Viscosity update using new velocity values
+     *
+     * @param[in] grid in which the calculations are done
+     *
+     */
+    void calculate_viscosity(Grid &grid);
 
     /**
      * @brief Adaptive step size calculation using x-velocity condition,
@@ -88,7 +96,11 @@ class Fields {
 
     /// get timestep size
     double dt() const;
+
+    /// get viscosity
+    double &nu(int i, int j);
     std::string &Energy();
+    std::string &NonNewtonian();
 
     /// pressure matrix access and modify
     Matrix<double> &p_matrix();
@@ -98,6 +110,7 @@ class Fields {
     Matrix<double> &f_matrix();
     Matrix<double> &g_matrix();
     Matrix<double> &rs_matrix();
+    Matrix<double> &nu_matrix();
 
 
     /// setters functions
@@ -108,6 +121,7 @@ class Fields {
     void setf(int i, int j, double val);
     void setg(int i, int j, double val);
     void setrs(int i, int j, double val);
+    void setnu(int i, int j, double val);
 
   private:
     /// x-velocity matrix
@@ -124,9 +138,11 @@ class Fields {
     Matrix<double> _RS;
     /// Temperature matrix
     Matrix<double> _T;
+    /// Viscosity matrix
+    Matrix<double> _NU;
 
     /// kinematic viscosity
-    double _nu;
+    double _nu = 0.0034;
     /// gravitional accelearation in x direction
     double _gx{0.0};
     /// gravitional accelearation in y direction
@@ -141,5 +157,7 @@ class Fields {
     double _beta;
     /// Energz equation (on or off)
     std::string _energy_eq{"NONE"};
+    /// NonNewtonian viscosity (on or off)
+    std::string _nonnewton_vis{"NONE"};
 
 };
