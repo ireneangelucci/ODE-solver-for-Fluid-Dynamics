@@ -41,12 +41,9 @@ Case::Case(std::string file_name, int argn, char **args) {
     double tau;     /* safety factor for time step*/
     int itermax;    /* max. number of iterations for pressure per time step */
     double eps;     /* accuracy bound for pressure*/
-
-    double dt_value;           /* time for output */
     std::string program;
     std::string energy_eq{"NONE"};
     double TI;                 /* initial temperature  */
-    double Pr;                 /* prandtl number   */
     double beta;               /* the coefficient of thermal expansion */
     double alpha;
     double deltaP;
@@ -248,8 +245,6 @@ void Case::simulate() {
         std::cout << "Simulation started \n";
     }
     double t = 0.0;
-    //_field.calculate_dt(_grid);
-    double dt = _field.dt();
     int timestep = 0;
     int output_counter = 0;
     std::string convergence;
