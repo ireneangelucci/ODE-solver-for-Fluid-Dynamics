@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <iostream>
 
+
 Fields::Fields(double nu, double dt, double tau, double alpha, double beta, int imax, int jmax, double UI, double VI, double PI, double TI, double GX, double GY, Grid &grid, std::string energy_eq, std::string nonnewton_vis)
     : _nu(nu), _dt(dt), _tau(tau), _alpha(alpha), _beta(beta), _energy_eq(energy_eq), _nonnewton_vis(nonnewton_vis) {
     // intializing u, v and p
@@ -86,7 +87,7 @@ void Fields::calculate_velocities(Grid &grid) {
 }
 
 void Fields::calculate_viscosity(Grid &grid){
-    double uy, vx, tau;
+    double uy, vx, gamma;
     for(auto &currentCell: grid.fluid_cells()){
         int i = currentCell->i();
         int j = currentCell->j();
@@ -94,7 +95,12 @@ void Fields::calculate_viscosity(Grid &grid){
         bool y = (j != grid.jmax()) || (j == grid.jmax() && currentCell->neighbour(border_position::TOP)->type() == cell_type::BOUNDARY_FLUID);
         if (x || y){
             uy = (u(i,j+1)-u(i,j))/grid.dy();
-            vx = (v(i+1,j)-v(i,j))/grid.dx();            
+            vx = (v(i+1,j)-v(i,j))/grid.dx(); 
+            gamma = 0.5 * (uy + vx);
+            if (pow(gamma, -0.0225) > 0.0034 ) {
+                setnu(i,j,pow(gamma, -0.0225) );
+            }
+            else {setnu(i,j,0.0034);}          
         }
             
     }

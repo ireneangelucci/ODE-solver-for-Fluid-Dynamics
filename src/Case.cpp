@@ -311,6 +311,7 @@ void Case::simulate() {
 
         // calculating velocities at next timestep 
         _field.calculate_velocities(_grid);
+        _field.calculate_viscosity(_grid);
 
         if(t >= output_counter*_output_freq){
             output_vtk(timestep, _my_rank);
