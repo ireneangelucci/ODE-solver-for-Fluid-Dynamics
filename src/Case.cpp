@@ -510,9 +510,6 @@ void Case::build_domain(Domain &domain, int imax_domain, int jmax_domain, int ip
         MPI_Recv(&domain.imax, 1, MPI_INT, 0, 3, MPI_COMM_WORLD, &status);
         MPI_Recv(&domain.jmax, 1, MPI_INT, 0, 4, MPI_COMM_WORLD, &status);
         MPI_Recv(&domain.size_x, 1, MPI_INT, 0, 5, MPI_COMM_WORLD, &status);
-        MPI_Recv(&domain.size_y, 1, MPI_INT, 0, 6, MPI_COMM_WORLD, &status);
-        //std::cout<<_my_rank<<" Imin: "<<domain.imin<<" Jmin: "<<domain.jmin<<"\n";
-        //std::cout<<_my_rank<<" Imax: "<<domain.imax<<" Jmax: "<<domain.jmax<<"\n";         
+        MPI_Recv(&domain.size_y, 1, MPI_INT, 0, 6, MPI_COMM_WORLD, &status);       
     }
-    //std::cout << "exiting build domain, rank "<< _my_rank <<  "\n";
 }
