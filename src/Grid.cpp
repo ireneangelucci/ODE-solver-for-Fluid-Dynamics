@@ -7,7 +7,7 @@
 #include <sstream>
 #include <vector>
 
-Grid::Grid(std::string geom_name, Domain &domain) {
+Grid::Grid(std::string geom_name, Domain &domain, int meshrefinement_x, int meshrefinement_y) {
 
     _domain = domain;
 
@@ -16,7 +16,7 @@ Grid::Grid(std::string geom_name, Domain &domain) {
     if (geom_name.compare("NONE")) {
         std::vector<std::vector<int>> geometry_data(_domain.domain_size_x + 2,
                                                     std::vector<int>(_domain.domain_size_y + 2, 0));
-        parse_geometry_file(geom_name, geometry_data);  
+        parse_geometry_file(geom_name, geometry_data, meshrefinement_x, meshrefinement_y);  
         assign_cell_types(geometry_data);
         check_forbidden_cells();
     } else {
@@ -245,10 +245,9 @@ void Grid::check_forbidden_cells() {
 
 }
 
-void Grid::parse_geometry_file(std::string filedoc, std::vector<std::vector<int>> &geometry_data) {
+void Grid::parse_geometry_file(std::string filedoc, std::vector<std::vector<int>> &geometry_data, int meshrefinement_x, int meshrefinement_y) {
 
     int numcols, numrows, depth;
-
     std::ifstream infile(filedoc);
     std::stringstream ss;
     std::string inputLine = "";
@@ -269,10 +268,73 @@ void Grid::parse_geometry_file(std::string filedoc, std::vector<std::vector<int>
     // Fourth line : depth
     ss >> depth;
 
+    std::vector<std::vector<int>> geometry_data_pgm(numrows,
+                                                    std::vector<int>(numcols, 0));
+
     // Following lines : data
     for (int col = numcols - 1; col > -1; --col) {
         for (int row = 0; row < numrows; ++row) {
-            ss >> geometry_data[row][col];
+            ss >> geometry_data_pgm[row][col];    
+        }
+    }
+    int row, col;
+    row = 0;
+    for(col = numcols - 1; col > -1; --col) {
+        if(col == numcols - 1){
+            geometry_data[row][(col-1)*meshrefinement_x+1] = geometry_data_pgm[row][col];
+        }else if(col == 0){
+            geometry_data[row][col] = geometry_data_pgm[row][col];
+        }else{
+            for(int r=0; r<meshrefinement_x; r++){
+                geometry_data[row][(col-1)*meshrefinement_x+1+r] = geometry_data_pgm[row][col];
+            }
+        }
+    }
+    std::cout<<"Here\n";
+    row = numrows-1;
+    for(col = numcols - 1; col > -1; --col) {
+        if(col == numcols - 1){
+            geometry_data[row][(col-1)*meshrefinement_x+1] = geometry_data_pgm[row][col];
+        }else if(col == 0){
+            geometry_data[row][col] = geometry_data_pgm[row][col];
+        }else{
+            for(int r=0; r<meshrefinement_x; r++){
+                geometry_data[row][(col-1)*meshrefinement_x+1+r] = geometry_data_pgm[row][col];
+            }
+        }
+    }
+    col = 0;
+    for (int row = 0; row < numrows; ++row) {
+        if(row == numrows - 1){
+            geometry_data[(row-1)*meshrefinement_y+1][col] = geometry_data_pgm[row][col];
+        }else if(row == 0){
+            geometry_data[row][col] = geometry_data_pgm[row][col];
+        }else{
+            for(int r=0; r<meshrefinement_y; r++){
+                geometry_data[(row-1)*meshrefinement_y+1+r][col] = geometry_data_pgm[row][col];
+            }
+        }
+    }
+    col = numcols-1;
+    for (int row = 0; row < numrows; ++row) {
+        if(row == numrows - 1){
+            geometry_data[(row-1)*meshrefinement_y+1][col] = geometry_data_pgm[row][col];
+        }else if(row == 0){
+            geometry_data[row][col] = geometry_data_pgm[row][col];
+        }else{
+            for(int r=0; r<meshrefinement_y; r++){
+                geometry_data[(row-1)*meshrefinement_y+1+r][col] = geometry_data_pgm[row][col];
+            }
+        }
+    }
+    std::cout<<"Here\n";
+    for (int col = numcols - 2; col > 0; --col) {
+        for (int row = 1; row < numrows-1; ++row) {
+            for(int r1=0; r1<meshrefinement_x; r1++){
+                for(int r2=0; r2<meshrefinement_y; r2++){
+                    geometry_data[(row-1)*meshrefinement_y+1+r2][(col-1)*meshrefinement_x+1+r1] = geometry_data_pgm[row][col];
+                }
+            }
         }
     }
 

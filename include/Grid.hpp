@@ -29,7 +29,7 @@ class Grid {
      * @param[in] cell size in y direction
      *
      */
-    Grid(std::string geom_name, Domain &domain);
+    Grid(std::string geom_name, Domain &domain, int meshrefinement_x, int meshrefinement_y);
 
     /// index based cell access
     Cell cell(int i, int j) const;
@@ -90,7 +90,7 @@ class Grid {
     /// Build cell data structures with given geometrical data
     void assign_cell_types(std::vector<std::vector<int>> &geometry_data);
     /// Extract geometry from pgm file and create geometrical data
-    void parse_geometry_file(std::string filedoc, std::vector<std::vector<int>> &geometry_data);
+    void parse_geometry_file(std::string filedoc, std::vector<std::vector<int>> &geometry_data, int meshrefinement_x, int meshrefinement_y);
     /// Check that wall cells are not forbidden
     void check_forbidden_cells();
 

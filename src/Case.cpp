@@ -40,6 +40,8 @@ Case::Case(std::string file_name, int argn, char **args) {
     double omg;     /* relaxation factor */
     double tau;     /* safety factor for time step*/
     int itermax;    /* max. number of iterations for pressure per time step */
+    int meshrefinement_x = 1;
+    int meshrefinement_y = 1;
     double eps;     /* accuracy bound for pressure*/
     std::string program;
     std::string energy_eq{"NONE"};
@@ -81,6 +83,8 @@ Case::Case(std::string file_name, int argn, char **args) {
                 if (var == "itermax") file >> itermax;
                 if (var == "imax") file >> imax;
                 if (var == "jmax") file >> jmax;
+                if (var == "meshrefinement_x") file >> meshrefinement_x;
+                if (var == "meshrefinement_y") file >> meshrefinement_y;
                 if (var == "iproc") file >> iproc;
                 if (var == "jproc") file >> jproc;
                 if (var == "program") file >> program;
@@ -124,15 +128,14 @@ Case::Case(std::string file_name, int argn, char **args) {
 
     // Build up the domain
     Domain domain;
-    domain.dx = xlength / (double)imax;
-    domain.dy = ylength / (double)jmax;
-    domain.domain_size_x = imax;
-    domain.domain_size_y = jmax;
+    domain.dx = xlength / (double)(imax*meshrefinement_x);
+    domain.dy = ylength / (double)(jmax*meshrefinement_y);
+    domain.domain_size_x = (imax*meshrefinement_x);
+    domain.domain_size_y = (jmax*meshrefinement_y);
 
-    build_domain(domain, imax, jmax, iproc, jproc);
+    build_domain(domain, (imax*meshrefinement_x), (jmax*meshrefinement_y), iproc, jproc);
     _communication = Communication(_my_rank, domain);
-    std::cout<<"here \n"<<_my_rank;
-    _grid = Grid(_geom_name, domain);
+    _grid = Grid(_geom_name, domain, meshrefinement_x, meshrefinement_y);
     _field = Fields(nu, dt, tau, alpha, beta, _grid.domain().size_x, _grid.domain().size_y, UI, VI, PI, TI, GX, GY, _grid, energy_eq);
     
 
