@@ -314,6 +314,7 @@ void Case::simulate() {
         _field.calculate_viscosity(_grid);
 
         if(t >= output_counter*_output_freq){
+            //Communication::communicate(_field.nu_matrix());
             output_vtk(timestep, _my_rank);
             output_counter += 1;
         }
@@ -406,6 +407,7 @@ void Case::output_vtk(int timestep, int my_rank) {
     if(_field.NonNewtonian() == "on"){
     for (int j = 1; j < _grid.domain().size_y + 1; j++) {
         for (int i = 1; i < _grid.domain().size_x + 1; i++) {
+            //double viscosity = 0.25*(_field.nu(i, j)+_field.nu(i-1, j-1)+_field.nu(i-1, j)+_field.nu(i, j-1));
             double viscosity = _field.nu(i, j);
             Viscosity->InsertNextTuple(&viscosity);
         }

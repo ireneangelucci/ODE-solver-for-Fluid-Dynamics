@@ -55,10 +55,10 @@ void Fields::calculate_fluxes(Grid &grid) {
         int i = currentCell->i();
         int j = currentCell->j();
         if(i != grid.imax() || (i == grid.imax() && currentCell->neighbour(border_position::RIGHT)->type() == cell_type::BOUNDARY_FLUID) ){   //excluding imax as f_imax is part of the fixed boundary and set as 0.0
-            setf(i,j,u(i,j)+dt()*(nu(i,j)*(Discretization::diffusion(_U, i, j))-Discretization::convection_u(_U, _V, i, j) - 0.5*_beta*_gx*(T(i,j)+T(i+1,j)) ));
+            setf(i,j,u(i,j)+dt()*(0.5*(nu(i,j)+nu(i,j-1))*(Discretization::diffusion(_U, i, j))-Discretization::convection_u(_U, _V, i, j) - 0.5*_beta*_gx*(T(i,j)+T(i+1,j)) ));
         }
         if(j != grid.jmax() || (j == grid.jmax() && currentCell->neighbour(border_position::TOP)->type() == cell_type::BOUNDARY_FLUID)){   // excluding jmax as g_jmax is part of the moving boundary and set as 0.0
-            setg(i,j,v(i,j)+dt()*(nu(i,j)*(Discretization::diffusion(_V, i, j))-Discretization::convection_v(_U, _V, i, j) - 0.5*_beta*_gy*(T(i,j)+T(i,j+1)) ));
+            setg(i,j,v(i,j)+dt()*(0.5*(nu(i,j)+nu(i-1,j))*(Discretization::diffusion(_V, i, j))-Discretization::convection_v(_U, _V, i, j) - 0.5*_beta*_gy*(T(i,j)+T(i,j+1)) ));
         }
     }
 }
@@ -91,17 +91,17 @@ void Fields::calculate_viscosity(Grid &grid){
     for(auto &currentCell: grid.fluid_cells()){
         int i = currentCell->i();
         int j = currentCell->j();
-        bool x = (i != grid.imax()) || (i == grid.imax() && currentCell->neighbour(border_position::RIGHT)->type() == cell_type::BOUNDARY_FLUID);
-        bool y = (j != grid.jmax()) || (j == grid.jmax() && currentCell->neighbour(border_position::TOP)->type() == cell_type::BOUNDARY_FLUID);
-        if (x || y){
+        //bool x = (i != grid.imax()) || (i == grid.imax() && currentCell->neighbour(border_position::RIGHT)->type() == cell_type::BOUNDARY_FLUID);
+        //bool y = (j != grid.jmax()) || (j == grid.jmax() && currentCell->neighbour(border_position::TOP)->type() == cell_type::BOUNDARY_FLUID);
+        //if (x || y){
             uy = (u(i,j+1)-u(i,j))/grid.dy();
             vx = (v(i+1,j)-v(i,j))/grid.dx(); 
             gamma = 0.5 * (std::abs(uy) + std::abs(vx));
             if (pow(gamma, -0.0225) > 0.0034 ) {
-                setnu(i,j,pow(gamma, -0.0225) );
+                setnu(i,j,_nu*pow(gamma, -0.0225) );
             }
-            else {setnu(i,j,0.0034);}          
-        }
+            else {setnu(i,j,_nu*0.0034);}          
+        //}
             
     }
 }
