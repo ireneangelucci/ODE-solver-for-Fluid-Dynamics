@@ -3,29 +3,24 @@
 
 #include "Fields.hpp"
 #include "Domain.hpp"
+#include "Enums.hpp"
 
 class Communication{
     public:
 
-        Communication() = default;
-        //~Communication();
+        Communication();
+        ~Communication();
         /**
          * @brief Constructor
          * 
          */
-        Communication(int my_rank, Domain domain);
+        //Communication(int my_rank, Domain domain);
 
         /**
          * @brief Initializing
          * 
          */
         static void init_parallel(int argn, char** args);
-
-        /**
-         * @brief Finalizing
-         * 
-         */
-        static void finalize();
 
         /**
          * @brief Communication
@@ -48,6 +43,8 @@ class Communication{
 
         static int _my_rank;
         static Domain _domain;
+        static std::array<int, 4> neighbours;
+        static int _nprocs;
 
 };
 

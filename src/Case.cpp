@@ -100,16 +100,11 @@ Case::Case(std::string file_name, int argn, char **args) {
     }
     file.close();
 
-    //int my_rank;
-    MPI_Comm_rank(MPI_COMM_WORLD, &_my_rank);
-    
-    int nprocs;
-    MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
-    if (nprocs == 1){
+    if (Communication::_nprocs == 1){
         iproc = 1;
         jproc = 1;
     }
-    else if(nprocs != iproc*jproc && _my_rank == 0){
+    else if(Communication::_nprocs != iproc*jproc && Communication::_my_rank == 0){
         std::cerr << "No. of processes not compatible with input file: Nprocs must be Iprocs*Jprocs \n"<<"Iprocs: "<<iproc<<", Jprocs: "<<jproc<<"\n";
         exit(1);
     }
@@ -123,20 +118,16 @@ Case::Case(std::string file_name, int argn, char **args) {
     set_file_names(file_name);
 
     // Build up the domain
-    Domain domain;
-    domain.dx = xlength / (double)imax;
-    domain.dy = ylength / (double)jmax;
-    domain.domain_size_x = imax;
-    domain.domain_size_y = jmax;
-
-    build_domain(domain, imax, jmax, iproc, jproc);
-    _communication = Communication(_my_rank, domain);
-    std::cout<<"here \n"<<_my_rank;
-    _grid = Grid(_geom_name, domain);
-    _field = Fields(nu, dt, tau, alpha, beta, _grid.domain().size_x, _grid.domain().size_y, UI, VI, PI, TI, GX, GY, _grid, energy_eq);
+    Communication::_domain.dx = xlength / (double)imax;
+    Communication::_domain.dy = ylength / (double)jmax;
+    Communication::_domain.domain_size_x = imax;
+    Communication::_domain.domain_size_y = jmax;
     
+    build_domain(Communication::_domain, imax, jmax, iproc, jproc);
+    _grid = Grid(_geom_name, Communication::_domain);
+    _field = Fields(nu, dt, tau, alpha, beta, _grid.domain().size_x, _grid.domain().size_y, UI, VI, PI, TI, GX, GY, _grid, energy_eq);
 
-    _discretization = Discretization(domain.dx, domain.dy, gamma);
+    _discretization = Discretization(Communication::_domain.dx, Communication::_domain.dy, gamma);
     _pressure_solver = std::make_unique<SOR>(omg);
     _max_iter = itermax;
     _tolerance = eps;
@@ -241,7 +232,7 @@ void Case::set_file_names(std::string file_name) {
  * For information about the classes and functions, you can check the header files.
  */
 void Case::simulate() {
-    if(_my_rank == 0){
+    if(Communication::_my_rank == 0){
         std::cout << "Simulation started \n";
     }
     double t = 0.0;
@@ -289,7 +280,7 @@ void Case::simulate() {
         }
 
         // output on screen - time, timestep, residual and convergence status of pressure eqn.
-        if(_my_rank == 0){
+        if(Communication::_my_rank == 0){
             std::cout << std::left << std::setw(12) << std::setfill(separator) << "Timestep: " ;
             std::cout << std::left << std::setw(numWidth) << std::setfill(separator) << timestep;
             std::cout << std::left << std::setw(8) << std::setfill(separator) << "Time: ";
@@ -306,7 +297,7 @@ void Case::simulate() {
         _field.calculate_velocities(_grid);
 
         if(t >= output_counter*_output_freq){
-            output_vtk(timestep, _my_rank);
+            output_vtk(timestep, Communication::_my_rank);
             output_counter += 1;
         }
         t = t + _field.dt();
@@ -433,15 +424,15 @@ void Case::output_vtk(int timestep, int my_rank) {
 }
 
 void Case::build_domain(Domain &domain, int imax_domain, int jmax_domain, int iproc, int jproc) {
-    if(_my_rank == 0){
+    if(Communication::_my_rank == 0){
         domain.imin = 0;
         domain.jmin = 0;
         domain.imax = imax_domain/iproc + 2;
         domain.jmax = jmax_domain/jproc + 2;
         domain.size_x = imax_domain/iproc;
         domain.size_y = jmax_domain/jproc;
-        if(iproc > 1){ domain.neighbours[neighbour::RIGHT]=1; }
-        if(jproc > 1){ domain.neighbours[neighbour::TOP]=iproc; }
+        if(iproc > 1){ Communication::neighbours[neighbour::RIGHT]=1; }
+        if(jproc > 1){ Communication::neighbours[neighbour::TOP]=iproc; }
 
         int imin, jmin, imax, jmax, curr_rank, size_x, size_y;
         for(int j = 0; j < jproc; j++){
@@ -476,7 +467,7 @@ void Case::build_domain(Domain &domain, int imax_domain, int jmax_domain, int ip
         }        
     }else{
         MPI_Status status;
-        MPI_Recv(&domain.neighbours, 4, MPI_INT, 0, 123, MPI_COMM_WORLD, &status);
+        MPI_Recv(Communication::neighbours.data(), 4, MPI_INT, 0, 123, MPI_COMM_WORLD, &status);
         MPI_Recv(&domain.imin, 1, MPI_INT, 0, 1, MPI_COMM_WORLD, &status);
         MPI_Recv(&domain.jmin, 1, MPI_INT, 0, 2, MPI_COMM_WORLD, &status);
         MPI_Recv(&domain.imax, 1, MPI_INT, 0, 3, MPI_COMM_WORLD, &status);
