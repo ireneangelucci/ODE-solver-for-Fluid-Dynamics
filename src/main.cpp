@@ -36,7 +36,9 @@ int main(int argn, char **args) {
     Communication::init_parallel(argn, args);
     if (argn > 1) {
         std::string file_name{args[1]};
+        Communication  communication;
         Case problem(file_name, argn, args);
+        MPI_Barrier(MPI_COMM_WORLD);
         problem.simulate();
     } else {
         std::cout << "Error: No input file is provided to fluidchen." << std::endl;

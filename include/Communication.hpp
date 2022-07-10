@@ -8,13 +8,13 @@
 class Communication{
     public:
 
-        Communication() = default;
-        //~Communication();
+        Communication();
+        ~Communication();
         /**
          * @brief Constructor
          * 
          */
-        Communication(int my_rank, Domain domain);
+        //Communication(int my_rank, Domain domain);
 
         /**
          * @brief Initializing

@@ -7,22 +7,21 @@ int Communication::_my_rank = -1;
 Domain Communication::_domain;
 std::array<int, 4> Communication::neighbours{MPI_PROC_NULL, MPI_PROC_NULL, MPI_PROC_NULL, MPI_PROC_NULL}; //L, B, R, T;
 
-Communication::Communication(int my_rank, Domain domain){
-    _my_rank = my_rank;
-    _domain = domain;
+Communication::Communication(){
+    std::cout << "constructor \n";
+    MPI_Comm_rank(MPI_COMM_WORLD, &Communication::_my_rank);
 }
 
-//Communication::~Communication(){
-//    std::cout<<"Destructor comm\n";
-//    MPI_Finalize();
-//}
+Communication::~Communication(){
+    std::cout<<"Destructor comm\n";
+    Communication::finalize();
+}
 
 void Communication::init_parallel(int argn, char** args) {
     MPI_Init(&argn, &args);
 }
 
 void Communication::finalize() {
-    //Communication::~Communication();
     MPI_Finalize();
 }
 
@@ -34,29 +33,29 @@ void Communication::communicate(Matrix<double>& matrix){
     if(_my_rank == 0){
         //std::cout << " right " <<  Communication::neighbours[neighbour::RIGHT] << " left " << Communication::neighbours[neighbour::LEFT] << " top " << Communication::neighbours[neighbour::TOP] << " bottom " << Communication::neighbours[neighbour:BOTTOM] << "\n";
     }
-    MPI_Sendrecv(send_left.data(), send_left.size(), MPI_DOUBLE, Communication::neighbours[neighbour::LEFT], 51,
-                 recv_left.data(), recv_left.size(), MPI_DOUBLE, Communication::neighbours[neighbour::RIGHT], 51, MPI_COMM_WORLD, &status);
+    MPI_Sendrecv(send_left.data(), send_left.size(), MPI_DOUBLE, neighbours[neighbour::LEFT], 51,
+                 recv_left.data(), recv_left.size(), MPI_DOUBLE, neighbours[neighbour::RIGHT], 51, MPI_COMM_WORLD, &status);
     matrix.set_col(recv_left, _domain.size_x+1);
         
     // Transfering data to right
     auto send_right = matrix.get_col(_domain.size_x);
     auto recv_right = matrix.get_col(0);
-    MPI_Sendrecv(send_right.data(), send_right.size(), MPI_DOUBLE, Communication::neighbours[neighbour::RIGHT], 151,
-                    recv_right.data(), recv_right.size(), MPI_DOUBLE, Communication::neighbours[neighbour::LEFT], 151, MPI_COMM_WORLD, &status);
+    MPI_Sendrecv(send_right.data(), send_right.size(), MPI_DOUBLE, neighbours[neighbour::RIGHT], 151,
+                    recv_right.data(), recv_right.size(), MPI_DOUBLE, neighbours[neighbour::LEFT], 151, MPI_COMM_WORLD, &status);
     matrix.set_col(recv_right, 0);
     
     // Transfering data to bottom
     auto send_bottom = matrix.get_row(1);
     auto recv_bottom = matrix.get_row(_domain.size_y+1);
-    MPI_Sendrecv(send_bottom.data(), send_bottom.size(), MPI_DOUBLE, Communication::neighbours[neighbour::BOTTOM], 251,
-                 recv_bottom.data(), recv_bottom.size(), MPI_DOUBLE, Communication::neighbours[neighbour::TOP], 251, MPI_COMM_WORLD, &status);
+    MPI_Sendrecv(send_bottom.data(), send_bottom.size(), MPI_DOUBLE, neighbours[neighbour::BOTTOM], 251,
+                 recv_bottom.data(), recv_bottom.size(), MPI_DOUBLE,neighbours[neighbour::TOP], 251, MPI_COMM_WORLD, &status);
     matrix.set_row(recv_bottom, _domain.size_y+1);
 
     // Transfering data to top
     auto send_top = matrix.get_row(_domain.size_y);
     auto recv_top = matrix.get_row(0);
-    MPI_Sendrecv(send_top.data(), send_top.size(), MPI_DOUBLE, Communication::neighbours[neighbour::TOP], 351,
-             recv_top.data(), recv_top.size(), MPI_DOUBLE, Communication::neighbours[neighbour::BOTTOM], 351, MPI_COMM_WORLD, &status);
+    MPI_Sendrecv(send_top.data(), send_top.size(), MPI_DOUBLE, neighbours[neighbour::TOP], 351,
+             recv_top.data(), recv_top.size(), MPI_DOUBLE, neighbours[neighbour::BOTTOM], 351, MPI_COMM_WORLD, &status);
     matrix.set_row(recv_top, 0);
     return;
 }
