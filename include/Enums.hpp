@@ -24,6 +24,13 @@ const int LEFT = 2;
 const int RIGHT = 3;
 } // namespace border
 
+namespace neighbour {
+const int BOTTOM = 1;
+const int LEFT = 0;
+const int RIGHT = 2;
+const int TOP = 3;
+} // namespace neighbour
+
 enum class cell_type {
     FLUID,
     BOUNDARY_FLUID,
