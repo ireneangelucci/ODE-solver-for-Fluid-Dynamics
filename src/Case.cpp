@@ -100,16 +100,11 @@ Case::Case(std::string file_name, int argn, char **args) {
     }
     file.close();
 
-    //int my_rank;
-    //MPI_Comm_rank(MPI_COMM_WORLD, &_my_rank);
-
-    int nprocs;
-    MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
-    if (nprocs == 1){
+    if (Communication::_nprocs == 1){
         iproc = 1;
         jproc = 1;
     }
-    else if(nprocs != iproc*jproc && Communication::_my_rank == 0){
+    else if(Communication::_nprocs != iproc*jproc && Communication::_my_rank == 0){
         std::cerr << "No. of processes not compatible with input file: Nprocs must be Iprocs*Jprocs \n"<<"Iprocs: "<<iproc<<", Jprocs: "<<jproc<<"\n";
         exit(1);
     }
@@ -123,13 +118,10 @@ Case::Case(std::string file_name, int argn, char **args) {
     set_file_names(file_name);
 
     // Build up the domain
-    //Domain domain;
     Communication::_domain.dx = xlength / (double)imax;
     Communication::_domain.dy = ylength / (double)jmax;
     Communication::_domain.domain_size_x = imax;
     Communication::_domain.domain_size_y = jmax;
-    //Communication::_my_rank = _my_rank;
-    
     
     build_domain(Communication::_domain, imax, jmax, iproc, jproc);
     _grid = Grid(_geom_name, Communication::_domain);

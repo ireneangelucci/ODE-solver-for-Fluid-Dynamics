@@ -5,24 +5,21 @@
 
 int Communication::_my_rank = -1;
 Domain Communication::_domain;
+int Communication::_nprocs = -1;
 std::array<int, 4> Communication::neighbours{MPI_PROC_NULL, MPI_PROC_NULL, MPI_PROC_NULL, MPI_PROC_NULL}; //L, B, R, T;
 
 Communication::Communication(){
-    std::cout << "constructor \n";
-    MPI_Comm_rank(MPI_COMM_WORLD, &Communication::_my_rank);
+    MPI_Comm_rank(MPI_COMM_WORLD, &_my_rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &_nprocs);
 }
 
 Communication::~Communication(){
-    std::cout<<"Destructor comm\n";
-    Communication::finalize();
+    MPI_Finalize();
 }
 
 void Communication::init_parallel(int argn, char** args) {
     MPI_Init(&argn, &args);
-}
-
-void Communication::finalize() {
-    MPI_Finalize();
+    
 }
 
 void Communication::communicate(Matrix<double>& matrix){
