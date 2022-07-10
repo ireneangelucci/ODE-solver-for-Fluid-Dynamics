@@ -41,13 +41,10 @@ Case::Case(std::string file_name, int argn, char **args) {
     double tau;     /* safety factor for time step*/
     int itermax;    /* max. number of iterations for pressure per time step */
     double eps;     /* accuracy bound for pressure*/
-
-    double dt_value;           /* time for output */
     std::string program;
     std::string energy_eq{"NONE"};
     std::string nonnewton_vis{"NONE"};
     double TI;                 /* initial temperature  */
-    double Pr;                 /* prandtl number   */
     double beta;               /* the coefficient of thermal expansion */
     double alpha;
     double deltaP;
@@ -136,6 +133,7 @@ Case::Case(std::string file_name, int argn, char **args) {
 
     build_domain(domain, imax, jmax, iproc, jproc);
     _communication = Communication(_my_rank, domain);
+    std::cout<<"here \n"<<_my_rank;
     _grid = Grid(_geom_name, domain);
     _field = Fields(nu, dt, tau, alpha, beta, _grid.domain().size_x, _grid.domain().size_y, UI, VI, PI, TI, GX, GY, _grid, energy_eq, nonnewton_vis);
     
@@ -249,8 +247,6 @@ void Case::simulate() {
         std::cout << "Simulation started \n";
     }
     double t = 0.0;
-    //_field.calculate_dt(_grid);
-    double dt = _field.dt();
     int timestep = 0;
     int output_counter = 0;
     std::string convergence;
@@ -283,8 +279,7 @@ void Case::simulate() {
         while(it < _max_iter && max_res > _tolerance){
             res = _pressure_solver->solve(_field, _grid, _boundaries);
             Communication::communicate(_field.p_matrix());
-            max_res = res;
-            MPI_Allreduce(&res, &max_res, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+            max_res = Communication::reduce_max(res);
             it++;
         }
 
@@ -470,8 +465,8 @@ void Case::build_domain(Domain &domain, int imax_domain, int jmax_domain, int ip
         domain.jmax = jmax_domain/jproc + 2;
         domain.size_x = imax_domain/iproc;
         domain.size_y = jmax_domain/jproc;
-        if(iproc > 1){ domain.neighbours[2]=1; }
-        if(jproc > 1){ domain.neighbours[3]=iproc; }
+        if(iproc > 1){ domain.neighbours[neighbour::RIGHT]=1; }
+        if(jproc > 1){ domain.neighbours[neighbour::TOP]=iproc; }
 
         int imin, jmin, imax, jmax, curr_rank, size_x, size_y;
         for(int j = 0; j < jproc; j++){
@@ -491,10 +486,10 @@ void Case::build_domain(Domain &domain, int imax_domain, int jmax_domain, int ip
                 size_x = imax - imin -2;
                 size_y = jmax - jmin -2;
                 curr_rank = i+j*iproc;
-                if(i<iproc-1){neighbours[2] = (i+1)+j*iproc; }
-                if(i>0){neighbours[0] = (i-1)+j*iproc; }
-                if(j<jproc-1){neighbours[3] = i+(j+1)*iproc; }
-                if(j>0){neighbours[1] = i+(j-1)*iproc; }
+                if(i<iproc-1){neighbours[neighbour::RIGHT] = (i+1)+j*iproc; }
+                if(i>0){neighbours[neighbour::LEFT] = (i-1)+j*iproc; }
+                if(j<jproc-1){neighbours[neighbour::TOP] = i+(j+1)*iproc; }
+                if(j>0){neighbours[neighbour::BOTTOM] = i+(j-1)*iproc; }
                 MPI_Send(&neighbours, 4, MPI_INT, curr_rank, 123, MPI_COMM_WORLD);
                 MPI_Send(&imin, 1, MPI_INT, curr_rank, 1, MPI_COMM_WORLD);
                 MPI_Send(&jmin, 1, MPI_INT, curr_rank, 2, MPI_COMM_WORLD);

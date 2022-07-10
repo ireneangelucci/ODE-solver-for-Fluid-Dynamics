@@ -50,4 +50,5 @@ int main(int argn, char **args) {
     }
 #endif
     Communication::finalize();
+    return 0;
 }
