@@ -98,7 +98,7 @@ void Fields::calculate_viscosity(Grid &grid){
             vx = (v(i+1,j)-v(i,j))/grid.dx(); 
             gamma = 0.5 * (std::abs(uy) + std::abs(vx));
             if (pow(gamma, -0.0225) > 0.0034 ) {
-                setnu(i,j,_nu*pow(gamma, -0.0225) );
+                setnu(i,j,_nu*pow(gamma, -0.225) );
             }
             else {setnu(i,j,_nu*0.0034);}          
         //}
