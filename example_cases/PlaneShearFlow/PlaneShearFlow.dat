@@ -85,3 +85,5 @@ num_of_walls 1
 
 
 nonnewton_vis on
+
+pressure_driven  on
