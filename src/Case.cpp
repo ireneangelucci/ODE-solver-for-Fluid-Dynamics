@@ -46,6 +46,7 @@ Case::Case(std::string file_name, int argn, char **args) {
     std::string program;
     std::string energy_eq{"NONE"};
     std::string nonnewton_vis{"NONE"};
+    std::string pressure_driven{"NONE"};
     double TI;                 /* initial temperature  */
     double Pr;                 /* prandtl number   */
     double beta;               /* the coefficient of thermal expansion */
@@ -92,6 +93,7 @@ Case::Case(std::string file_name, int argn, char **args) {
                 if (var == "TI") file >> TI;
                 if (var == "energy_eq") file >> energy_eq;
                 if (var == "nonnewton_vis") file >> nonnewton_vis;
+                if (var == "pressure_driven") file >> pressure_driven;
                 if (var == "alpha") file >> alpha;
                 if (var == "beta") file >> beta;
                 if (var == "deltaP") file >> deltaP;
@@ -164,7 +166,12 @@ Case::Case(std::string file_name, int argn, char **args) {
         _boundaries.push_back(std::make_unique<FixedWallBoundary>(_grid.cold_wall_cells(), coldwall_temp));
     }
     if (not _grid.inflow_cells().empty()) {
-        _boundaries.push_back(std::make_unique<InflowBoundary>(_grid.inflow_cells(),UIN, VIN));
+        if (pressure_driven == "off"){
+            _boundaries.push_back(std::make_unique<InflowBoundary>(_grid.inflow_cells(),UIN, VIN));
+        }
+        if (pressure_driven == "on"){
+            _boundaries.push_back(std::make_unique<OutflowBoundary>(_grid.inflow_cells(),1.0));
+        }
     }
     double Pout = 0.0;
     if (not _grid.outflow_cells().empty()) {

@@ -230,45 +230,45 @@ InflowBoundary::InflowBoundary(std::vector<Cell *> cells, double inlet_velocity_
 
 void InflowBoundary::apply(Fields &field) {
     for(const auto& currentCell: _cells){
-        if(currentCell->is_border(border_position::LEFT)){   //Fluid on left cells
-            // U(i-1,j) = U(i-2,j) 
-            field.setu(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j(),field.u(currentCell->neighbour(border_position::LEFT)->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->neighbour(border_position::LEFT)->j()));
-            // V(i,j) = V(i-1,j)
-            field.setv(currentCell->i(),currentCell->j(),field.v(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j()));
-            // P(i,j) = 2*P_out - P(i-1,j) 
-            field.setp(currentCell->i(),currentCell->j(),2 * 1.0 - field.p(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j()));
-            // F(i-1,j) = U(i-1,j)
-            field.setf(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j(),field.u(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j()));
-        }
         if(currentCell->is_border(border_position::RIGHT)){   //Fluid on right cells
-            // U(i,j) = U(i+1,j) 
-            field.setu(currentCell->i(),currentCell->j(),field.u(currentCell->neighbour(border_position::RIGHT)->i(),currentCell->neighbour(border_position::RIGHT)->j()));
-            // V(i,j) = V(i+1,j)
-            field.setv(currentCell->i(),currentCell->j(),field.v(currentCell->neighbour(border_position::RIGHT)->i(),currentCell->neighbour(border_position::RIGHT)->j()));
-            // P(i,j) = 2*P_out - P(i+1,j)
-            field.setp(currentCell->i(),currentCell->j(),2 * 1.0 - field.p(currentCell->neighbour(border_position::RIGHT)->i(),currentCell->neighbour(border_position::RIGHT)->j()));
+            // U(i,j) = U_in
+            field.setu(currentCell->i(),currentCell->j(), _inlet_velocity_x);
+            // V(i,j) = 2*V_in - V(i+1,j)
+            field.setv(currentCell->i(),currentCell->j(), 2*_inlet_velocity_y -(field.v(currentCell->neighbour(border_position::RIGHT)->i(),currentCell->neighbour(border_position::RIGHT)->j())));
+            // P(i,j) = P(i+1,j)
+            field.setp(currentCell->i(),currentCell->j(),field.p(currentCell->neighbour(border_position::RIGHT)->i(),currentCell->neighbour(border_position::RIGHT)->j()));
             // F(i,j) = U(i,j)
             field.setf(currentCell->i(),currentCell->j(),field.u(currentCell->i(),currentCell->j()));
         }
-        if(currentCell->is_border(border_position::BOTTOM)){   //Fluid on bottom cells
-            // V(i,j-1) = V(i,j-2)
-            field.setv(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j(),field.v(currentCell->neighbour(border_position::BOTTOM)->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->neighbour(border_position::BOTTOM)->j()));
-            // U(i,j) = U(i,j-1)
-            field.setu(currentCell->i(),currentCell->j(),field.u(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j()));
-            // P(i,j) = 2*P_out - P(i,j-1)
-            field.setp(currentCell->i(),currentCell->j(),2 * 1.0 - field.p(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j()));
-            // G(i,j-1) = V(i,j-1)
-            field.setg(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j(),field.v(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j()));
+        if(currentCell->is_border(border_position::LEFT)){   //Fluid on left cells
+            // U(i-1,j) = U_in
+            field.setu(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j(),_inlet_velocity_x);
+            // V(i,j) = 2*V_in - V(i-1,j)
+            field.setv(currentCell->i(),currentCell->j(),2*_inlet_velocity_y -(field.v(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j())));
+            // P(i,j) = P(i-1,j) 
+            field.setp(currentCell->i(),currentCell->j(),field.p(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j()));
+            // F(i-1,j) = U(i-1,j)
+            field.setf(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j(),field.u(currentCell->neighbour(border_position::LEFT)->i(),currentCell->neighbour(border_position::LEFT)->j()));
         }
         if(currentCell->is_border(border_position::TOP)){   //Fluid on top cells
-            // V(i,j) = V(i,j+1)
-            field.setv(currentCell->i(),currentCell->j(),field.v(currentCell->neighbour(border_position::TOP)->i(),currentCell->neighbour(border_position::TOP)->j()));
-            // U(i,j) = U(i,j+1)
-            field.setu(currentCell->i(),currentCell->j(),field.u(currentCell->neighbour(border_position::TOP)->i(),currentCell->neighbour(border_position::TOP)->j()));
-            // P(i,j) = 2*P_out - P(i,j+1)
-            field.setp(currentCell->i(),currentCell->j(),2 * 1.0 - field.p(currentCell->neighbour(border_position::TOP)->i(),currentCell->neighbour(border_position::TOP)->j()));
+            // U(i,j) = 2*U_in - U(i,j+1)
+            field.setu(currentCell->i(),currentCell->j(),2*_inlet_velocity_x - field.u(currentCell->neighbour(border_position::TOP)->i(),currentCell->neighbour(border_position::TOP)->j()));
+            // V(i,j) = V_in
+            field.setv(currentCell->i(),currentCell->j(),_inlet_velocity_y);
+            // P(i,j) = P(i,j+1)
+            field.setp(currentCell->i(),currentCell->j(),field.p(currentCell->neighbour(border_position::TOP)->i(),currentCell->neighbour(border_position::TOP)->j()));
             // G(i,j) = V(i,j)
             field.setg(currentCell->i(),currentCell->j(),field.v(currentCell->i(),currentCell->j()));
+        }
+        if(currentCell->is_border(border_position::BOTTOM)){   //Fluid on bottom cells
+            // U(i,j) = 2*U_in - U(i,j-1)
+            field.setu(currentCell->i(),currentCell->j(),2*_inlet_velocity_x -(field.u(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j())));
+             // V(i,j-1) = V_in
+            field.setv(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j(),_inlet_velocity_y);
+            // P(i,j) = P(i,j-1)
+            field.setp(currentCell->i(),currentCell->j(),field.p(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j()));
+            // G(i,j-1) = V(i,j-1)
+            field.setg(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j(),field.v(currentCell->neighbour(border_position::BOTTOM)->i(),currentCell->neighbour(border_position::BOTTOM)->j()));
         }
     }
 }
