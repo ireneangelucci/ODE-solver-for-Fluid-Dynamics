@@ -8,7 +8,7 @@
 
 Fields::Fields(double nu, double dt, double tau, double alpha, double beta, int imax, int jmax, double UI, double VI, double PI, double TI, double GX, double GY, Grid &grid, std::string energy_eq, std::string nonnewton_vis)
     : _nu(nu), _dt(dt), _tau(tau), _alpha(alpha), _beta(beta), _energy_eq(energy_eq), _nonnewton_vis(nonnewton_vis) {
-    // intializing u, v and p
+    // intializing u, v, T and p
     _U = Matrix<double>(imax + 2, jmax + 2, 0.0);
     _V = Matrix<double>(imax + 2, jmax + 2, 0.0);
     _P = Matrix<double>(imax + 2, jmax + 2, 0.0);
@@ -51,7 +51,6 @@ Fields::Fields(double nu, double dt, double tau, double alpha, double beta, int 
 
 void Fields::calculate_fluxes(Grid &grid) {
     for(auto &currentCell: grid.fluid_cells()){
-        //std::cout << "entered for loop \n";
         int i = currentCell->i();
         int j = currentCell->j();
         if(i != grid.imax() || (i == grid.imax() && currentCell->neighbour(border_position::RIGHT)->type() == cell_type::BOUNDARY_FLUID) ){   //excluding imax as f_imax is part of the fixed boundary and set as 0.0
@@ -91,18 +90,13 @@ void Fields::calculate_viscosity(Grid &grid){
     for(auto &currentCell: grid.fluid_cells()){
         int i = currentCell->i();
         int j = currentCell->j();
-        //bool x = (i != grid.imax()) || (i == grid.imax() && currentCell->neighbour(border_position::RIGHT)->type() == cell_type::BOUNDARY_FLUID);
-        //bool y = (j != grid.jmax()) || (j == grid.jmax() && currentCell->neighbour(border_position::TOP)->type() == cell_type::BOUNDARY_FLUID);
-        //if (x || y){
             uy = (u(i,j+1)-u(i,j))/grid.dy();
             vx = (v(i+1,j)-v(i,j))/grid.dx(); 
             gamma = 0.5 * (std::abs(uy) + std::abs(vx));
             if (pow(gamma, -0.0225) > 0.0034 ) {
                 setnu(i,j,_nu*pow(gamma, -0.225) );
             }
-            else {setnu(i,j,_nu*0.0034);}          
-        //}
-            
+            else {setnu(i,j,_nu*0.0034);}                      
     }
 }
 

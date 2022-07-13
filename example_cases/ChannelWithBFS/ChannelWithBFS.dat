@@ -18,7 +18,7 @@ jmax         20
 #--------------------------------------------
 #            number of processors
 #--------------------------------------------
-iproc        1
+iproc        4
 jproc        1
 #--------------------------------------------
 #               time steps
@@ -81,3 +81,7 @@ VIN          0.0
 # num_of_walls:     number of walls
 #--------------------------------------------
 num_of_walls 1
+
+nonnewton_vis off
+
+pressure_driven  off

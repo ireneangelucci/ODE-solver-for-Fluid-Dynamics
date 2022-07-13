@@ -155,11 +155,10 @@ Case::Case(std::string file_name, int argn, char **args) {
         _boundaries.push_back(std::make_unique<FixedWallBoundary>(_grid.cold_wall_cells(), coldwall_temp));
     }
     if (not _grid.inflow_cells().empty()) {
-        if (pressure_driven == "off"){
-            _boundaries.push_back(std::make_unique<InflowBoundary>(_grid.inflow_cells(),UIN, VIN));
-        }
         if (pressure_driven == "on"){
             _boundaries.push_back(std::make_unique<OutflowBoundary>(_grid.inflow_cells(),1.0));
+        }else{
+            _boundaries.push_back(std::make_unique<InflowBoundary>(_grid.inflow_cells(),UIN, VIN));
         }
     }
     double Pout = 0.0;
