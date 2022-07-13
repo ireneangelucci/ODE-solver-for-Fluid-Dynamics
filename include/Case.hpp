@@ -57,7 +57,6 @@ class Case {
     //int _nprocs;
     Fields _field;
     Grid _grid;
-    Communication _communication;
     Discretization _discretization;
     std::unique_ptr<PressureSolver> _pressure_solver;
     std::vector<std::unique_ptr<Boundary>> _boundaries;
