@@ -86,15 +86,16 @@ void Fields::calculate_velocities(Grid &grid) {
 }
 
 void Fields::calculate_viscosity(Grid &grid){
-    double uy, vx, gamma;
+    double uy, vx, gamma, power;
     for(auto &currentCell: grid.fluid_cells()){
         int i = currentCell->i();
         int j = currentCell->j();
             uy = (u(i,j+1)-u(i,j))/grid.dy();
             vx = (v(i+1,j)-v(i,j))/grid.dx(); 
             gamma = 0.5 * (std::abs(uy) + std::abs(vx));
-            if (pow(gamma, -0.0225) > 0.0034 ) {
-                setnu(i,j,_nu*pow(gamma, -0.225) );
+            power = pow(gamma, -0.0255);
+            if (power> 0.0034 ) {
+                setnu(i,j,_nu*power );
             }
             else {setnu(i,j,_nu*0.0034);}                      
     }
