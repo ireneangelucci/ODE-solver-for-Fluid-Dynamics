@@ -52,7 +52,7 @@ gamma        0.5
 #--------------------------------------------
 #     kinematic viscosity
 #--------------------------------------------
-nu           2.0
+nu           0.2
 
 #--------------------------------------------
 #        gravity / external forces
@@ -83,6 +83,6 @@ VIN          0.0
 #--------------------------------------------
 num_of_walls 1
 
-nonnewton_vis on
+nonnewton_vis off
 
-pressure_driven  on
+pressure_driven  off
