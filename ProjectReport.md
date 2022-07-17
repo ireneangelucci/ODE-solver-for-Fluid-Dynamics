@@ -4,23 +4,44 @@
 *Manish Mishra, Irene Angelucci, Basak Kapusuzoglu*
 
 ### Theory
-Non-newtonian fluids are - types - plot of different types
+There are four types of Non Newtonian fluids. Those types are Rheopectic, Thixotropic, Dilatant and Pseudoplastic.
+Viscosity vs Stress graphs of these different types are:
 
-expected velocity for shear thinning and shear thickening fluids
+<p> 
+<img src="images/nnf2.jpg" width="700">
+</p>
 
-Egs. of shear thinning fluids
+<p> 
+<img src="images/nnf3.jpg" width="700">
+</p>
 
-Blood and importance, Wall Shear Stress
+Shear thinning is a phenomenon characteristic of some non-Newtonian fluids in which the fluid viscosity decreases with increasing shear stress. Shear thickening is the opposite phenomenon. Shear thinning proves useful in many applications, from lubricating fast-moving engine parts to making an otherwise stiff biocompatible hydrogel injectable.
+<p> 
+<img src="images/MadwikiST.jpg" width="700">
+</p>
+
+Common examples include ketchup, paints and blood. 
+
 
 ### Objective
 1. Simulate blood and observe the effect of non newtonian model
 2. To understand scenarios where non newtonian models are significant
-3. 
+ 
 
 ### Modified Algorithm
-Scheme - where is the viscosity, averaging for flux computation
-Just add the algorithm `plot here` 
-highlight key changes wrt fluidchen
+The things we have done after Fluidchen are:
+
+1. Defining and Initializing viscosity field
+2. Flux Computation with viscosity at the given point
+3. Computing shear rate (ɣ) and updating viscosity at each point (fluid cells), after calculating new velocities
+4. Calculating time step size for next iteration with maximum viscosity
+
+and the modified algorithm is:
+
+<p> 
+<img src="algo.png" width="700">
+</p>
+
 
 ### Pipe Flow with Inflow Boundary
 We selected flow in a pipe as the base case for our study because of its simplicity and resemblance to the actual problem of blood flow in arteries. We began with simulating newtonian flow to establish ground results to compare non-newtonian simulations with later on. However, we observed that the velocity profile along the y-direction remains unchanged (same parabolic profile) for different viscosity values at the steady state. As we looked closely, we realized that this can be attributed to the physics of the problem at the steady state and uniform velocity inflow boundary condition. Derivation is shown below for reference. However, in this case, we get a straight forward relationship between WSS and viscosity. As the velocity profile remains unchanged, WSS is directly proportional to the viscosity (or inversely proportional to the Re).
