@@ -4,40 +4,48 @@
 *Manish Mishra, Irene Angelucci, Basak Kapusuzoglu*
 
 ### Theory
-There are four types of Non Newtonian fluids. Those types are Rheopectic, Thixotropic, Dilatant and Pseudoplastic.
-Viscosity vs Stress graphs of these different types are:
+Newton's law of viscosity, which assumes a constant viscosity under stress, is one of the most commonly applied assumption in flow simulations. However, this assumption doesn't hold for a variety of fluids. These are referred to as Non-Newtonian fluids and are typically classified into 4 types. Rheopectic and Thixotropic fluids change viscosity with stress applied over time. Rheopectic fluids show an increase in viscosity while Thixotropic fluids show a decrease in viscosity over time under an applied stress. Dilatant (Shear Thickening) and Pseudoplastic (Shear Thinning) fluids show a change in viscosity with shear rate. As the name suggests, Shear thickening fluids show an increase in viscosity with increased shear rate while Shear thinning fluids show a decrease in viscosity at high shear rates.
 
 <p> 
-<img src="docs/ProjectPlots/nnf2.jpg" width="400">
-<img src="docs/ProjectPlots/nnf3.jpg" width="400">
+<img src="docs/ProjectPlots/nnf2.jpg" width="370">
 </p>
+<em> Viscosity variation with stress over time for Rheopectic and Thixotropic fluids </em>
 
-Shear thinning is a phenomenon characteristic of some non-Newtonian fluids in which the fluid viscosity decreases with increasing shear stress. Shear thickening is the opposite phenomenon. Shear thinning proves useful in many applications, from lubricating fast-moving engine parts to making an otherwise stiff biocompatible hydrogel injectable.
 <p> 
 <img src="docs/ProjectPlots/MadwikiST.jpg" width="400">
 </p>
+<em> Viscosity variation with shear rate for Shear thickening and Shear thinning fluids </em>
 
-Common examples include ketchup, paints and blood. 
+Shear thinning is a phenomenon characteristic of some non-Newtonian fluids in which the fluid viscosity decreases with increasing shear stress. Shear thickening is the opposite phenomenon. Shear thinning proves useful in many applications, from lubricating fast-moving engine parts to making an otherwise stiff biocompatible hydrogel injectable. Common examples include ketchup, paints and blood. 
+
+<p> 
+<img src="docs/ProjectPlots/TypicalVelProfile_NonNewtonianFluids.png" width="300">
+</p>
+<em> Velocity profile comparision for Shear thickening and Shear thinning fluids with a newtonian fluid </em>
+
+In the present study, we focus on extending Fluidchen to simulate shear thinning fluid (with application focus on blood flow) using Wallburn-Schneck Model by explicitly updating viscosity at each point in each timestep. One of the key parameters studied in the blood flow simulation is the Wall Shear Stress (WSS) which will the focus of present study along with typical parameters like pressure drop, flow rate (velocity), etc.
 
 
-### Objective
-1. Simulate blood and observe the effect of non newtonian model
-2. To understand scenarios where non newtonian models are significant
- 
+### Objectives
+1. Simulate blood as a Shear thinning fluid and observe the effect of non Newtonian viscosity model on pressure drop, velocity profile, WSS, etc.
+2. To understand scenarios where non Newtonian models are crucial for simulating the actual flow.
 
 ### Modified Algorithm
-The things we have done after Fluidchen are:
+To implement a non-Newtonian model, following changes are made to Fluidchen:
 
-1. Defining and Initializing viscosity field
-2. Flux Computation with viscosity at the given point
-3. Computing shear rate (ɣ) and updating viscosity at each point (fluid cells), after calculating new velocities
-4. Calculating time step size for next iteration with maximum viscosity
-
-and the modified algorithm is:
+1. Defining and initializing a Viscosity field. Viscosity is defined on top-right corner of cell on the staggered grid.
+2. Flux Computation with local viscosity at edge center obtained by averaging the viscosity at corner points.
+3. Computing shear rate (ɣ) and updating viscosity at each point (for all fluid cells) using the updated velocities.
+4. Calculating time step size for next iteration with maximum viscosity in the domain.
+<p> 
+<img src="docs/ProjectPlots/ViscosityonGrid.png" width="300">
+</p>
+<em> Viscosity on the Staggered Grid</em>
 
 <p> 
 <img src="docs/ProjectPlots/algo.png" width="700">
 </p>
+<em> Modified algorithm for a parallel Non-Newtonian simulation using MPI </em>
 
 ### Pipe Flow with Inflow Boundary
 We selected flow in a pipe as the base case for our study because of its simplicity and resemblance to the actual problem of blood flow in arteries. We began with simulating newtonian flow to establish ground results to compare non-newtonian simulations with later on. However, we observed that the velocity profile along the y-direction remains unchanged (same parabolic profile) for different viscosity values at the steady state. As we looked closely, we realized that this can be attributed to the physics of the problem at the steady state and uniform velocity inflow boundary condition. Derivation is shown below for reference. However, in this case, we get a straight forward relationship between WSS and viscosity. As the velocity profile remains unchanged, WSS is directly proportional to the viscosity (or inversely proportional to the Re).
@@ -47,7 +55,7 @@ We selected flow in a pipe as the base case for our study because of its simplic
 </p>
 <em>Derivation showing cross-section velocity profile in a pipe flow with inflow bounday condition is independent of the viscosity </em>
 
-Re for blood flow in arteries is ~1000. We carried out both Newtonian & Non-Newtonian simulations at Re 3000 & Re 300 and compared the WSS for both cases. Velocity profile along cross section was same for the reasons explained above, however the viscosity for non Newtonian case was slightly different. In both the cases, we obtained a lower WSS for non-Newtonian case. For Re 3000, the difference was about ~0.4% while for Re 300, the difference was as high as ~4%. However, if we consider minimum viscosity for calculating the Reynolds number, we will see that there is no effect of Re on the WSS.
+Re for blood flow in arteries is ~1000. We carried out both Newtonian & Non-Newtonian simulations at Re 3000 & Re 300 and compared the WSS for both cases. Velocity profile along cross section was similar for the reasons explained above (except slightly flattened near the center), however the viscosity for non Newtonian case was slightly different. In both the cases, we obtained a lower WSS for non-Newtonian case. For Re 3000, the difference was about ~0.4% while for Re 300, the difference was as high as ~4%. However, if we consider minimum viscosity for calculating the Reynolds number, we will see that there is no effect of Re on the WSS.
 
 <p> 
 <img src="docs/ProjectPlots/ViscosityField_nupt2_inflowBC.png" width="500">
@@ -59,7 +67,12 @@ Re for blood flow in arteries is ~1000. We carried out both Newtonian & Non-Newt
 <img src="docs/ProjectPlots/PressureDropComparison_inflowBC_nupt2.png" width="500">
 <img src="docs/ProjectPlots/VelocityProfileComparison_inflowBC_nupt2.png" width="500">
 </p>
-<em> Viscosity field (left) and Velocity field (right) for Non-Newtonian simulation of a pipe flow with limiting viscosity 0.2  </em>
+<em> Plots comapring pressure variation along length (left) and velocity profile along cross section (right) for Newtonian and Non-Newtonian simulation of a pipe flow with limiting viscosity 0.2  </em>
+
+<p> 
+<img src="docs/ProjectPlots/ViscosityVariation_nupt2.png" width="500">
+</p>
+<em> Viscosity variation along cross-section for Non-Newtonian simulation of a pipe flow with limiting viscosity 0.2  </em>
 
 We observe that velocity profile is flatterr for the Non-Newtonian case near the centre due to high viscosity. We see a ~8% higher pressure drop for the Non-Newtonian simulation which can also be attributed to the higher viscosity in the domain. The main problem with these simulation remains that we don't see any significant change in the velocity profile for the Non-Newtonian flow for the same reasons as described for effect of viscosity on velocity field for Newtonian flow.
 
@@ -105,8 +118,8 @@ For higher viscosity, pressure driven flow simulation becomes unstable for the s
 ### Channel with Obstacle
 
 ### Discussion
-1. WSS shear stress varies inversely with Reynolds number.
-2. The extent of the effect of Non-Newtonian model depends on the specific problem, geometry, Re, and boundary conditions.
+1. The extent of the effect of Non-Newtonian model depends on the specific problem, geometry, Re, and boundary conditions. 
+2. Wall shear stress (WSS), a critical parameter for blood flow simulations, varies inversely with Reynolds number.
 3. Inflow boundary condition leads to same steady state velocity profile in pipe flow for the Newtonian case. A slight difference, flattened profile near the center, is observed for the non Newtonian case.
 4. Pressure driven flow yields different velocity profile for same applied pressure drop across it. Significant difference in WSS is observed for same Re flow with Newtonian and Non-Newtonian model highlighting the need of Non-Newtonian model for blood flow simulation.
 5. Non Newtonian effects are dominant in unsteady cases at low Re (high viscosity), or cases with large shear rates, like flow in curved pipe, etc.
