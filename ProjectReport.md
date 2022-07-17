@@ -8,16 +8,13 @@ There are four types of Non Newtonian fluids. Those types are Rheopectic, Thixot
 Viscosity vs Stress graphs of these different types are:
 
 <p> 
-<img src="images/nnf2.jpg" width="700">
-</p>
-
-<p> 
-<img src="images/nnf3.jpg" width="700">
+<img src="docs/ProjectPlots/nnf2.jpg" width="400">
+<img src="docs/ProjectPlots/nnf3.jpg" width="400">
 </p>
 
 Shear thinning is a phenomenon characteristic of some non-Newtonian fluids in which the fluid viscosity decreases with increasing shear stress. Shear thickening is the opposite phenomenon. Shear thinning proves useful in many applications, from lubricating fast-moving engine parts to making an otherwise stiff biocompatible hydrogel injectable.
 <p> 
-<img src="images/MadwikiST.jpg" width="700">
+<img src="docs/ProjectPlots/MadwikiST.jpg" width="400">
 </p>
 
 Common examples include ketchup, paints and blood. 
@@ -39,7 +36,7 @@ The things we have done after Fluidchen are:
 and the modified algorithm is:
 
 <p> 
-<img src="images/algo.png" width="700">
+<img src="docs/ProjectPlots/algo.png" width="700">
 </p>
 
 ### Pipe Flow with Inflow Boundary
