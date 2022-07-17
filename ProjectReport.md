@@ -39,7 +39,7 @@ The things we have done after Fluidchen are:
 and the modified algorithm is:
 
 <p> 
-<img src="algo.png" width="700">
+<img src="algorithm.jpg" width="700">
 </p>
 
 
