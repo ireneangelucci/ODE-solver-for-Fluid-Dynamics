@@ -55,6 +55,8 @@ We selected flow in a pipe as the base case for our study because of its simplic
 </p>
 <em>Derivation showing cross-section velocity profile in a pipe flow with inflow bounday condition is independent of the viscosity </em>
 
+**Note that we modified the blood model to make it "more non-Newtonian", changing the power law coefficient from -0.0225 to -0.2 for the simulations below. For the actual case, we didn't observe any difference compared to Newtonian case upto 4 decimal digits.**
+
 Re for blood flow in arteries is ~1000. We carried out both Newtonian & Non-Newtonian simulations at Re 3000 & Re 300 and compared the WSS for both cases. Velocity profile along cross section was similar for the reasons explained above (except slightly flattened near the center), however the viscosity for non Newtonian case was slightly different. In both the cases, we obtained a lower WSS for non-Newtonian case. For Re 3000, the difference was about ~0.4% while for Re 300, the difference was as high as ~4%. However, if we consider minimum viscosity for calculating the Reynolds number, we will see that there is no effect of Re on the WSS.
 
 <p> 
@@ -115,8 +117,7 @@ For higher viscosity, pressure driven flow simulation becomes unstable for the s
 
 ### Channel with step
 
-We conducted similar simulations for a Channel with step and a channel with Obstacle in order to consolidate our results and to seewheter some differences could be found.
-We started by simulating a non Newtonian fluid in a channel with step and inflow BC. The limiting viscosity was taken equal to 0.2, for sake of comparison to the pipe flow case.
+We conducted similar simulations for a Channel with step and a channel with Obstacle in order to consolidate our results and to see whether some additional differences could be found. We started by simulating a non Newtonian fluid in a channel with step and inflow BC. The limiting viscosity was taken equal to 0.2, for sake of comparison to the pipe flow case.
 
 <p> 
 <img src="docs/ProjectPlots/nonNew_vis_step_inflow.png" width="500">
@@ -136,7 +137,7 @@ We started by simulating a non Newtonian fluid in a channel with step and inflow
 </p>
 <em> Viscosity variation along length(left) and along cross-section(right)for Non-Newtonian simulation of a channel with step with inflow BC and limiting viscosity 0.2  </em>
 
-As we have already seen for the pipe flow case, the change in velocity profile along the y-axes is extremely small and in this case it is even nearly noticeable. We have therefore conducted a new simulation, using a pressure driven flow, with a constant pressure drop of 1 unit over the entire length.
+As we have already seen for the pipe flow case, the change in velocity profile along the y-axis is extremely small and in this case it is even nearly noticeable. We have therefore conducted another simulation of a pressure driven flow with a constant pressure drop of 1 unit over the entire length.
 
 <p> 
 <img src="docs/ProjectPlots/nonNew_vis_step_PressDDriv.png" width="500">
@@ -152,9 +153,9 @@ As we have already seen for the pipe flow case, the change in velocity profile a
 
 ### Channel with Obstacle
 
-Again, we conducted similar analysis for a flow in a channel with an obstacle. The results we obtained are similar to those resulting from the channel with step.
+We conducted similar analysis for a flow in a channel with an obstacle. The results we obtained are similar to those resulting from the channel with step.
 
-We conducted our first simulation with inflow BC and limiting viscosity equal to 0.2.
+We carried out our first simulation with inflow BC and limiting viscosity equal to 0.2.
 
 <p> 
 <img src="docs/ProjectPlots/nonNew_vis_obstacle_inflow.png" width="500">
@@ -191,9 +192,10 @@ Results obtained simulation a pressure-driven flow with constant pressure drop e
 <em>Velocity profiles actual (left) and scaled(right) for Newtonian and Non-Newtonian simulation for pressure-driven flow with limiting viscosity 0.2 </em>
 
 ### Discussion
-1. The extent of the effect of Non-Newtonian model depends on the specific problem, geometry, Re, and boundary conditions. 
+1. The extent of the effect of Non-Newtonian model depends on the specific problem, geometry, Re, and boundary conditions.
 2. Wall shear stress (WSS), a critical parameter for blood flow simulations, varies inversely with Reynolds number.
 3. Inflow boundary condition leads to same steady state velocity profile in pipe flow for the Newtonian case. A slight difference, flattened profile near the center, is observed for the non Newtonian case.
-4. Pressure driven flow yields different velocity profile for same applied pressure drop across it. Significant difference in WSS is observed for same Re flow with Newtonian and Non-Newtonian model highlighting the need of Non-Newtonian model for blood flow simulation.
+4. Pressure driven flow yields different velocity profile for same applied pressure drop across it. Significant difference in WSS is observed for same Re flow with Newtonian and Non-Newtonian model highlighting the need of Non-Newtonian model.
 5. Non Newtonian effects are dominant in unsteady cases at low Re (high viscosity), or cases with large shear rates, like flow in curved pipe, etc.
-6. While a Newtonian model may suffice for a first simulation of blood flow, a Non Newtonian model may be crucial for a detailed simulation and evaluation of parameters like the WSS.
+6. Newtonian model proved sufficient for simulation of blood flow in simple cases as ours. More complicated cases like curved pipes, external force may still call for a non Newtonian model.
+7. Non-Newtonian model would be required for detailed simulation of materials that exhibit greater non-linearity than blood.
