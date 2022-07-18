@@ -131,9 +131,10 @@ We started by simulating a non Newtonian fluid in a channel with step and inflow
 <em> Plots comapring pressure variation along length (left) and velocity profile along cross section (right) for Newtonian and Non-Newtonian simulation of a channel with step with inflow BC and limiting viscosity 0.2  </em>
 
 <p> 
+<img src="docs/ProjectPlots/ViscosityAlongX_InflowBC_ChannelWithBFS.png" width="500">
 <img src="docs/ProjectPlots/ViscosityAlongY_InflowBC_ChannelWithBFS.png" width="500">
 </p>
-<em> Viscosity variation along cross-section for Non-Newtonian simulation of a channel with step with inflow BC and limiting viscosity 0.2  </em>
+<em> Viscosity variation along length(left) and along cross-section(right)for Non-Newtonian simulation of a channel with step with inflow BC and limiting viscosity 0.2  </em>
 
 As we have already seen for the pipe flow case, the change in velocity profile along the y-axes is extremely small and in this case it is even nearly noticeable. We have therefore conducted a new simulation, using a pressure driven flow, with a constant pressure drop of 1 unit over the entire length.
 
@@ -147,9 +148,47 @@ As we have already seen for the pipe flow case, the change in velocity profile a
 <img src="docs/ProjectPlots/VelocityProfileComparison_PressDriv_ChannelWithBFS.png" width="570">
 <img src="docs/ProjectPlots/VelocityProfileComparison_PressDrivScaled_ChannelWithBFS.png" width="500">
 </p>
-<em>Velocity profiles actual (left) and scaled(right) for Newtonian and Non-Newtonian simulation for pressure-driven flow with viscosity 0.2 </em>
+<em>Velocity profiles actual (left) and scaled(right) for Newtonian and Non-Newtonian simulation for pressure-driven flow with limiting viscosity 0.2 </em>
 
 ### Channel with Obstacle
+
+Again, we conducted similar analysis for a flow in a channel with an obstacle. The results we obtained are similar to those resulting from the channel with step.
+
+We conducted our first simulation with inflow BC and limiting viscosity equal to 0.2.
+
+<p> 
+<img src="docs/ProjectPlots/nonNew_vis_obstacle_inflow.png" width="500">
+<img src="docs/ProjectPlots/nonNew_vel_obstacle_inflow.png" width="500">
+</p>
+<em> Viscosity field (left) and Velocity field (right) for Non-Newtonian simulation of a channel with obstacle with inflow BC and limiting viscosity 0.2  </em>
+
+<p> 
+<img src="docs/ProjectPlots/PressureDropComparison_inflowBC_ChannelWithObstacle.png" width="500">
+<img src="docs/ProjectPlots/VelocityProfileComparison_inflowBC_ChannelWithObstacle.png" width="500">
+</p>
+<em> Plots comapring pressure variation along length (left) and velocity profile along cross section (right) for Newtonian and Non-Newtonian simulation of a channel with obstacle with inflow BC and limiting viscosity 0.2  </em>
+
+<p> 
+<img src="docs/ProjectPlots/ViscosityAlongX_InflowBC_ChannelWithObstacle.png" width="500">
+<img src="docs/ProjectPlots/ViscosityAlongY_InflowBC_ChannelWithObstacle.png" width="500">
+</p>
+<em> Viscosity variation along length(left) and along cross-section(right)for Non-Newtonian simulation of a channel with step with inflow BC and limiting viscosity 0.2  </em>
+
+For the pressure drop, we can clearly see the presence of the obstacle in our domain, as expected.
+
+Results obtained simulation a pressure-driven flow with constant pressure drop equal to 1 unity show different x-velocity profiles along the y-axes.
+
+<p> 
+<img src="docs/ProjectPlots/nonNew_vis_obstacle_PressDriv.png" width="500">
+<img src="docs/ProjectPlots/nonNew_vel_obstacle_PressDriv.png" width="500">
+</p>
+<em> Viscosity field (left) and Velocity field (right) for Non-Newtonian simulation of a channel with obstacle for a pressure-driven flow with limiting viscosity 0.2  </em>
+
+<p> 
+<img src="docs/ProjectPlots/VelocityProfileComparison_PressDriv_ChannelWithObstacle.png" width="570">
+<img src="docs/ProjectPlots/VelocityProfileComparison_PressDrivScaled_ChannelWithObstacle.png" width="500">
+</p>
+<em>Velocity profiles actual (left) and scaled(right) for Newtonian and Non-Newtonian simulation for pressure-driven flow with limiting viscosity 0.2 </em>
 
 ### Discussion
 1. The extent of the effect of Non-Newtonian model depends on the specific problem, geometry, Re, and boundary conditions. 
