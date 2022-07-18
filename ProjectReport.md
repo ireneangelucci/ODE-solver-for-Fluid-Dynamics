@@ -115,6 +115,40 @@ For higher viscosity, pressure driven flow simulation becomes unstable for the s
 
 ### Channel with step
 
+We conducted similar simulations for a Channel with step and a channel with Obstacle in order to consolidate our results and to seewheter some differences could be found.
+We started by simulating a non Newtonian fluid in a channel with step and inflow BC. The limiting viscosity was taken equal to 0.2, for sake of comparison to the pipe flow case.
+
+<p> 
+<img src="docs/ProjectPlots/nonNew_vis_step_inflow.png" width="500">
+<img src="docs/ProjectPlots/nonNew_vel_step_inflow.png" width="500">
+</p>
+<em> Viscosity field (left) and Velocity field (right) for Non-Newtonian simulation of a channel with step with inflow BC and limiting viscosity 0.2  </em>
+
+<p> 
+<img src="docs/ProjectPlots/PressureDropComparison_inflowBC_ChannelWithBFS.png" width="500">
+<img src="docs/ProjectPlots/VelocityProfileComparison_inflowBC_hannelWithBFS.png" width="500">
+</p>
+<em> Plots comapring pressure variation along length (left) and velocity profile along cross section (right) for Newtonian and Non-Newtonian simulation of a channel with step with inflow BC and limiting viscosity 0.2  </em>
+
+<p> 
+<img src="docs/ProjectPlots/ViscosityAlongY_InflowBC_ChannelWithBFS.png" width="500">
+</p>
+<em> Viscosity variation along cross-section for Non-Newtonian simulation of a channel with step with inflow BC and limiting viscosity 0.2  </em>
+
+As we have already seen for the pipe flow case, the change in velocity profile along the y-axes is extremely small and in this case it is even nearly noticeable. We have therefore conducted a new simulation, using a pressure driven flow, with a constant pressure drop of 1 unit over the entire length.
+
+<p> 
+<img src="docs/ProjectPlots/nonNew_vis_step_PressDriv.png" width="500">
+<img src="docs/ProjectPlots/nonNew_vel_step_PressDriv.png" width="500">
+</p>
+<em> Viscosity field (left) and Velocity field (right) for Non-Newtonian simulation of a channel with step for a pressure-driven flow with limiting viscosity 0.2  </em>
+
+<p> 
+<img src="docs/ProjectPlots/VelocityComparison_PressDriv_ChannelWithBFS.png" width="570">
+<img src="docs/ProjectPlots/VelocityComparison_PressDrivScaled_ChannelWithBFS.png" width="500">
+</p>
+<em>Velocity profiles actual (left) and scaled(right) for Newtonian and Non-Newtonian simulation for pressure-driven flow with viscosity 0.2 </em>
+
 ### Channel with Obstacle
 
 ### Discussion
