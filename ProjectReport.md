@@ -23,7 +23,7 @@ Shear thinning is a phenomenon characteristic of some non-Newtonian fluids in wh
 </p>
 <em> Velocity profile comparision for Shear thickening and Shear thinning fluids with a newtonian fluid </em>
 
-In the present study, we focus on extending Fluidchen to simulate shear thinning fluid (with application focus on blood flow) using Wallburn-Schneck Model by explicitly updating viscosity at each point in each timestep. One of the key parameters studied in the blood flow simulation is the Wall Shear Stress (WSS) which will the focus of present study along with typical parameters like pressure drop, flow rate (velocity), etc.
+In the present study, we focus on extending Fluidchen to simulate shear thinning fluid (with application focus on blood flow) using Wallburn-Schneck Model by explicitly updating viscosity at each point in each timestep. One of the key parameters studied in the blood flow simulation is the Wall Shear Stress (WSS) which will be the focus of present study along with typical parameters like pressure drop, flow rate (velocity), etc.
 
 
 ### Objectives
@@ -55,7 +55,7 @@ We selected flow in a pipe as the base case for our study because of its simplic
 </p>
 <em>Derivation showing cross-section velocity profile in a pipe flow with inflow bounday condition is independent of the viscosity </em>
 
-**Note that we modified the blood model to make it "more non-Newtonian", changing the power law coefficient from -0.0225 to -0.2 for the simulations below. For the actual case, we didn't observe any difference compared to Newtonian case upto 4 decimal digits.**
+**Note that we modified the blood model to make it "more non-Newtonian", changing the power law coefficient from -0.0225 to -0.225 for the simulations below. For the actual case, we didn't observe any difference compared to Newtonian case upto 4 decimal digits.**
 
 Re for blood flow in arteries is ~1000. We carried out both Newtonian & Non-Newtonian simulations at Re 3000 & Re 300 and compared the WSS for both cases. Velocity profile along cross section was similar for the reasons explained above (except slightly flattened near the center), however the viscosity for non Newtonian case was slightly different. In both the cases, we obtained a lower WSS for non-Newtonian case. For Re 3000, the difference was about ~0.4% while for Re 300, the difference was as high as ~4%. However, if we consider minimum viscosity for calculating the Reynolds number, we will see that there is no effect of Re on the WSS.
 
@@ -79,7 +79,7 @@ Re for blood flow in arteries is ~1000. We carried out both Newtonian & Non-Newt
 We observe that velocity profile is flatterr for the Non-Newtonian case near the centre due to high viscosity. We see a ~8% higher pressure drop for the Non-Newtonian simulation which can also be attributed to the higher viscosity in the domain. The main problem with these simulation remains that we don't see any significant change in the velocity profile for the Non-Newtonian flow for the same reasons as described for effect of viscosity on velocity field for Newtonian flow.
 
 ### Pressure Driven Pipe Flow
-To circumvent the problem, we moved towards pressure-driven flow simulation. In this case, the pressure (and hence the pressure gradient) is constratint causing the velocity variation to be dependent on the viscosity (this can be seen in the last expression in the derivation above). This case is also much closer to the human body where the heart pumps the blood with a certain pressure (although the pressure is not constant but cyclic). 
+To circumvent the problem, we moved towards pressure-driven flow simulation. In this case, the pressure (and hence the pressure gradient) is constraint causing the velocity variation to be dependent on the viscosity (this can be seen in the last expression in the derivation above). This case is also much closer to the human body where the heart pumps the blood with a certain pressure (although the pressure is not constant but cyclic). 
 
 We carried out Newtonian and Non-Newtonian simulation with viscosity 0.2 (for non-Newtonian case, this value represents the viscosity when the power law coefficient goes to zero, i.e. limiting Newtonian viscosity). With a fixed pressure drop of 1 unit over the entire length, we obtained ~40% higher WSS in Non-Newtonian case. We observed that the velocity gradient at wall was smaller but viscosity was much higher, leading to the higher WSS. However, this difference can be simply attributed to the difference in Re. Re for non-Newtonian case is ~45% of Re for the Newtonian simulation. Note that Re is calculated with peak velocity and viscosity near the wall (which is also the minimum value in the domain).
 
@@ -117,7 +117,7 @@ For higher viscosity, pressure driven flow simulation becomes unstable for the s
 
 ### Channel with step
 
-We conducted similar simulations for a Channel with step and a channel with Obstacle in order to consolidate our results and to see whether some additional differences could be found. We started by simulating a non Newtonian fluid in a channel with step and inflow BC. The limiting viscosity was taken equal to 0.2, for sake of comparison to the pipe flow case.
+We conducted similar simulations for a channel with step and a channel with obstacle in order to consolidate our results and to see whether some additional differences could be found. We started by simulating a non Newtonian fluid in a channel with step and inflow BC. The limiting viscosity was taken equal to 0.2, for sake of comparison to the pipe flow case.
 
 <p> 
 <img src="docs/ProjectPlots/nonNew_vis_step_inflow.png" width="500">
@@ -177,7 +177,7 @@ We carried out our first simulation with inflow BC and limiting viscosity equal 
 
 For the pressure drop, we can clearly see the presence of the obstacle in our domain, as expected.
 
-Results obtained simulation a pressure-driven flow with constant pressure drop equal to 1 unity show different x-velocity profiles along the y-axes.
+Again, results obtained using inflow BC show little to no difference in velocity profile and hence we simulated a pressure-driven flow with constant pressure drop equal to 1 unity. For this case we are able to observe different x-velocity profiles along the y-axes.
 
 <p> 
 <img src="docs/ProjectPlots/nonNew_vis_obstacle_PressDriv.png" width="500">
@@ -199,3 +199,8 @@ Results obtained simulation a pressure-driven flow with constant pressure drop e
 5. Non Newtonian effects are dominant in unsteady cases at low Re (high viscosity), or cases with large shear rates, like flow in curved pipe, etc.
 6. Newtonian model proved sufficient for simulation of blood flow in simple cases as ours. More complicated cases like curved pipes, external force may still call for a non Newtonian model.
 7. Non-Newtonian model would be required for detailed simulation of materials that exhibit greater non-linearity than blood.
+
+### References
+[Non Newtonian Fluids article, Science Learning Hub](https://www.sciencelearn.org.nz/resources/1502-non-newtonian-fluids)
+[Blood rheology modeling effects in aortic flow simulations, Alexander Fuchs, Niclas Berg, Lisa Prahl Wittberg](https://drive.google.com/file/d/1bb47SYAdzJ74panJV1X40_7SnkiYBD0N/view?usp=sharing)
+[Viscosity of Newtonian and non-Newtonian Fluids article from Rheosense](https://www.rheosense.com/applications/viscosity/newtonian-non-newtonian)
