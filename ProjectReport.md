@@ -201,6 +201,6 @@ Again, results obtained using inflow BC show little to no difference in velocity
 7. Non-Newtonian model would be required for detailed simulation of materials that exhibit greater non-linearity than blood.
 
 ### References
-[Non Newtonian Fluids article, Science Learning Hub](https://www.sciencelearn.org.nz/resources/1502-non-newtonian-fluids)
-[Blood rheology modeling effects in aortic flow simulations, Alexander Fuchs, Niclas Berg, Lisa Prahl Wittberg](https://drive.google.com/file/d/1bb47SYAdzJ74panJV1X40_7SnkiYBD0N/view?usp=sharing)
-[Viscosity of Newtonian and non-Newtonian Fluids article from Rheosense](https://www.rheosense.com/applications/viscosity/newtonian-non-newtonian)
+1. [Non Newtonian Fluids article, Science Learning Hub](https://www.sciencelearn.org.nz/resources/1502-non-newtonian-fluids)
+2. [Blood rheology modeling effects in aortic flow simulations, Alexander Fuchs, Niclas Berg, Lisa Prahl Wittberg](https://drive.google.com/file/d/1bb47SYAdzJ74panJV1X40_7SnkiYBD0N/view?usp=sharing)
+3. [Viscosity of Newtonian and non-Newtonian Fluids article from Rheosense](https://www.rheosense.com/applications/viscosity/newtonian-non-newtonian)
